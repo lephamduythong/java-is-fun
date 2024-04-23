@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import com.thonglee.demo.entity.ProductCategory;
 
 @Repository
-@RepositoryRestResource(collectionResourceRel = "productCategory", path = "product-category")
+//@RepositoryRestResource(collectionResourceRel = "productCategory", path = "product-categories") // if default: "productCategories"
 public interface ProductCategoryRepository extends JpaRepository<ProductCategory, Long> {
 
 }
