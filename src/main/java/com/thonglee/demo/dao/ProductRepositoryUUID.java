@@ -1,0 +1,20 @@
+package com.thonglee.demo.dao;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.CrossOrigin;
+
+import com.thonglee.demo.entity.Product;
+import com.thonglee.demo.entity.ProductUUID;
+
+@CrossOrigin("http://localhost:4200")
+@Repository
+@RepositoryRestResource(collectionResourceRel = "product_uuid", path = "products-uuid")
+public interface ProductRepositoryUUID extends JpaRepository<ProductUUID, Long> {
+	Page<Product> findByCategoryId(@Param("id") Long id, Pageable pageable);	
+}
+ 
