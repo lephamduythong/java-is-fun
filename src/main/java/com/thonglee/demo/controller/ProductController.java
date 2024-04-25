@@ -6,9 +6,12 @@ package com.thonglee.demo.controller;
 import java.net.http.HttpHeaders;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
@@ -21,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import com.thonglee.demo.entity.Product;
 import com.thonglee.demo.entity.Product2;
 import com.thonglee.demo.service.ProductService;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletResponse;
@@ -82,6 +87,34 @@ public class ProductController {
     	return ResponseEntity
     			.ok().headers(rh)
     			.body(productList);
+    } 
+    
+    @GetMapping("/products4") 
+    public ResponseEntity<List<Product2>> fetchproductList4(HttpServletResponse httpServletResponse) throws SQLException 
+    { 
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mariadb://localhost:3306/full-stack-ecommerce");
+        config.setUsername("ecommerceapp");
+        config.setPassword("ecommerceapp");
+        try (var dataSource = new HikariDataSource(config)) {
+			var connection = dataSource.getConnection();
+			var queryRunner = new QueryRunner();
+			var resultHandler = new BeanListHandler<>(Product2.class);
+			var productList = queryRunner.query(connection, "SELECT * FROM product", resultHandler);
+			for (var product : productList) {
+				System.out.println(product.getName());
+			}
+			var rh = new org.springframework.http.HttpHeaders();
+			rh.set("ThongHeader", "products4");
+			
+			return ResponseEntity
+					.ok().headers(rh)
+					.body(productList);
+			
+		} catch (Exception e) {
+			return ResponseEntity
+					.internalServerError().body(null);
+		}
     } 
     
     @PostMapping("/products2") 
