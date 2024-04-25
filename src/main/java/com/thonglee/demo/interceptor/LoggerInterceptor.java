@@ -12,8 +12,16 @@ public class LoggerInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
+		//response.sendError(403, "HHAHAHA");
 		System.out.println("---------preHandle");
 		return true;
+	}
+	
+	@Override
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+			ModelAndView modelAndView) throws Exception {
+		//response.sendError(403, "YOLO");
+		System.out.println("---------postHandle");
 	}
 	
 	@Override
@@ -22,9 +30,5 @@ public class LoggerInterceptor implements HandlerInterceptor {
 		System.out.println("---------afterCompletion");
 	}
 	
-	@Override
-	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-			ModelAndView modelAndView) throws Exception {
-		System.out.println("---------postHandle");
-	}
+
 }
