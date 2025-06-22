@@ -1,12 +1,12 @@
 package com.ltfullstack.bookservice.command.aggregate;
 
 import com.ltfullstack.bookservice.command.command.CreateBookCommand;
-// import com.ltfullstack.bookservice.command.command.DeleteBookCommand;
-// import com.ltfullstack.bookservice.command.command.UpdateBookCommand;
+import com.ltfullstack.bookservice.command.command.DeleteBookCommand;
+import com.ltfullstack.bookservice.command.command.UpdateBookCommand;
 import com.ltfullstack.bookservice.command.data.Book;
 import com.ltfullstack.bookservice.command.event.BookCreatedEvent;
-// import com.ltfullstack.bookservice.command.event.BookDeletedEvent;
-// import com.ltfullstack.bookservice.command.event.BookUpdatedEvent;
+import com.ltfullstack.bookservice.command.event.BookDeletedEvent;
+import com.ltfullstack.bookservice.command.event.BookUpdatedEvent;
 // import com.ltfullstack.commonservice.command.RollBackStatusBookCommand;
 // import com.ltfullstack.commonservice.command.UpdateStatusBookCommand;
 import com.ltfullstack.commonservice.event.BookRollBackStatusEvent;
@@ -41,19 +41,19 @@ public class BookAggregate {
         AggregateLifecycle.apply(bookCreatedEvent);
     }
 
-    // @CommandHandler
-    // public void handle(UpdateBookCommand command){
-    //     BookUpdatedEvent bookUpdatedEvent = new BookUpdatedEvent();
-    //     BeanUtils.copyProperties(command,bookUpdatedEvent);
-    //     AggregateLifecycle.apply(bookUpdatedEvent);
-    // }
+    @CommandHandler
+    public void handle(UpdateBookCommand command){
+        BookUpdatedEvent bookUpdatedEvent = new BookUpdatedEvent();
+        BeanUtils.copyProperties(command,bookUpdatedEvent);
+        AggregateLifecycle.apply(bookUpdatedEvent);
+    }
 
-    // @CommandHandler
-    // public void handle(DeleteBookCommand command){
-    //     BookDeletedEvent bookDeletedEvent = new BookDeletedEvent();
-    //     BeanUtils.copyProperties(command,bookDeletedEvent);
-    //     AggregateLifecycle.apply(bookDeletedEvent);
-    // }
+    @CommandHandler
+    public void handle(DeleteBookCommand command){
+        BookDeletedEvent bookDeletedEvent = new BookDeletedEvent();
+        BeanUtils.copyProperties(command,bookDeletedEvent);
+        AggregateLifecycle.apply(bookDeletedEvent);
+    }
 
     // @CommandHandler
     // public void handler(UpdateStatusBookCommand command){

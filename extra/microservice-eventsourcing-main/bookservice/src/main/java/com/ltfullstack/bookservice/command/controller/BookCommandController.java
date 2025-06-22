@@ -1,8 +1,8 @@
 package com.ltfullstack.bookservice.command.controller;
 
 import com.ltfullstack.bookservice.command.command.CreateBookCommand;
-// import com.ltfullstack.bookservice.command.command.DeleteBookCommand;
-// import com.ltfullstack.bookservice.command.command.UpdateBookCommand;
+import com.ltfullstack.bookservice.command.command.DeleteBookCommand;
+import com.ltfullstack.bookservice.command.command.UpdateBookCommand;
 import com.ltfullstack.bookservice.command.model.BookRequestModel;
 import jakarta.validation.Valid;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -24,16 +24,15 @@ public class BookCommandController {
         return commandGateway.sendAndWait(command);
     }
 
-    // @PutMapping("/{bookId}")
-    // public String updateBook(@RequestBody BookRequestModel model, @PathVariable String bookId){
+    @PutMapping("/{bookId}")
+    public String updateBook(@RequestBody BookRequestModel model, @PathVariable String bookId){
+        UpdateBookCommand command = new UpdateBookCommand(bookId, model.getName(), model.getAuthor(), model.getIsReady());
+        return commandGateway.sendAndWait(command);
+    }
 
-    //     UpdateBookCommand command = new UpdateBookCommand(bookId, model.getName(), model.getAuthor(), model.getIsReady());
-    //     return commandGateway.sendAndWait(command);
-    // }
-
-    // @DeleteMapping("/{bookId}")
-    // public String deleteBook(@PathVariable String bookId){
-    //     DeleteBookCommand command = new DeleteBookCommand(bookId);
-    //     return commandGateway.sendAndWait(command);
-    // }
+    @DeleteMapping("/{bookId}")
+    public String deleteBook(@PathVariable String bookId){
+        DeleteBookCommand command = new DeleteBookCommand(bookId);
+        return commandGateway.sendAndWait(command);
+    }
 }
