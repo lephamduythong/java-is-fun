@@ -14,14 +14,14 @@ import java.util.concurrent.TimeUnit;
  * Ensures only one connection is created and shared across the application
  * Includes auto-reconnect mechanism
  */
-public class ActiveMQConfig {
+public class ActiveMQGateway {
     private static final String BROKER_URL = "tcp://localhost:61616";
     private static final String USERNAME = "admin";
     private static final String PASSWORD = "admin";
     private static final long RECONNECT_INTERVAL_SECONDS = 10;
 
     // Singleton instance
-    private static volatile ActiveMQConfig instance;
+    private static volatile ActiveMQGateway instance;
     
     private final ConnectionFactory connectionFactory;
     private Connection connection;
@@ -31,7 +31,7 @@ public class ActiveMQConfig {
     /**
      * Private constructor to prevent external instantiation
      */
-    private ActiveMQConfig() {
+    private ActiveMQGateway() {
         ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
         factory.setBrokerURL(BROKER_URL);
         factory.setUserName(USERNAME);
@@ -61,11 +61,11 @@ public class ActiveMQConfig {
     /**
      * Get singleton instance (thread-safe double-checked locking)
      */
-    public static ActiveMQConfig getInstance() {
+    public static ActiveMQGateway getInstance() {
         if (instance == null) {
-            synchronized (ActiveMQConfig.class) {
+            synchronized (ActiveMQGateway.class) {
                 if (instance == null) {
-                    instance = new ActiveMQConfig();
+                    instance = new ActiveMQGateway();
                 }
             }
         }

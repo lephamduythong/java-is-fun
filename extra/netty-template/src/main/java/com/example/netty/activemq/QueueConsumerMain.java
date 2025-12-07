@@ -21,7 +21,7 @@ public class QueueConsumerMain {
         // Add shutdown hook for graceful cleanup
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("\n\nShutdown signal received, cleaning up...");
-            ActiveMQConfig.getInstance().shutdown();
+            ActiveMQGateway.getInstance().shutdown();
         }));
         
         try {

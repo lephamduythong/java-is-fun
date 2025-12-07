@@ -45,7 +45,7 @@ public class QueueProducerMain {
             if (producer != null) {
                 producer.close();
             }
-            ActiveMQConfig.getInstance().shutdown();
+            ActiveMQGateway.getInstance().shutdown();
             System.out.println("\nProducer shutdown complete");
         }
     }
