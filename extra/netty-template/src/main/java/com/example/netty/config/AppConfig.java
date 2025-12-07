@@ -48,6 +48,18 @@ public class AppConfig {
         return Integer.parseInt(properties.getProperty("session.cleanup.interval.hours", "1"));
     }
     
+    public boolean isSslEnabled() {
+        return Boolean.parseBoolean(properties.getProperty("ssl.enabled", "false"));
+    }
+    
+    public String getSslCertPath() {
+        return properties.getProperty("ssl.cert.path");
+    }
+    
+    public String getSslKeyPath() {
+        return properties.getProperty("ssl.key.path");
+    }
+    
     public String getProperty(String key) {
         return properties.getProperty(key);
     }

@@ -1,16 +1,41 @@
 package com.example.netty;
 
+import com.example.netty.config.SslConfig;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.ssl.SslContext;
 
 public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
+    
+    private final boolean enableSsl;
+    
+    public HttpServerInitializer() {
+        this(false);
+    }
+    
+    public HttpServerInitializer(boolean enableSsl) {
+        this.enableSsl = enableSsl;
+    }
     
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
+        
+        // SSL handler (if enabled)
+        if (enableSsl) {
+            SslConfig sslConfig = SslConfig.getInstance();
+            if (sslConfig.isSslEnabled()) {
+                SslContext sslContext = sslConfig.getSslContext();
+                if (sslContext != null) {
+                    pipeline.addLast(sslContext.newHandler(ch.alloc()));
+                } else {
+                    throw new IllegalStateException("SSL is enabled but SslContext is not initialized. Check server logs for SSL initialization errors.");
+                }
+            }
+        }
         
         // HTTP codec
         pipeline.addLast(new HttpServerCodec());

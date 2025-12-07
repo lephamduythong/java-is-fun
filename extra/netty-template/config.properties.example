@@ -9,3 +9,13 @@ session.storage.sqlite.path=sessions.db
 
 # Session cleanup interval in hours
 session.cleanup.interval.hours=1
+
+# SSL/TLS Configuration
+# Set to true to enable HTTPS server (will run on port 8443)
+ssl.enabled=false
+
+# SSL Certificate and Key paths (optional)
+# If not provided, a self-signed certificate will be generated automatically
+# For production, provide your own certificate and key files
+#ssl.cert.path=certificate.crt
+#ssl.key.path=private.key
