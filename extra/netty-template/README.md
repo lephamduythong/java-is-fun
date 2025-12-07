@@ -94,6 +94,8 @@ session.cleanup.interval.hours=1
 
 ## Cài đặt và chạy
 
+### Cách 1: Chạy từ Maven (Development)
+
 1. Build project:
 ```bash
 mvn clean package
@@ -105,6 +107,35 @@ mvn exec:java -Dexec.mainClass="com.example.netty.NettyServerApplication"
 ```
 
 Hoặc chạy trực tiếp từ IDE bằng cách run class `NettyServerApplication`.
+
+### Cách 2: Đóng gói thành JAR độc lập (Production)
+
+1. Build JAR file với tất cả dependencies:
+```bash
+mvn clean package
+```
+
+Lệnh này sẽ tạo file `netty-server-standalone.jar` trong thư mục `target/`
+
+2. Chạy JAR file:
+```bash
+java -jar target/netty-server-standalone.jar
+```
+
+**Lưu ý:** File JAR này bao gồm tất cả dependencies (Netty, Gson, Google OAuth, SQLite, BouncyCastle), có thể chạy trên bất kỳ máy nào có Java 11+ mà không cần cài đặt thêm.
+
+**File cấu hình:**
+- Đảm bảo file `config.properties` và `oauth.properties` nằm cùng thư mục với file JAR khi chạy
+- Hoặc đặt trong classpath
+
+**Ví dụ cấu trúc khi deploy:**
+```
+deploy/
+├── netty-server-standalone.jar
+├── config.properties
+├── oauth.properties
+└── sessions.db (tự động tạo nếu dùng SQLite)
+```
 
 Server sẽ khởi động trên port **8080**.
 
