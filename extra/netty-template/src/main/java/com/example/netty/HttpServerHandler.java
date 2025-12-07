@@ -152,13 +152,11 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     
     private FullHttpResponse handleProfileRequest(FullHttpRequest request) {
         try {
-            String uri = request.uri();
-            Map<String, String> params = parseQueryParams(uri);
-            String sessionId = params.get("session");
+            String sessionId = getSessionFromHeader(request);
             
             if (sessionId == null) {
                 return createJsonResponse(UNAUTHORIZED,
-                        createErrorJson("Unauthorized", "Session ID required"));
+                        createErrorJson("Unauthorized", "Session ID required in Authorization header"));
             }
             
             Session session = sessionManager.getSession(sessionId);
@@ -183,9 +181,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     
     private FullHttpResponse handleLogoutRequest(FullHttpRequest request) {
         try {
-            String uri = request.uri();
-            Map<String, String> params = parseQueryParams(uri);
-            String sessionId = params.get("session");
+            String sessionId = getSessionFromHeader(request);
             
             if (sessionId != null) {
                 sessionManager.deleteSession(sessionId);
@@ -202,13 +198,11 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     
     private FullHttpResponse handleGetRequest(FullHttpRequest request) {
         // Check authentication
-        String uri = request.uri();
-        Map<String, String> params = parseQueryParams(uri);
-        String sessionId = params.get("session");
+        String sessionId = getSessionFromHeader(request);
         
         if (sessionId == null) {
             return createJsonResponse(UNAUTHORIZED,
-                    createErrorJson("Unauthorized", "Session ID required. Please login first at /login"));
+                    createErrorJson("Unauthorized", "Session ID required in Authorization header. Please login first at /login"));
         }
         
         Session session = sessionManager.getSession(sessionId);
@@ -230,13 +224,11 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     
     private FullHttpResponse handlePostRequest(FullHttpRequest request) {
         // Check authentication
-        String uri = request.uri();
-        Map<String, String> params = parseQueryParams(uri);
-        String sessionId = params.get("session");
+        String sessionId = getSessionFromHeader(request);
         
         if (sessionId == null) {
             return createJsonResponse(UNAUTHORIZED,
-                    createErrorJson("Unauthorized", "Session ID required. Please login first at /login"));
+                    createErrorJson("Unauthorized", "Session ID required in Authorization header. Please login first at /login"));
         }
         
         Session session = sessionManager.getSession(sessionId);
@@ -274,6 +266,25 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         errorData.put("error", error);
         errorData.put("message", message);
         return errorData;
+    }
+    
+    /**
+     * Extract session ID from Authorization header
+     * Expected format: "Bearer {sessionId}"
+     */
+    private String getSessionFromHeader(FullHttpRequest request) {
+        String authHeader = request.headers().get(HttpHeaderNames.AUTHORIZATION);
+        
+        if (authHeader == null || authHeader.isEmpty()) {
+            return null;
+        }
+        
+        // Support both "Bearer {token}" and just "{token}"
+        if (authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7).trim();
+        }
+        
+        return authHeader.trim();
     }
     
     private FullHttpResponse createHtmlResponse(String title, String body) {

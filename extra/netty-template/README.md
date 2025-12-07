@@ -97,12 +97,13 @@ Endpoint này sẽ redirect bạn đến trang đăng nhập của Google.
 #### 2. GET /oauth/callback
 Callback endpoint để nhận authorization code từ Google (tự động được Google gọi)
 
-#### 3. GET /profile?session={sessionId}
+#### 3. GET /profile
 Lấy thông tin profile của user đã đăng nhập
 
 **Request:**
 ```bash
-curl "http://localhost:8080/profile?session=YOUR_SESSION_ID"
+curl http://localhost:8080/profile \
+  -H "Authorization: Bearer YOUR_SESSION_ID"
 ```
 
 **Response:**
@@ -121,24 +122,25 @@ curl "http://localhost:8080/profile?session=YOUR_SESSION_ID"
 }
 ```
 
-#### 4. GET /logout?session={sessionId}
+#### 4. GET /logout
 Đăng xuất và xóa session
 
-**Sử dụng:**
+**Request:**
 ```bash
-# Mở trong browser
-http://localhost:8080/logout?session=YOUR_SESSION_ID
+curl http://localhost:8080/logout \
+  -H "Authorization: Bearer YOUR_SESSION_ID"
 ```
 
 ### API Endpoints (Protected - Requires Authentication)
 
-#### 1. GET /hello?session={sessionId}
+#### 1. GET /hello
 
-**Yêu cầu:** Phải đăng nhập với Google trước và cung cấp session ID
+**Yêu cầu:** Phải đăng nhập với Google trước và cung cấp session ID trong **Authorization header**
 
 **Request:**
 ```bash
-curl "http://localhost:8080/hello?session=YOUR_SESSION_ID"
+curl http://localhost:8080/hello \
+  -H "Authorization: Bearer YOUR_SESSION_ID"
 ```
 
 **Response:**
@@ -156,17 +158,18 @@ curl "http://localhost:8080/hello?session=YOUR_SESSION_ID"
 ```json
 {
   "error": "Unauthorized",
-  "message": "Session ID required. Please login first at /login"
+  "message": "Session ID required in Authorization header. Please login first at /login"
 }
 ```
 
-#### 2. POST /data?session={sessionId}
+#### 2. POST /data
 
-**Yêu cầu:** Phải đăng nhập với Google trước và cung cấp session ID
+**Yêu cầu:** Phải đăng nhập với Google trước và cung cấp session ID trong **Authorization header**
 
 **Request:**
 ```bash
-curl -X POST "http://localhost:8080/data?session=YOUR_SESSION_ID" \
+curl -X POST http://localhost:8080/data \
+  -H "Authorization: Bearer YOUR_SESSION_ID" \
   -H "Content-Type: application/json" \
   -d '{"name": "John", "age": 30}'
 ```
@@ -241,14 +244,23 @@ curl -X POST "http://localhost:8080/data?session=YOUR_SESSION_ID" \
 3. Mở browser và truy cập: `http://localhost:8080/login`
 4. Đăng nhập với Google account
 5. Sau khi đăng nhập thành công, copy session ID từ response
-6. Test các protected endpoints với session ID:
-   - `http://localhost:8080/hello?session=YOUR_SESSION_ID`
-   - `http://localhost:8080/data?session=YOUR_SESSION_ID` (POST request)
-7. Test profile endpoint: `http://localhost:8080/profile?session=YOUR_SESSION_ID`
-8. Logout: `http://localhost:8080/logout?session=YOUR_SESSION_ID`
+6. Test các protected endpoints với session ID trong Authorization header:
+   ```bash
+   curl http://localhost:8080/hello -H "Authorization: Bearer YOUR_SESSION_ID"
+   
+   curl -X POST http://localhost:8080/data \
+     -H "Authorization: Bearer YOUR_SESSION_ID" \
+     -H "Content-Type: application/json" \
+     -d '{"test":"data"}'
+   
+   curl http://localhost:8080/profile -H "Authorization: Bearer YOUR_SESSION_ID"
+   
+   curl http://localhost:8080/logout -H "Authorization: Bearer YOUR_SESSION_ID"
+   ```
 
 ## Lưu ý
 
-- Các endpoints `/hello` và `/data` hiện yêu cầu **session ID hợp lệ** từ Google login
+- Các endpoints `/hello`, `/data`, `/profile`, và `/logout` yêu cầu **session ID trong Authorization header**
+- Format header: `Authorization: Bearer {SESSION_ID}` hoặc chỉ `Authorization: {SESSION_ID}`
 - Nếu chưa đăng nhập hoặc session hết hạn, sẽ nhận được lỗi `401 Unauthorized`
 - Session có hiệu lực trong 24 giờ sau khi đăng nhập
