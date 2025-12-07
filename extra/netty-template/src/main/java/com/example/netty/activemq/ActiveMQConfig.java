@@ -47,6 +47,15 @@ public class ActiveMQConfig {
             thread.setDaemon(true);
             return thread;
         });
+
+        // Establish initial connection
+        try {
+            getConnection();
+        } catch (JMSException e) {
+            System.err.println("Initial connection failed: " + e.getMessage());
+            // Start auto-reconnect even if initial connection fails
+            startAutoReconnect();
+        }
     }
 
     /**
@@ -73,7 +82,7 @@ public class ActiveMQConfig {
     /**
      * Get or create Connection (singleton connection)
      */
-    public Connection getConnection() throws JMSException {
+    public synchronized Connection getConnection() throws JMSException {
         if (connection == null || ((org.apache.activemq.ActiveMQConnection) connection).isClosed()) {
             connection = connectionFactory.createConnection();
             connection.start();
@@ -105,7 +114,7 @@ public class ActiveMQConfig {
     /**
      * Check if connection is active
      */
-    public boolean isConnected() {
+    public synchronized boolean isConnected() {
         try {
             return connection != null && !((org.apache.activemq.ActiveMQConnection) connection).isClosed();
         } catch (Exception e) {

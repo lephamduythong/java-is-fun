@@ -28,6 +28,7 @@ public class ActiveMQConsumer {
      */
     public ActiveMQConsumer(String destinationName, boolean isTopic) throws JMSException {
         connection = ActiveMQConfig.getInstance().getConnection();
+        // false: no transactions
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         
         if (isTopic) {

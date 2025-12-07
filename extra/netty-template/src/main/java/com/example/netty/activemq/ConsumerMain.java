@@ -34,7 +34,7 @@ public class ConsumerMain {
             
             // Keep running indefinitely
             while (true) {
-                Thread.sleep(1000);
+                Thread.sleep(1);
             }
             
         } catch (JMSException e) {
