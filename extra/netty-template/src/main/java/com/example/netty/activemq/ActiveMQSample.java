@@ -11,29 +11,31 @@ public class ActiveMQSample {
      * Run producer and consumer examples
      */
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("=== ActiveMQ Classic Sample ===");
-        System.out.println("Broker URL: tcp://localhost:61616");
-        System.out.println("Username: admin");
-        System.out.println("Password: admin");
-        System.out.println("Queue: sample.queue");
-        System.out.println("================================\n");
+        while (true) {
+            System.out.println("=== ActiveMQ Classic Sample ===");
+            System.out.println("Broker URL: tcp://localhost:61616");
+            System.out.println("Username: admin");
+            System.out.println("Password: admin");
+            System.out.println("Queue: sample.queue");
+            System.out.println("================================\n");
 
-        // Check if argument is provided
-        if (args.length > 0) {
-            String mode = args[0].toLowerCase();
-            
-            if (mode.equals("producer")) {
-                runProducer();
-            } else if (mode.equals("consumer")) {
-                runConsumer();
-            } else if (mode.equals("both")) {
-                runBoth();
+            // Check if argument is provided
+            if (args.length > 0) {
+                String mode = args[0].toLowerCase();
+                
+                if (mode.equals("producer")) {
+                    runProducer();
+                } else if (mode.equals("consumer")) {
+                    runConsumer();
+                } else if (mode.equals("both")) {
+                    runBoth();
+                } else {
+                    printUsage();
+                }
             } else {
-                printUsage();
+                // Default: run both
+                runBoth();
             }
-        } else {
-            // Default: run both
-            runBoth();
         }
     }
 
@@ -67,7 +69,7 @@ public class ActiveMQSample {
             if (producer != null) {
                 producer.close();
             }
-            ActiveMQConfig.closeConnection();
+            ActiveMQConfig.getInstance().closeConnection();
         }
     }
 
@@ -96,7 +98,7 @@ public class ActiveMQSample {
             if (consumer != null) {
                 consumer.close();
             }
-            ActiveMQConfig.closeConnection();
+            ActiveMQConfig.getInstance().closeConnection();
         }
     }
 
@@ -153,7 +155,7 @@ public class ActiveMQSample {
             if (consumer != null) {
                 consumer.close();
             }
-            ActiveMQConfig.closeConnection();
+            ActiveMQConfig.getInstance().closeConnection();
         }
     }
 

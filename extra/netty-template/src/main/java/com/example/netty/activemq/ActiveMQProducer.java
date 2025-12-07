@@ -27,7 +27,7 @@ public class ActiveMQProducer {
      * @param isTopic true for topic, false for queue
      */
     public ActiveMQProducer(String destinationName, boolean isTopic) throws JMSException {
-        connection = ActiveMQConfig.getConnection();
+        connection = ActiveMQConfig.getInstance().getConnection();
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         
         if (isTopic) {
@@ -119,7 +119,7 @@ public class ActiveMQProducer {
             if (producer != null) {
                 producer.close();
             }
-            ActiveMQConfig.closeConnection();
+            ActiveMQConfig.getInstance().closeConnection();
         }
     }
 }

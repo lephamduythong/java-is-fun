@@ -27,7 +27,7 @@ public class ActiveMQConsumer {
      * @param isTopic true for topic, false for queue
      */
     public ActiveMQConsumer(String destinationName, boolean isTopic) throws JMSException {
-        connection = ActiveMQConfig.getConnection();
+        connection = ActiveMQConfig.getInstance().getConnection();
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         
         if (isTopic) {
@@ -155,7 +155,7 @@ public class ActiveMQConsumer {
             if (consumer != null) {
                 consumer.close();
             }
-            ActiveMQConfig.closeConnection();
+            ActiveMQConfig.getInstance().closeConnection();
         }
     }
 
@@ -182,7 +182,7 @@ public class ActiveMQConsumer {
             if (consumer != null) {
                 consumer.close();
             }
-            ActiveMQConfig.closeConnection();
+            ActiveMQConfig.getInstance().closeConnection();
         }
     }
 
