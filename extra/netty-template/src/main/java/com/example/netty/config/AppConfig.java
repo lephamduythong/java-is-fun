@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class AppConfig {
     
-    private static final String CONFIG_FILE = "config/config.properties";
+    private static final String CONFIG_FILE = "config/app.properties";
     private static AppConfig instance;
     private final Properties properties;
     
