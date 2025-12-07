@@ -59,6 +59,9 @@ public class GoogleOAuthHandler {
             url.append("&state=").append(URLEncoder.encode(state, "UTF-8"));
             url.append("&access_type=offline");
             url.append("&prompt=consent");
+
+            System.out.println("Generated Google OAuth Authorization URL:");
+            System.out.println(url);
             
             return url.toString();
         } catch (Exception e) {

@@ -46,7 +46,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         else if (method == HttpMethod.GET && uri.equals("/logout")) {
             response = handleLogoutRequest(request);
         }
-        // Original routes
+        // Protected routes - require authentication
         else if (method == HttpMethod.GET && uri.startsWith("/hello")) {
             response = handleGetRequest(request);
         }
@@ -201,16 +201,51 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     }
     
     private FullHttpResponse handleGetRequest(FullHttpRequest request) {
+        // Check authentication
+        String uri = request.uri();
+        Map<String, String> params = parseQueryParams(uri);
+        String sessionId = params.get("session");
+        
+        if (sessionId == null) {
+            return createJsonResponse(UNAUTHORIZED,
+                    createErrorJson("Unauthorized", "Session ID required. Please login first at /login"));
+        }
+        
+        Session session = sessionManager.getSession(sessionId);
+        if (session == null) {
+            return createJsonResponse(UNAUTHORIZED,
+                    createErrorJson("Unauthorized", "Invalid or expired session. Please login again at /login"));
+        }
+        
+        // User is authenticated
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("message", "Hello from Netty Server!");
         responseData.put("method", "GET");
         responseData.put("timestamp", System.currentTimeMillis());
         responseData.put("status", "success");
+        responseData.put("user", session.getUserInfo().get("email"));
         
         return createJsonResponse(OK, responseData);
     }
     
     private FullHttpResponse handlePostRequest(FullHttpRequest request) {
+        // Check authentication
+        String uri = request.uri();
+        Map<String, String> params = parseQueryParams(uri);
+        String sessionId = params.get("session");
+        
+        if (sessionId == null) {
+            return createJsonResponse(UNAUTHORIZED,
+                    createErrorJson("Unauthorized", "Session ID required. Please login first at /login"));
+        }
+        
+        Session session = sessionManager.getSession(sessionId);
+        if (session == null) {
+            return createJsonResponse(UNAUTHORIZED,
+                    createErrorJson("Unauthorized", "Invalid or expired session. Please login again at /login"));
+        }
+        
+        // User is authenticated
         String contentBody = request.content().toString(CharsetUtil.UTF_8);
         
         Map<String, Object> responseData = new HashMap<>();
@@ -219,6 +254,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         responseData.put("receivedData", contentBody);
         responseData.put("timestamp", System.currentTimeMillis());
         responseData.put("status", "success");
+        responseData.put("user", session.getUserInfo().get("email"));
         
         // Parse received JSON if possible
         try {

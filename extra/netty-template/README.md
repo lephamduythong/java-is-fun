@@ -130,13 +130,15 @@ curl "http://localhost:8080/profile?session=YOUR_SESSION_ID"
 http://localhost:8080/logout?session=YOUR_SESSION_ID
 ```
 
-### API Endpoints (Original)
+### API Endpoints (Protected - Requires Authentication)
 
-#### 1. GET /hello
+#### 1. GET /hello?session={sessionId}
+
+**Yêu cầu:** Phải đăng nhập với Google trước và cung cấp session ID
 
 **Request:**
 ```bash
-curl http://localhost:8080/hello
+curl "http://localhost:8080/hello?session=YOUR_SESSION_ID"
 ```
 
 **Response:**
@@ -145,15 +147,26 @@ curl http://localhost:8080/hello
   "message": "Hello from Netty Server!",
   "method": "GET",
   "timestamp": 1701950400000,
-  "status": "success"
+  "status": "success",
+  "user": "user@example.com"
 }
 ```
 
-#### 2. POST /data
+**Nếu không có session hoặc session không hợp lệ:**
+```json
+{
+  "error": "Unauthorized",
+  "message": "Session ID required. Please login first at /login"
+}
+```
+
+#### 2. POST /data?session={sessionId}
+
+**Yêu cầu:** Phải đăng nhập với Google trước và cung cấp session ID
 
 **Request:**
 ```bash
-curl -X POST http://localhost:8080/data \
+curl -X POST "http://localhost:8080/data?session=YOUR_SESSION_ID" \
   -H "Content-Type: application/json" \
   -d '{"name": "John", "age": 30}'
 ```
@@ -169,7 +182,16 @@ curl -X POST http://localhost:8080/data \
     "age": 30
   },
   "timestamp": 1701950400000,
-  "status": "success"
+  "status": "success",
+  "user": "user@example.com"
+}
+```
+
+**Nếu không có session hoặc session không hợp lệ:**
+```json
+{
+  "error": "Unauthorized",
+  "message": "Invalid or expired session. Please login again at /login"
 }
 ```
 
@@ -184,11 +206,12 @@ curl -X POST http://localhost:8080/data \
 ## Tính năng
 
 - ✅ Embedded Netty HTTP server
-- ✅ GET endpoint trả về JSON
-- ✅ POST endpoint nhận và parse JSON
+- ✅ GET endpoint trả về JSON (Protected)
+- ✅ POST endpoint nhận và parse JSON (Protected)
 - ✅ **Google OAuth 2.0 Login**
 - ✅ **Session Management (24 giờ)**
 - ✅ **Protected Profile Endpoint**
+- ✅ **Authentication Required for API Endpoints**
 - ✅ Error handling
 - ✅ Async non-blocking I/O
 
@@ -201,7 +224,7 @@ curl -X POST http://localhost:8080/data \
 5. Server exchange code để lấy access token
 6. Server lấy user info từ Google
 7. Server tạo session và trả về session ID
-8. User sử dụng session ID để truy cập protected endpoints
+8. **User sử dụng session ID để truy cập protected endpoints (/hello, /data)**
 
 ## Bảo mật
 
@@ -209,6 +232,7 @@ curl -X POST http://localhost:8080/data \
 - ✅ Session expiration (24 giờ)
 - ✅ Secure OAuth 2.0 flow
 - ✅ Session-based authentication
+- ✅ **Protected API endpoints - require Google login**
 
 ## Test OAuth Flow
 
@@ -217,5 +241,14 @@ curl -X POST http://localhost:8080/data \
 3. Mở browser và truy cập: `http://localhost:8080/login`
 4. Đăng nhập với Google account
 5. Sau khi đăng nhập thành công, copy session ID từ response
-6. Test profile endpoint: `http://localhost:8080/profile?session=YOUR_SESSION_ID`
-7. Logout: `http://localhost:8080/logout?session=YOUR_SESSION_ID`
+6. Test các protected endpoints với session ID:
+   - `http://localhost:8080/hello?session=YOUR_SESSION_ID`
+   - `http://localhost:8080/data?session=YOUR_SESSION_ID` (POST request)
+7. Test profile endpoint: `http://localhost:8080/profile?session=YOUR_SESSION_ID`
+8. Logout: `http://localhost:8080/logout?session=YOUR_SESSION_ID`
+
+## Lưu ý
+
+- Các endpoints `/hello` và `/data` hiện yêu cầu **session ID hợp lệ** từ Google login
+- Nếu chưa đăng nhập hoặc session hết hạn, sẽ nhận được lỗi `401 Unauthorized`
+- Session có hiệu lực trong 24 giờ sau khi đăng nhập
