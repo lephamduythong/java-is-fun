@@ -1,6 +1,6 @@
 package com.example.netty;
 
-import com.example.netty.config.AppConfig;
+import com.example.netty.config.SslConfig;
 import com.example.netty.session.SessionManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -15,8 +15,8 @@ public class NettyServerApplication {
     private static final int HTTPS_PORT = 8443;
     
     public static void main(String[] args) throws Exception {
-        AppConfig appConfig = AppConfig.getInstance();
-        boolean sslEnabled = appConfig.isSslEnabled();
+        SslConfig sslConfig = SslConfig.getInstance();
+        boolean sslEnabled = sslConfig.isSslEnabled();
         
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();

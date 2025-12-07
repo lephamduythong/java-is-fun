@@ -6,21 +6,43 @@ import io.netty.handler.ssl.util.SelfSignedCertificate;
 
 import javax.net.ssl.SSLException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.cert.CertificateException;
+import java.util.Properties;
 
 public class SslConfig {
     
     private static SslConfig instance;
     private SslContext sslContext;
     private final boolean sslEnabled;
+    private final String certPath;
+    private final String keyPath;
     
     private SslConfig() {
-        AppConfig appConfig = AppConfig.getInstance();
-        this.sslEnabled = appConfig.isSslEnabled();
+        Properties properties = loadProperties();
+        this.sslEnabled = Boolean.parseBoolean(properties.getProperty("ssl.enabled", "false"));
+        this.certPath = properties.getProperty("ssl.cert.path", "").trim();
+        this.keyPath = properties.getProperty("ssl.key.path", "").trim();
         
         if (sslEnabled) {
             initializeSslContext();
         }
+    }
+    
+    private Properties loadProperties() {
+        Properties properties = new Properties();
+        String configPath = "config/ssl.properties";
+        
+        try (InputStream input = new FileInputStream(configPath)) {
+            properties.load(input);
+            System.out.println("Loaded SSL configuration from " + configPath);
+        } catch (IOException e) {
+            System.err.println("Could not load ssl.properties, using defaults: " + e.getMessage());
+        }
+        
+        return properties;
     }
     
     public static SslConfig getInstance() {
@@ -36,11 +58,7 @@ public class SslConfig {
     
     private void initializeSslContext() {
         try {
-            AppConfig appConfig = AppConfig.getInstance();
-            String certPath = appConfig.getSslCertPath();
-            String keyPath = appConfig.getSslKeyPath();
-            
-            if (certPath != null && keyPath != null) {
+            if (certPath != null && !certPath.isEmpty() && keyPath != null && !keyPath.isEmpty()) {
                 // Use provided certificate and key
                 File certFile = new File(certPath);
                 File keyFile = new File(keyPath);
