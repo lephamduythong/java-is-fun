@@ -6,7 +6,7 @@ import javax.jms.JMSException;
  * Main application for ActiveMQ Producer
  * Sends messages to ActiveMQ queue
  */
-public class ProducerMain {
+public class QueueProducerMain {
 
     public static void main(String[] args) {
         System.out.println("=== ActiveMQ Producer ===");
