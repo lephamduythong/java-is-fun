@@ -6,7 +6,7 @@ import javax.jms.JMSException;
  * Main application for ActiveMQ Consumer
  * Listens for messages from ActiveMQ queue
  */
-public class ConsumerMain {
+public class QueueConsumerMain {
 
     public static void main(String[] args) {
         System.out.println("=== ActiveMQ Consumer ===");
