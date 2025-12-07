@@ -1,5 +1,6 @@
 package com.example.netty.activemq;
 
+import com.example.netty.config.ActiveMQConfig;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.Connection;
@@ -10,15 +11,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Singleton configuration class for ActiveMQ Classic connection
+ * Singleton gateway class for ActiveMQ Classic connection
  * Ensures only one connection is created and shared across the application
  * Includes auto-reconnect mechanism
  */
 public class ActiveMQGateway {
-    private static final String BROKER_URL = "tcp://localhost:61616";
-    private static final String USERNAME = "admin";
-    private static final String PASSWORD = "admin";
-    private static final long RECONNECT_INTERVAL_SECONDS = 10;
+    private final long reconnectIntervalSeconds;
 
     // Singleton instance
     private static volatile ActiveMQGateway instance;
@@ -32,13 +30,16 @@ public class ActiveMQGateway {
      * Private constructor to prevent external instantiation
      */
     private ActiveMQGateway() {
+        ActiveMQConfig config = ActiveMQConfig.getInstance();
+        this.reconnectIntervalSeconds = config.getReconnectIntervalSeconds();
+        
         ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
-        factory.setBrokerURL(BROKER_URL);
-        factory.setUserName(USERNAME);
-        factory.setPassword(PASSWORD);
+        factory.setBrokerURL(config.getBrokerUrl());
+        factory.setUserName(config.getUsername());
+        factory.setPassword(config.getPassword());
         
         // Optional: Configure connection pool and other settings
-        factory.setTrustAllPackages(true);
+        factory.setTrustAllPackages(config.isTrustAllPackages());
         this.connectionFactory = factory;
         
         // Initialize reconnect scheduler
@@ -158,9 +159,9 @@ public class ActiveMQGateway {
             } catch (Exception e) {
                 System.err.println("Error in auto-reconnect: " + e.getMessage());
             }
-        }, RECONNECT_INTERVAL_SECONDS, RECONNECT_INTERVAL_SECONDS, TimeUnit.SECONDS);
+        }, reconnectIntervalSeconds, reconnectIntervalSeconds, TimeUnit.SECONDS);
         
-        System.out.println("Auto-reconnect enabled (checking every " + RECONNECT_INTERVAL_SECONDS + " seconds)");
+        System.out.println("Auto-reconnect enabled (checking every " + reconnectIntervalSeconds + " seconds)");
     }
     
     /**

@@ -1,2 +1,5 @@
 **/*.db
+
+# Properties files
 oauth.properties
+activemq.properties
