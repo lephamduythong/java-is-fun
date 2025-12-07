@@ -18,6 +18,16 @@ public class Session {
         this.expiresAt = createdAt + SESSION_DURATION;
     }
     
+    /**
+     * Constructor for loading session from database
+     */
+    public Session(String sessionId, Map<String, Object> userInfo, long createdAt, long expiresAt) {
+        this.sessionId = sessionId;
+        this.userInfo = userInfo;
+        this.createdAt = createdAt;
+        this.expiresAt = expiresAt;
+    }
+    
     public String getSessionId() {
         return sessionId;
     }

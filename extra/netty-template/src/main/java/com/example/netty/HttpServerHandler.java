@@ -68,6 +68,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             String authUrl = oauthHandler.getAuthorizationUrl();
             
             // Create HTML redirect response
+            // "window.location.href" will redirect the user automatically to the Google login page
             String html = "<!DOCTYPE html>" +
                     "<html><head><title>Login with Google</title></head>" +
                     "<body>" +

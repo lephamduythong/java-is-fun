@@ -8,6 +8,8 @@ Project Maven sử dụng Netty embedded server với các endpoints GET/POST v�
 netty-template/
 ├── pom.xml
 ├── oauth.properties.example
+├── .env.example
+├── sessions.db (tạo tự động nếu dùng SQLite)
 └── src/
     └── main/
         └── java/
@@ -22,7 +24,8 @@ netty-template/
                         │   └── GoogleOAuthHandler.java
                         └── session/
                             ├── SessionManager.java
-                            └── Session.java
+                            ├── Session.java
+                            └── SessionDatabase.java
 ```
 
 ## Yêu cầu
@@ -62,6 +65,25 @@ set GOOGLE_CLIENT_ID=your_client_id
 set GOOGLE_CLIENT_SECRET=your_client_secret
 set GOOGLE_REDIRECT_URI=http://localhost:8080/oauth/callback
 ```
+
+### 3. Cấu hình Session Storage (Tùy chọn)
+
+Mặc định, sessions được lưu trong **memory** (RAM). Để sử dụng **SQLite** cho persistent storage:
+
+**Cách 1: Biến môi trường**
+```bash
+set USE_SQLITE_SESSION=true
+```
+
+**Cách 2: System property**
+```bash
+mvn exec:java -Dexec.mainClass="com.example.netty.NettyServerApplication" -Duse.sqlite.session=true
+```
+
+**Lợi ích của SQLite:**
+- Sessions được lưu vĩnh viễn, không mất khi restart server
+- Tự động tạo file `sessions.db` trong thư mục project
+- Cleanup tự động các sessions hết hạn mỗi giờ
 
 ## Cài đặt và chạy
 
@@ -205,6 +227,7 @@ curl -X POST http://localhost:8080/data \
 - **Google OAuth Client 1.34.1**: Google OAuth authentication
 - **Google HTTP Client 1.43.3**: HTTP client cho Google APIs
 - **Google API Client 2.2.0**: Google API client library
+- **SQLite JDBC 3.44.1.0**: SQLite database driver cho persistent session storage
 
 ## Tính năng
 
@@ -213,6 +236,8 @@ curl -X POST http://localhost:8080/data \
 - ✅ POST endpoint nhận và parse JSON (Protected)
 - ✅ **Google OAuth 2.0 Login**
 - ✅ **Session Management (24 giờ)**
+- ✅ **Dual Session Storage**: In-memory hoặc SQLite persistent storage
+- ✅ **Auto cleanup expired sessions** (mỗi giờ)
 - ✅ **Protected Profile Endpoint**
 - ✅ **Authentication Required for API Endpoints**
 - ✅ Error handling
@@ -264,3 +289,37 @@ curl -X POST http://localhost:8080/data \
 - Format header: `Authorization: Bearer {SESSION_ID}` hoặc chỉ `Authorization: {SESSION_ID}`
 - Nếu chưa đăng nhập hoặc session hết hạn, sẽ nhận được lỗi `401 Unauthorized`
 - Session có hiệu lực trong 24 giờ sau khi đăng nhập
+
+## Session Storage Options
+
+### In-Memory Storage (Mặc định)
+- Sessions lưu trong RAM
+- Mất toàn bộ sessions khi restart server
+- Nhanh và đơn giản
+- Phù hợp cho development/testing
+
+### SQLite Persistent Storage
+- Sessions lưu trong file `sessions.db`
+- Giữ nguyên sessions sau khi restart server
+- Tự động cleanup expired sessions mỗi giờ
+- Phù hợp cho production
+
+**Để bật SQLite storage:**
+```bash
+# Windows CMD
+set USE_SQLITE_SESSION=true
+mvn exec:java -Dexec.mainClass="com.example.netty.NettyServerApplication"
+
+# Hoặc với system property
+mvn exec:java -Dexec.mainClass="com.example.netty.NettyServerApplication" -Duse.sqlite.session=true
+```
+
+**Kiểm tra storage mode khi khởi động server:**
+```
+SessionManager: Using SQLite for persistent session storage
+SQLite database initialized successfully at: jdbc:sqlite:sessions.db
+```
+hoặc
+```
+SessionManager: Using in-memory session storage
+```
