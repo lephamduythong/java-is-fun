@@ -7,6 +7,8 @@ Project Maven sử dụng Netty embedded server với các endpoints GET/POST v�
 ```
 netty-template/
 ├── pom.xml
+├── config.properties (cấu hình session storage)
+├── config.properties.example
 ├── oauth.properties.example
 ├── .env.example
 ├── sessions.db (tạo tự động nếu dùng SQLite)
@@ -22,6 +24,8 @@ netty-template/
                         ├── oauth/
                         │   ├── OAuthConfig.java
                         │   └── GoogleOAuthHandler.java
+                        ├── config/
+                        │   └── AppConfig.java
                         └── session/
                             ├── SessionManager.java
                             ├── Session.java
@@ -70,20 +74,23 @@ set GOOGLE_REDIRECT_URI=http://localhost:8080/oauth/callback
 
 Mặc định, sessions được lưu trong **memory** (RAM). Để sử dụng **SQLite** cho persistent storage:
 
-**Cách 1: Biến môi trường**
-```bash
-set USE_SQLITE_SESSION=true
-```
+**Chỉnh sửa file `config.properties`:**
+```properties
+# Bật SQLite storage
+session.storage.sqlite=true
 
-**Cách 2: System property**
-```bash
-mvn exec:java -Dexec.mainClass="com.example.netty.NettyServerApplication" -Duse.sqlite.session=true
+# Đường dẫn file database (tùy chọn)
+session.storage.sqlite.path=sessions.db
+
+# Khoảng thời gian cleanup sessions hết hạn (giờ)
+session.cleanup.interval.hours=1
 ```
 
 **Lợi ích của SQLite:**
 - Sessions được lưu vĩnh viễn, không mất khi restart server
-- Tự động tạo file `sessions.db` trong thư mục project
-- Cleanup tự động các sessions hết hạn mỗi giờ
+- Tự động tạo file database theo cấu hình
+- Cleanup tự động các sessions hết hạn theo interval đã cấu hình
+- Đơn giản, chỉ cần sửa file config
 
 ## Cài đặt và chạy
 
@@ -299,27 +306,26 @@ curl -X POST http://localhost:8080/data \
 - Phù hợp cho development/testing
 
 ### SQLite Persistent Storage
-- Sessions lưu trong file `sessions.db`
+- Sessions lưu trong file database (mặc định `sessions.db`)
 - Giữ nguyên sessions sau khi restart server
-- Tự động cleanup expired sessions mỗi giờ
+- Tự động cleanup expired sessions theo interval cấu hình
 - Phù hợp cho production
 
-**Để bật SQLite storage:**
-```bash
-# Windows CMD
-set USE_SQLITE_SESSION=true
-mvn exec:java -Dexec.mainClass="com.example.netty.NettyServerApplication"
-
-# Hoặc với system property
-mvn exec:java -Dexec.mainClass="com.example.netty.NettyServerApplication" -Duse.sqlite.session=true
+**Để bật SQLite storage, chỉnh sửa `config.properties`:**
+```properties
+session.storage.sqlite=true
+session.storage.sqlite.path=sessions.db
+session.cleanup.interval.hours=1
 ```
 
 **Kiểm tra storage mode khi khởi động server:**
 ```
+Configuration loaded from config.properties
 SessionManager: Using SQLite for persistent session storage
 SQLite database initialized successfully at: jdbc:sqlite:sessions.db
 ```
 hoặc
 ```
+Configuration loaded from config.properties
 SessionManager: Using in-memory session storage
 ```

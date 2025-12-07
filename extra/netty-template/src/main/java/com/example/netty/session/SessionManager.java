@@ -1,5 +1,7 @@
 package com.example.netty.session;
 
+import com.example.netty.config.AppConfig;
+
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,14 +16,15 @@ public class SessionManager {
     private final SessionDatabase database;
     private final boolean useSqlite;
     private final ScheduledExecutorService cleanupScheduler;
+    private final int cleanupIntervalHours;
     
     private SessionManager() {
         this.sessions = new ConcurrentHashMap<>();
         
-        // Check if SQLite should be used (via environment variable or system property)
-        String useSqliteEnv = System.getenv("USE_SQLITE_SESSION");
-        String useSqliteProp = System.getProperty("use.sqlite.session");
-        this.useSqlite = "true".equalsIgnoreCase(useSqliteEnv) || "true".equalsIgnoreCase(useSqliteProp);
+        // Load configuration from config.properties
+        AppConfig config = AppConfig.getInstance();
+        this.useSqlite = config.isUseSqliteSession();
+        this.cleanupIntervalHours = config.getSessionCleanupIntervalHours();
         
         if (useSqlite) {
             this.database = SessionDatabase.getInstance();
@@ -58,7 +61,7 @@ public class SessionManager {
             } catch (Exception e) {
                 System.err.println("Error during session cleanup: " + e.getMessage());
             }
-        }, 1, 1, TimeUnit.HOURS); // Run every hour
+        }, cleanupIntervalHours, cleanupIntervalHours, TimeUnit.HOURS);
     }
     
     /**

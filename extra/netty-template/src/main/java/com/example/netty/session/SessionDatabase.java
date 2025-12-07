@@ -1,5 +1,6 @@
 package com.example.netty.session;
 
+import com.example.netty.config.AppConfig;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -12,10 +13,13 @@ public class SessionDatabase {
     private static SessionDatabase instance;
     private Connection connection;
     private final Gson gson;
-    private static final String DB_URL = "jdbc:sqlite:sessions.db";
+    private final String dbUrl;
     
     private SessionDatabase() {
         this.gson = new Gson();
+        AppConfig config = AppConfig.getInstance();
+        String dbPath = config.getSqliteDatabasePath();
+        this.dbUrl = "jdbc:sqlite:" + dbPath;
         initializeDatabase();
     }
     
@@ -35,7 +39,7 @@ public class SessionDatabase {
      */
     private void initializeDatabase() {
         try {
-            connection = DriverManager.getConnection(DB_URL);
+            connection = DriverManager.getConnection(dbUrl);
             
             String createTableSQL = "CREATE TABLE IF NOT EXISTS sessions (" +
                     "session_id TEXT PRIMARY KEY, " +
@@ -53,7 +57,7 @@ public class SessionDatabase {
                 stmt.execute(createIndexSQL);
             }
             
-            System.out.println("SQLite database initialized successfully at: " + DB_URL);
+            System.out.println("SQLite database initialized successfully at: " + dbUrl);
             
         } catch (SQLException e) {
             System.err.println("Failed to initialize database: " + e.getMessage());
