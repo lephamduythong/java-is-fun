@@ -68,6 +68,13 @@
             <artifactId>bcpkix-jdk18on</artifactId>
             <version>1.78.1</version>
         </dependency>
+
+        <!-- ActiveMQ Classic -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-client</artifactId>
+            <version>5.18.3</version>
+        </dependency>
     </dependencies>
 
     <build>
