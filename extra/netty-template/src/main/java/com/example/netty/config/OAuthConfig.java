@@ -1,4 +1,4 @@
-package com.example.netty.oauth;
+package com.example.netty.config;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class OAuthConfig {
     
-    private static final String CONFIG_FILE = "oauth.properties";
+    private static final String CONFIG_FILE = "config/oauth.properties";
     
     private String clientId;
     private String clientSecret;

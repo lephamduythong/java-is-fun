@@ -1,5 +1,6 @@
 package com.example.netty.oauth;
 
+import com.example.netty.config.OAuthConfig;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
