@@ -31,30 +31,11 @@ public class ProducerMain {
             
             producer.sendMessage("Important alert!", "priority", "high");
             Thread.sleep(300);
-            
-            // Send batch messages
-            String[] batchMessages = {
-                "Batch message 1",
-                "Batch message 2",
-                "Batch message 3"
-            };
-            producer.sendMessages(batchMessages);
-            
-            System.out.println("\n✓ All messages sent successfully!");
-            
-            // Optional: Keep sending messages periodically
-            if (args.length > 0 && args[0].equalsIgnoreCase("continuous")) {
-                System.out.println("\nContinuous mode: Sending messages every 5 seconds...");
-                System.out.println("Press Ctrl+C to stop\n");
-                
-                int counter = 1;
-                while (true) {
-                    Thread.sleep(5000);
-                    producer.sendMessage("Periodic message #" + counter);
-                    counter++;
-                }
+
+            // Generate 500 messages
+            for (int i = 1; i <= 500; i++) {
+                producer.sendMessage("Generated message #" + i);
             }
-            
         } catch (JMSException e) {
             System.err.println("✗ Producer error: " + e.getMessage());
             e.printStackTrace();
