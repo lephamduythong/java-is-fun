@@ -5,8 +5,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gson.Gson;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -17,22 +16,26 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 
 public class WonderUtils {
-    private static final Gson gson = new Gson();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static FullHttpResponse createJsonResponse(HttpResponseStatus status, Object data) {
-        String jsonResponse = gson.toJson(data);
-        
-        FullHttpResponse response = new DefaultFullHttpResponse(
-                HTTP_1_1,
-                status,
-                Unpooled.copiedBuffer(jsonResponse, CharsetUtil.UTF_8)
-        );
-        
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
-        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-        response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
-        
-        return response;
+        try {
+            String jsonResponse = objectMapper.writeValueAsString(data);
+            
+            FullHttpResponse response = new DefaultFullHttpResponse(
+                    HTTP_1_1,
+                    status,
+                    Unpooled.copiedBuffer(jsonResponse, CharsetUtil.UTF_8)
+            );
+            
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
+            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
+            
+            return response;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize JSON", e);
+        }
     }
     
     public static Map<String, String> createErrorJson(String error, String message) {

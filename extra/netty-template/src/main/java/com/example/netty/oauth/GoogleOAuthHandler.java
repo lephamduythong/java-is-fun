@@ -1,8 +1,8 @@
 package com.example.netty.oauth;
 
 import com.example.netty.config.OAuthConfig;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -20,12 +20,12 @@ public class GoogleOAuthHandler {
     
     private static GoogleOAuthHandler instance;
     private final OAuthConfig config;
-    private final Gson gson;
+    private final ObjectMapper objectMapper;
     private final Map<String, String> stateStore; // Store state tokens to prevent CSRF
     
     private GoogleOAuthHandler() {
         this.config = OAuthConfig.getInstance();
-        this.gson = new Gson();
+        this.objectMapper = new ObjectMapper();
         this.stateStore = new ConcurrentHashMap<>();
     }
     
@@ -112,15 +112,15 @@ public class GoogleOAuthHandler {
             }
             in.close();
             
-            JsonObject jsonResponse = gson.fromJson(response.toString(), JsonObject.class);
+            JsonNode jsonResponse = objectMapper.readTree(response.toString());
             Map<String, Object> result = new HashMap<>();
-            result.put("access_token", jsonResponse.get("access_token").getAsString());
+            result.put("access_token", jsonResponse.get("access_token").asText());
             
             if (jsonResponse.has("refresh_token")) {
-                result.put("refresh_token", jsonResponse.get("refresh_token").getAsString());
+                result.put("refresh_token", jsonResponse.get("refresh_token").asText());
             }
             if (jsonResponse.has("expires_in")) {
-                result.put("expires_in", jsonResponse.get("expires_in").getAsInt());
+                result.put("expires_in", jsonResponse.get("expires_in").asInt());
             }
             
             return result;
@@ -156,23 +156,23 @@ public class GoogleOAuthHandler {
             }
             in.close();
             
-            JsonObject jsonResponse = gson.fromJson(response.toString(), JsonObject.class);
+            JsonNode jsonResponse = objectMapper.readTree(response.toString());
             Map<String, Object> userInfo = new HashMap<>();
             
             if (jsonResponse.has("id")) {
-                userInfo.put("id", jsonResponse.get("id").getAsString());
+                userInfo.put("id", jsonResponse.get("id").asText());
             }
             if (jsonResponse.has("email")) {
-                userInfo.put("email", jsonResponse.get("email").getAsString());
+                userInfo.put("email", jsonResponse.get("email").asText());
             }
             if (jsonResponse.has("name")) {
-                userInfo.put("name", jsonResponse.get("name").getAsString());
+                userInfo.put("name", jsonResponse.get("name").asText());
             }
             if (jsonResponse.has("picture")) {
-                userInfo.put("picture", jsonResponse.get("picture").getAsString());
+                userInfo.put("picture", jsonResponse.get("picture").asText());
             }
             if (jsonResponse.has("verified_email")) {
-                userInfo.put("verified_email", jsonResponse.get("verified_email").getAsBoolean());
+                userInfo.put("verified_email", jsonResponse.get("verified_email").asBoolean());
             }
             
             return userInfo;

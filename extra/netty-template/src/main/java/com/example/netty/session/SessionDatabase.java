@@ -1,10 +1,9 @@
 package com.example.netty.session;
 
 import com.example.netty.config.AppConfig;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.lang.reflect.Type;
 import java.sql.*;
 import java.util.Map;
 
@@ -12,11 +11,11 @@ public class SessionDatabase {
     
     private static SessionDatabase instance;
     private Connection connection;
-    private final Gson gson;
+    private final ObjectMapper objectMapper;
     private final String dbUrl;
     
     private SessionDatabase() {
-        this.gson = new Gson();
+        this.objectMapper = new ObjectMapper();
         AppConfig config = AppConfig.getInstance();
         String dbPath = config.getSqliteDatabasePath();
         this.dbUrl = "jdbc:sqlite:" + dbPath;
@@ -73,14 +72,14 @@ public class SessionDatabase {
         
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, session.getSessionId());
-            pstmt.setString(2, gson.toJson(session.getUserInfo()));
+            pstmt.setString(2, objectMapper.writeValueAsString(session.getUserInfo()));
             pstmt.setLong(3, session.getCreatedAt());
             pstmt.setLong(4, session.getExpiresAt());
             
             pstmt.executeUpdate();
             return true;
             
-        } catch (SQLException e) {
+        } catch (Exception e) {
             System.err.println("Failed to save session: " + e.getMessage());
             e.printStackTrace();
             return false;
@@ -103,8 +102,8 @@ public class SessionDatabase {
                     long expiresAt = rs.getLong("expires_at");
                     
                     // Parse user info JSON back to Map
-                    Type type = new TypeToken<Map<String, Object>>(){}.getType();
-                    Map<String, Object> userInfo = gson.fromJson(userInfoJson, type);
+                    TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {};
+                    Map<String, Object> userInfo = objectMapper.readValue(userInfoJson, typeRef);
                     
                     // Create session object
                     Session session = new Session(sessionId, userInfo, createdAt, expiresAt);
@@ -119,7 +118,7 @@ public class SessionDatabase {
                 }
             }
             
-        } catch (SQLException e) {
+        } catch (Exception e) {
             System.err.println("Failed to get session: " + e.getMessage());
             e.printStackTrace();
         }

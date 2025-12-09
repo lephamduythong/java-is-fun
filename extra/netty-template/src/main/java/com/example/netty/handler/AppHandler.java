@@ -9,15 +9,15 @@ import java.util.Map;
 import com.example.netty.common.WonderUtils;
 import com.example.netty.session.Session;
 import com.example.netty.session.SessionManager;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.util.CharsetUtil;
 
 public class AppHandler {
-    private final Gson gson = new Gson();
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final SessionManager sessionManager = SessionManager.getInstance();
 
     public FullHttpResponse handleGetRequest(FullHttpRequest request) {
@@ -75,7 +75,7 @@ public class AppHandler {
         // Parse received JSON if possible
         try {
             if (contentBody != null && !contentBody.isEmpty()) {
-                JsonObject receivedJson = gson.fromJson(contentBody, JsonObject.class);
+                JsonNode receivedJson = objectMapper.readTree(contentBody);
                 responseData.put("parsedData", receivedJson);
             }
         } catch (Exception e) {
