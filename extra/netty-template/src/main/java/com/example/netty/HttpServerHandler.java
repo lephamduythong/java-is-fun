@@ -17,8 +17,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         String uri = request.uri();
         HttpMethod method = request.method();
         
-        System.out.println("Received " + method + " request for: " + uri);
-        
         FullHttpResponse response;
         
         // OAuth routes

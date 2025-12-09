@@ -1,6 +1,7 @@
 package com.example.netty;
 
 import com.example.netty.config.SslConfig;
+import com.example.netty.middleware.LoggingMiddleware;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -42,6 +43,9 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
         
         // HTTP aggregator - để có thể đọc full HTTP content
         pipeline.addLast(new HttpObjectAggregator(65536));
+        
+        // Logging middleware - log all requests and responses
+        pipeline.addLast(new LoggingMiddleware());
         
         // Custom handler
         pipeline.addLast(new HttpServerHandler());
