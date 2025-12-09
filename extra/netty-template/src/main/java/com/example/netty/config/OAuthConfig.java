@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class OAuthConfig {
     
-    private static final String CONFIG_FILE = "config/oauth.properties";
+    private static final String CONFIG_FILE = "src/main/resources/configs/oauth.properties";
     
     private String clientId;
     private String clientSecret;

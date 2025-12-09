@@ -41,7 +41,7 @@ public class ActiveMQConfig {
     
     private Properties loadProperties() {
         Properties properties = new Properties();
-        String configPath = "config/activemq.properties";
+        String configPath = "src/main/resources/configs/activemq.properties";
         
         try (InputStream input = new FileInputStream(configPath)) {
             properties.load(input);

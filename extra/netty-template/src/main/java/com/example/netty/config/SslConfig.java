@@ -33,7 +33,7 @@ public class SslConfig {
     
     private Properties loadProperties() {
         Properties properties = new Properties();
-        String configPath = "config/ssl.properties";
+        String configPath = "src/main/resources/configs/ssl.properties";
         
         try (InputStream input = new FileInputStream(configPath)) {
             properties.load(input);
