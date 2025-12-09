@@ -19,40 +19,70 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         
         FullHttpResponse response;
         
-        // OAuth routes
-        if (method == HttpMethod.GET && uri.equals("/login")) {
-            var oauthHandler = new OAuthHandler();
-            response = oauthHandler.handleLoginRequest();
-        }
-        else if (method == HttpMethod.GET && uri.startsWith("/oauth/callback")) {
-            var oauthHandler = new OAuthHandler();
-            response = oauthHandler.handleOAuthCallback(uri);
-        }
-        else if (method == HttpMethod.GET && uri.equals("/profile")) {
-            var oauthHandler = new OAuthHandler();
-            response = oauthHandler.handleProfileRequest(request);
-        }
-        else if (method == HttpMethod.GET && uri.equals("/logout")) {
-            var oauthHandler = new OAuthHandler();
-            response = oauthHandler.handleLogoutRequest(request);
-        }
-        // Protected routes - require authentication
-        else if (method == HttpMethod.GET && uri.startsWith("/hello")) {
-            var appHandler = new AppHandler();
-            response = appHandler.handleGetRequest(request);
-        }
-        else if (method == HttpMethod.POST && uri.startsWith("/data")) {
-            var appHandler = new AppHandler();
-            response = appHandler.handlePostRequest(request);
-        }
-        // 404 Not Found
-        else {
-            response = WonderUtils.createJsonResponse(NOT_FOUND, 
-                    WonderUtils.createErrorJson("Not Found", "The requested endpoint does not exist"));
+        // Route handling by HTTP method
+        if (method == HttpMethod.GET) {
+            response = handleGetRequest(request, uri);
+        } else if (method == HttpMethod.POST) {
+            response = handlePostRequest(request, uri);
+        } else if (method == HttpMethod.PUT) {
+            response = handlePutRequest(request, uri);
+        } else if (method == HttpMethod.DELETE) {
+            response = handleDeleteRequest(request, uri);
+        } else {
+            response = WonderUtils.createJsonResponse(NOT_FOUND, WonderUtils.createErrorJson("Not Found", "The requested endpoint does not exist"));
         }
         
         // Send response and close connection
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+    }
+    
+    private FullHttpResponse handleGetRequest(FullHttpRequest request, String uri) {
+        switch (uri) {
+            case "/login": {
+                var oauthHandler = new OAuthHandler();
+                return oauthHandler.handleLoginRequest();
+            }
+            case "/profile": {
+                var oauthHandler = new OAuthHandler();
+                return oauthHandler.handleProfileRequest(request);
+            }
+            case "/logout": {
+                var oauthHandler = new OAuthHandler();
+                return oauthHandler.handleLogoutRequest(request);
+            }
+            default: {
+                if (uri.startsWith("/oauth/callback")) {
+                    var oauthHandler = new OAuthHandler();
+                    return oauthHandler.handleOAuthCallback(uri);
+                } else if (uri.startsWith("/hello")) {
+                    var appHandler = new AppHandler();
+                    return appHandler.handleGetRequest(request);
+                } else {
+                    return WonderUtils.createJsonResponse(NOT_FOUND,
+                            WonderUtils.createErrorJson("Not Found", "The requested endpoint does not exist"));
+                }
+            }
+        }
+    }
+    
+    private FullHttpResponse handlePostRequest(FullHttpRequest request, String uri) {
+        if (uri.startsWith("/data")) {
+            var appHandler = new AppHandler();
+            return appHandler.handlePostRequest(request);
+        } else {
+            return WonderUtils.createJsonResponse(NOT_FOUND,
+                    WonderUtils.createErrorJson("Not Found", "The requested endpoint does not exist"));
+        }
+    }
+    
+    private FullHttpResponse handlePutRequest(FullHttpRequest request, String uri) {
+        return WonderUtils.createJsonResponse(NOT_FOUND,
+                WonderUtils.createErrorJson("Not Found", "The requested endpoint does not exist"));
+    }
+    
+    private FullHttpResponse handleDeleteRequest(FullHttpRequest request, String uri) {
+        return WonderUtils.createJsonResponse(NOT_FOUND,
+                WonderUtils.createErrorJson("Not Found", "The requested endpoint does not exist"));
     }
     
     @Override
