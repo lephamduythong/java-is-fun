@@ -40,3 +40,17 @@ docker run --name demo1_container -d demo1:tag1 bash -c "while true; do sleep 60
 # Enter running app container
 docker exec -it demo1_container bash -l
 
+# View logs
+docker logs demo1
+
+# View containers
+docker ps
+
+# Remove container
+docker rm demo1_container
+
+# View images
+docker images
+
+# Remove image
+docker rmi demo1:tag1
