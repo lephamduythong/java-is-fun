@@ -71,12 +71,19 @@ public class NettyServerApplication {
             System.out.println("  GET  http://localhost:" + HTTP_PORT + "/login");
             System.out.println("  GET  http://localhost:" + HTTP_PORT + "/hello");
             System.out.println("  POST http://localhost:" + HTTP_PORT + "/data");
+            System.out.println("\nStatic files:");
+            System.out.println("  GET  http://localhost:" + HTTP_PORT + "/static/index.html");
+            System.out.println("  GET  http://localhost:" + HTTP_PORT + "/static/test.txt");
+            System.out.println("  GET  http://localhost:" + HTTP_PORT + "/static/css/style.css");
+            System.out.println("  GET  http://localhost:" + HTTP_PORT + "/static/js/app.js");
             
             if (sslEnabled) {
                 System.out.println("\nHTTPS endpoints:");
                 System.out.println("  GET  https://localhost:" + HTTPS_PORT + "/login");
                 System.out.println("  GET  https://localhost:" + HTTPS_PORT + "/hello");
                 System.out.println("  POST https://localhost:" + HTTPS_PORT + "/data");
+                System.out.println("\nHTTPS static files:");
+                System.out.println("  GET  https://localhost:" + HTTPS_PORT + "/static/index.html");
                 System.out.println("\nNote: Self-signed certificate warnings are expected in browsers.");
             }
             System.out.println("==========================\n");

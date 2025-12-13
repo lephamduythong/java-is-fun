@@ -3,6 +3,7 @@ package com.example.netty;
 import com.example.netty.common.WonderUtils;
 import com.example.netty.handler.AppHandler;
 import com.example.netty.handler.OAuthHandler;
+import com.example.netty.handler.StaticFileHandler;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -57,6 +58,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                 } else if (uri.startsWith("/hello")) {
                     var appHandler = new AppHandler();
                     return appHandler.handleGetRequest(request);
+                } else if (uri.startsWith("/static/")) {
+                    // Serve static files from resources/static
+                    var staticFileHandler = new StaticFileHandler();
+                    return staticFileHandler.handleStaticFileRequest(uri.substring("/static".length()));
                 } else {
                     return WonderUtils.createJsonResponse(NOT_FOUND,
                             WonderUtils.createErrorJson("Not Found", "The requested endpoint does not exist"));
