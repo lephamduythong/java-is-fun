@@ -1,0 +1,104 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 10px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 800px;
+    width: 100%;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+h2 {
+    color: #555;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 10px;
+}
+
+p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.info ul li {
+    margin: 10px 0;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.info ul li:hover {
+    background: #e9ecef;
+}
+
+.info ul li a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.info ul li a:hover {
+    text-decoration: underline;
+}
+
+.demo {
+    margin-top: 30px;
+}
+
+#testBtn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#testBtn:hover {
+    background: #5568d3;
+}
+
+#message {
+    margin-top: 15px;
+    padding: 15px;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    color: #155724;
+    display: none;
+}
+
+#message.show {
+    display: block;
+}
