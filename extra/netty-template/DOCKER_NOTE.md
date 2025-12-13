@@ -54,3 +54,7 @@ docker images
 
 # Remove image
 docker rmi demo1:tag1
+
+# Push image to DockerHub
+docker tag demo1:tag1 thonglee/thong-web-java-app:v1
+docker push thonglee/thong-web-java-app:v1
