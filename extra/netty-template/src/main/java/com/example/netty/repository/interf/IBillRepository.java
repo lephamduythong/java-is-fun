@@ -1,4 +1,4 @@
-package com.example.netty.repository;
+package com.example.netty.repository.interf;
 
 import com.example.netty.repository.entity.Bill;
 

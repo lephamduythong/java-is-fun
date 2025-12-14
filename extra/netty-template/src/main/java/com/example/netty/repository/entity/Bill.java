@@ -1,5 +1,7 @@
 package com.example.netty.repository.entity;
 
+import com.example.netty.repository.validation.NonNegative;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -10,7 +12,10 @@ public class Bill {
     private Long id;
     private String billNumber;
     private String customerName;
+    
+    @NonNegative(message = "Amount must be non-negative")
     private BigDecimal amount;
+    
     private String status; // PENDING, PAID, CANCELLED
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

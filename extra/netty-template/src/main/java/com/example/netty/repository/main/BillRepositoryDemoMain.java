@@ -1,5 +1,7 @@
-package com.example.netty.repository;
+package com.example.netty.repository.main;
 
+import com.example.netty.repository.BillRepository;
+import com.example.netty.repository.interf.IBillRepository;
 import com.example.netty.repository.entity.Bill;
 
 import java.math.BigDecimal;

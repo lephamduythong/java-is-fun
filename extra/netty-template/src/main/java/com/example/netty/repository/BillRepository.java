@@ -1,6 +1,9 @@
 package com.example.netty.repository;
 
 import com.example.netty.repository.entity.Bill;
+import com.example.netty.repository.interf.IBillRepository;
+import com.example.netty.repository.validation.EntityValidator;
+import com.example.netty.repository.validation.ValidationException;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -62,6 +65,13 @@ public class BillRepository implements IBillRepository {
     
     @Override
     public Bill save(Bill bill) {
+        // Validate entity before saving
+        try {
+            EntityValidator.validateAndThrow(bill);
+        } catch (ValidationException e) {
+            throw new RuntimeException("Validation failed: " + e.getMessage(), e);
+        }
+        
         String sql = "INSERT INTO bills (bill_number, customer_name, amount, status, created_at, updated_at) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
         
@@ -104,6 +114,13 @@ public class BillRepository implements IBillRepository {
     
     @Override
     public Bill update(Bill bill) {
+        // Validate entity before updating
+        try {
+            EntityValidator.validateAndThrow(bill);
+        } catch (ValidationException e) {
+            throw new RuntimeException("Validation failed: " + e.getMessage(), e);
+        }
+        
         String sql = "UPDATE bills " +
                 "SET bill_number = ?, customer_name = ?, amount = ?, status = ?, updated_at = ? " +
                 "WHERE id = ?";
