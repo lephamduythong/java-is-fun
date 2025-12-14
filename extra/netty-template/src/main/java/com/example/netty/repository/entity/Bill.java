@@ -82,6 +82,12 @@ public class Bill {
     }
 
     public void setAmount(BigDecimal amount) {
+        if (amount == null) {
+            throw new IllegalArgumentException("Amount cannot be null");
+        }
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Amount must be non-negative");
+        }
         this.amount = amount;
     }
 
