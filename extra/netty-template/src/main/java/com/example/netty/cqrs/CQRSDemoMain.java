@@ -4,11 +4,11 @@ import com.example.netty.cqrs.command.CreateProductCommand;
 import com.example.netty.cqrs.command.DeleteProductCommand;
 import com.example.netty.cqrs.command.UpdateProductCommand;
 import com.example.netty.cqrs.domain.Product;
+import com.example.netty.cqrs.interf.IProductRepository;
 import com.example.netty.cqrs.mediator.CQRSMediator;
 import com.example.netty.cqrs.query.GetAllProductsQuery;
 import com.example.netty.cqrs.query.GetProductByIdQuery;
 import com.example.netty.cqrs.repository.InMemoryProductRepository;
-import com.example.netty.cqrs.repository.ProductRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,7 +24,7 @@ public class CQRSDemoMain {
         System.out.println("=== CQRS Pattern Demo with Repository ===\n");
 
         // Initialize repository and mediator
-        ProductRepository repository = new InMemoryProductRepository();
+        IProductRepository repository = new InMemoryProductRepository();
         CQRSMediator mediator = new CQRSMediator(repository);
 
         // 1. CREATE - Create new products

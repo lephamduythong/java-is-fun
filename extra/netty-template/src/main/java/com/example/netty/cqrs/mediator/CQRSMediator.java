@@ -5,9 +5,11 @@ import com.example.netty.cqrs.command.DeleteProductCommand;
 import com.example.netty.cqrs.command.UpdateProductCommand;
 import com.example.netty.cqrs.domain.Product;
 import com.example.netty.cqrs.handler.*;
+import com.example.netty.cqrs.interf.ICommandHandler;
+import com.example.netty.cqrs.interf.IQueryHandler;
+import com.example.netty.cqrs.interf.IProductRepository;
 import com.example.netty.cqrs.query.GetAllProductsQuery;
 import com.example.netty.cqrs.query.GetProductByIdQuery;
-import com.example.netty.cqrs.repository.ProductRepository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +24,7 @@ public class CQRSMediator {
     private final Map<Class<?>, Object> commandHandlers = new HashMap<>();
     private final Map<Class<?>, Object> queryHandlers = new HashMap<>();
 
-    public CQRSMediator(ProductRepository repository) {
+    public CQRSMediator(IProductRepository repository) {
         // Register command handlers
         registerCommandHandler(CreateProductCommand.class, new CreateProductCommandHandler(repository));
         registerCommandHandler(UpdateProductCommand.class, new UpdateProductCommandHandler(repository));
@@ -38,7 +40,7 @@ public class CQRSMediator {
      */
     public <TCommand, TResult> void registerCommandHandler(
             Class<TCommand> commandClass, 
-            CommandHandler<TCommand, TResult> handler) {
+            ICommandHandler<TCommand, TResult> handler) {
         commandHandlers.put(commandClass, handler);
     }
 
@@ -47,7 +49,7 @@ public class CQRSMediator {
      */
     public <TQuery, TResult> void registerQueryHandler(
             Class<TQuery> queryClass, 
-            QueryHandler<TQuery, TResult> handler) {
+            IQueryHandler<TQuery, TResult> handler) {
         queryHandlers.put(queryClass, handler);
     }
 
@@ -56,8 +58,8 @@ public class CQRSMediator {
      */
     @SuppressWarnings("unchecked")
     public <TCommand, TResult> TResult send(TCommand command) {
-        CommandHandler<TCommand, TResult> handler = 
-            (CommandHandler<TCommand, TResult>) commandHandlers.get(command.getClass());
+        ICommandHandler<TCommand, TResult> handler = 
+            (ICommandHandler<TCommand, TResult>) commandHandlers.get(command.getClass());
         
         if (handler == null) {
             throw new IllegalArgumentException("No handler registered for command: " + command.getClass().getName());
@@ -71,8 +73,8 @@ public class CQRSMediator {
      */
     @SuppressWarnings("unchecked")
     public <TQuery, TResult> TResult query(TQuery query) {
-        QueryHandler<TQuery, TResult> handler = 
-            (QueryHandler<TQuery, TResult>) queryHandlers.get(query.getClass());
+        IQueryHandler<TQuery, TResult> handler = 
+            (IQueryHandler<TQuery, TResult>) queryHandlers.get(query.getClass());
         
         if (handler == null) {
             throw new IllegalArgumentException("No handler registered for query: " + query.getClass().getName());
