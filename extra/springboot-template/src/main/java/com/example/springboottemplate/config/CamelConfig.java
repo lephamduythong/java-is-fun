@@ -1,8 +1,13 @@
 package com.example.springboottemplate.config;
 
+import java.io.IOException;
+
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.springframework.stereotype.Component;
+
+import com.example.springboottemplate.Utils;
+import com.example.springboottemplate.Constants;
 
 @Component
 public class CamelConfig extends RouteBuilder {
@@ -28,6 +33,13 @@ public class CamelConfig extends RouteBuilder {
                 .description("Create new user")
                 .type(User.class)
                 .to("direct:createUser");
+
+        rest("/images")
+            .description("Image service")
+            .get("/cat")
+                .description("Get cat image")
+                .produces("image/jpeg")
+                .to("direct:getCatImage");
 
         // Implement route logic
         from("direct:getUser")
@@ -61,6 +73,27 @@ public class CamelConfig extends RouteBuilder {
                 exchange.getIn().setBody(user);
             })
             .setHeader("Content-Type", constant("application/json"));
+        
+        Utils.logTextToFile(Constants.LOG_FILE_PATH, "Camel route started");
+
+        from("direct:getCatImage")
+            .routeId("getCatImageRoute")
+            .log("Reading cat image from classpath")
+            .process(exchange -> {
+                try {
+                    // Read file from classpath
+                    byte[] imageBytes = getClass().getClassLoader()
+                        .getResourceAsStream("static/img/cat.jpg")
+                        .readAllBytes();
+                    exchange.getIn().setBody(imageBytes);
+                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "Cat image read successfully");
+                } catch (Exception e) {
+                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "Error reading cat image: " + e.getMessage());
+                    throw e;
+                }
+            })
+            .setHeader("Content-Type", constant("image/jpeg"))
+            .setHeader("Content-Disposition", constant("inline; filename=cat.jpg"));
     }
 
     // Inner class for User model
