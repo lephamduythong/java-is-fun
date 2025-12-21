@@ -127,9 +127,9 @@ public class CamelConfig extends RouteBuilder {
                         return;
                     }
                     
-                    // Read file bytes
-                    byte[] fileBytes = java.nio.file.Files.readAllBytes(file.toPath());
-                    exchange.getIn().setBody(fileBytes);
+                    // Use FileInputStream for streaming (no memory loading)
+                    java.io.FileInputStream fileInputStream = new java.io.FileInputStream(file);
+                    exchange.getIn().setBody(fileInputStream);
                     
                     // Determine content type
                     String contentType = java.nio.file.Files.probeContentType(file.toPath());
@@ -139,9 +139,10 @@ public class CamelConfig extends RouteBuilder {
                     
                     exchange.getIn().setHeader("Content-Type", contentType);
                     exchange.getIn().setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+                    exchange.getIn().setHeader("Content-Length", file.length());
                     exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 200);
                     
-                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "File downloaded successfully: " + filename);
+                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "File download started: " + filename + " (" + file.length() + " bytes)");
                 } catch (Exception e) {
                     Utils.logTextToFile(Constants.LOG_FILE_PATH, "Error downloading file: " + e.getMessage());
                     exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 500);
@@ -153,6 +154,8 @@ public class CamelConfig extends RouteBuilder {
             .routeId("uploadFileRoute")
             .log("Uploading file: ${header.filename}")
             .process(exchange -> {
+                java.io.InputStream inputStream = null;
+                java.io.OutputStream outputStream = null;
                 try {
                     String filename = exchange.getIn().getHeader("filename", String.class);
                     String uploadFolder = "E:\\CODING\\Upload\\";
@@ -167,10 +170,10 @@ public class CamelConfig extends RouteBuilder {
                     String filePath = uploadFolder + filename;
                     Utils.logTextToFile(Constants.LOG_FILE_PATH, "Attempting to upload file: " + filePath);
                     
-                    // Get file content from request body
-                    byte[] fileBytes = exchange.getIn().getBody(byte[].class);
+                    // Get input stream from request body (streaming, no memory loading)
+                    inputStream = exchange.getIn().getBody(java.io.InputStream.class);
                     
-                    if (fileBytes == null || fileBytes.length == 0) {
+                    if (inputStream == null) {
                         Utils.logTextToFile(Constants.LOG_FILE_PATH, "No file content received");
                         exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 400);
                         exchange.getIn().setBody("{\"success\": false, \"message\": \"No file content received\"}");
@@ -178,24 +181,37 @@ public class CamelConfig extends RouteBuilder {
                         return;
                     }
                     
-                    // Write file to disk
-                    java.nio.file.Files.write(
-                        java.nio.file.Paths.get(filePath),
-                        fileBytes,
-                        java.nio.file.StandardOpenOption.CREATE,
-                        java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
-                    );
+                    // Stream file directly to disk (memory-efficient)
+                    outputStream = new java.io.FileOutputStream(filePath);
+                    byte[] buffer = new byte[8192]; // 8KB buffer
+                    int bytesRead;
+                    long totalBytes = 0;
                     
-                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "File uploaded successfully: " + filename + " (" + fileBytes.length + " bytes)");
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                        totalBytes += bytesRead;
+                    }
+                    
+                    outputStream.flush();
+                    
+                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "File uploaded successfully: " + filename + " (" + totalBytes + " bytes)");
                     
                     exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 200);
-                    exchange.getIn().setBody("{\"success\": true, \"message\": \"File uploaded successfully\", \"filename\": \"" + filename + "\", \"size\": " + fileBytes.length + "}");
+                    exchange.getIn().setBody("{\"success\": true, \"message\": \"File uploaded successfully\", \"filename\": \"" + filename + "\", \"size\": " + totalBytes + "}");
                     exchange.getIn().setHeader("Content-Type", "application/json");
                 } catch (Exception e) {
                     Utils.logTextToFile(Constants.LOG_FILE_PATH, "Error uploading file: " + e.getMessage());
                     exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 500);
                     exchange.getIn().setBody("{\"success\": false, \"message\": \"Error uploading file: " + e.getMessage() + "\"}");
                     exchange.getIn().setHeader("Content-Type", "application/json");
+                } finally {
+                    // Close streams
+                    if (inputStream != null) {
+                        try { inputStream.close(); } catch (Exception e) {}
+                    }
+                    if (outputStream != null) {
+                        try { outputStream.close(); } catch (Exception e) {}
+                    }
                 }
             });
     }
