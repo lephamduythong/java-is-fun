@@ -1,19 +1,20 @@
 package com.example.netty.cqrs.handler;
 
 import com.example.netty.cqrs.domain.Product;
+import com.example.netty.cqrs.interf.IQueryHandler;
+import com.example.netty.cqrs.interf.IProductRepository;
 import com.example.netty.cqrs.query.GetProductByIdQuery;
-import com.example.netty.cqrs.repository.ProductRepository;
 
 import java.util.Optional;
 
 /**
  * Handler for GetProductByIdQuery
  */
-public class GetProductByIdQueryHandler implements QueryHandler<GetProductByIdQuery, Optional<Product>> {
+public class GetProductByIdQueryHandler implements IQueryHandler<GetProductByIdQuery, Optional<Product>> {
     
-    private final ProductRepository repository;
+    private final IProductRepository repository;
 
-    public GetProductByIdQueryHandler(ProductRepository repository) {
+    public GetProductByIdQueryHandler(IProductRepository repository) {
         this.repository = repository;
     }
 

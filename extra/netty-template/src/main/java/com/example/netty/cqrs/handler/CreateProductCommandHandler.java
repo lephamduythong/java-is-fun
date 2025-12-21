@@ -2,16 +2,17 @@ package com.example.netty.cqrs.handler;
 
 import com.example.netty.cqrs.command.CreateProductCommand;
 import com.example.netty.cqrs.domain.Product;
-import com.example.netty.cqrs.repository.ProductRepository;
+import com.example.netty.cqrs.interf.ICommandHandler;
+import com.example.netty.cqrs.interf.IProductRepository;
 
 /**
  * Handler for CreateProductCommand
  */
-public class CreateProductCommandHandler implements CommandHandler<CreateProductCommand, Product> {
+public class CreateProductCommandHandler implements ICommandHandler<CreateProductCommand, Product> {
     
-    private final ProductRepository repository;
+    private final IProductRepository repository;
 
-    public CreateProductCommandHandler(ProductRepository repository) {
+    public CreateProductCommandHandler(IProductRepository repository) {
         this.repository = repository;
     }
 

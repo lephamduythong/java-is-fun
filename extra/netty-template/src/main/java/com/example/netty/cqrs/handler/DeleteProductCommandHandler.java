@@ -1,16 +1,17 @@
 package com.example.netty.cqrs.handler;
 
 import com.example.netty.cqrs.command.DeleteProductCommand;
-import com.example.netty.cqrs.repository.ProductRepository;
+import com.example.netty.cqrs.interf.ICommandHandler;
+import com.example.netty.cqrs.interf.IProductRepository;
 
 /**
  * Handler for DeleteProductCommand
  */
-public class DeleteProductCommandHandler implements CommandHandler<DeleteProductCommand, Boolean> {
+public class DeleteProductCommandHandler implements ICommandHandler<DeleteProductCommand, Boolean> {
     
-    private final ProductRepository repository;
+    private final IProductRepository repository;
 
-    public DeleteProductCommandHandler(ProductRepository repository) {
+    public DeleteProductCommandHandler(IProductRepository repository) {
         this.repository = repository;
     }
 

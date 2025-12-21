@@ -1,9 +1,10 @@
 package com.example.netty.cqrs;
 
 import com.example.netty.cqrs.http.ProductCQRSHandler;
+import com.example.netty.cqrs.interf.IProductRepository;
 import com.example.netty.cqrs.mediator.CQRSMediator;
 import com.example.netty.cqrs.repository.InMemoryProductRepository;
-import com.example.netty.cqrs.repository.ProductRepository;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -21,7 +22,7 @@ public class CQRSHttpServerMain {
 
     public static void main(String[] args) throws Exception {
         // Initialize CQRS components
-        ProductRepository repository = new InMemoryProductRepository();
+        IProductRepository repository = new InMemoryProductRepository();
         CQRSMediator mediator = new CQRSMediator(repository);
         ProductCQRSHandler productHandler = new ProductCQRSHandler(mediator);
 

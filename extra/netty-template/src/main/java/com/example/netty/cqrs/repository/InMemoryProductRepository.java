@@ -1,6 +1,7 @@
 package com.example.netty.cqrs.repository;
 
 import com.example.netty.cqrs.domain.Product;
+import com.example.netty.cqrs.interf.IProductRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * In-memory implementation of ProductRepository
  */
-public class InMemoryProductRepository implements ProductRepository {
+public class InMemoryProductRepository implements IProductRepository {
     
     private final Map<String, Product> storage = new ConcurrentHashMap<>();
     
