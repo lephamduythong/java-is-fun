@@ -41,6 +41,12 @@ public class CamelConfig extends RouteBuilder {
                 .produces("image/jpeg")
                 .to("direct:getCatImage");
 
+        rest("/download")
+            .description("File download service")
+            .get("/{filename}")
+                .description("Download file from E:\\CODING\\Download folder")
+                .to("direct:downloadFile");
+
         // Implement route logic
         from("direct:getUser")
             .routeId("getUserRoute")
@@ -94,6 +100,46 @@ public class CamelConfig extends RouteBuilder {
             })
             .setHeader("Content-Type", constant("image/jpeg"))
             .setHeader("Content-Disposition", constant("inline; filename=cat.jpg"));
+
+        from("direct:downloadFile")
+            .routeId("downloadFileRoute")
+            .log("Downloading file: ${header.filename}")
+            .process(exchange -> {
+                try {
+                    String filename = exchange.getIn().getHeader("filename", String.class);
+                    String filePath = "E:\\CODING\\Download\\" + filename;
+                    
+                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "Attempting to download file: " + filePath);
+                    
+                    java.io.File file = new java.io.File(filePath);
+                    if (!file.exists() || !file.isFile()) {
+                        Utils.logTextToFile(Constants.LOG_FILE_PATH, "File not found: " + filePath);
+                        exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 404);
+                        exchange.getIn().setBody("File not found: " + filename);
+                        return;
+                    }
+                    
+                    // Read file bytes
+                    byte[] fileBytes = java.nio.file.Files.readAllBytes(file.toPath());
+                    exchange.getIn().setBody(fileBytes);
+                    
+                    // Determine content type
+                    String contentType = java.nio.file.Files.probeContentType(file.toPath());
+                    if (contentType == null) {
+                        contentType = "application/octet-stream";
+                    }
+                    
+                    exchange.getIn().setHeader("Content-Type", contentType);
+                    exchange.getIn().setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+                    exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 200);
+                    
+                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "File downloaded successfully: " + filename);
+                } catch (Exception e) {
+                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "Error downloading file: " + e.getMessage());
+                    exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 500);
+                    exchange.getIn().setBody("Error downloading file: " + e.getMessage());
+                }
+            });
     }
 
     // Inner class for User model
