@@ -15,6 +15,7 @@
     <groupId>com.example</groupId>
     <artifactId>springboot-template</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
     <name>springboot-template</name>
     <description>Spring Boot Maven project compatible with Java 11</description>
     
@@ -29,16 +30,24 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
+        <!-- Mark Tomcat as provided to use external server (JBoss/WildFly) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     
     <build>
+        <finalName>test-api</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

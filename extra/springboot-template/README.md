@@ -69,16 +69,16 @@ You should see: `Hello, Spring Boot with Java 11!`
 
 ## Building for Production
 
-Create a JAR file:
+Create a WAR file:
 
 ```bash
 mvn clean package
 ```
 
-Run the JAR:
+Run the WAR:
 
 ```bash
-java -jar target/springboot-template-0.0.1-SNAPSHOT.jar
+java -jar target/test-api.war
 ```
 
 ## Configuration
