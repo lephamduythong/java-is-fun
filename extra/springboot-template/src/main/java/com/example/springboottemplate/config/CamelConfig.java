@@ -47,6 +47,14 @@ public class CamelConfig extends RouteBuilder {
                 .description("Download file from E:\\CODING\\Download folder")
                 .to("direct:downloadFile");
 
+        rest("/upload")
+            .description("File upload service")
+            .post("/{filename}")
+                .description("Upload file to E:\\CODING\\Upload folder")
+                .consumes("multipart/form-data,application/octet-stream")
+                .bindingMode(RestBindingMode.off)
+                .to("direct:uploadFile");
+
         // Implement route logic
         from("direct:getUser")
             .routeId("getUserRoute")
@@ -138,6 +146,56 @@ public class CamelConfig extends RouteBuilder {
                     Utils.logTextToFile(Constants.LOG_FILE_PATH, "Error downloading file: " + e.getMessage());
                     exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 500);
                     exchange.getIn().setBody("Error downloading file: " + e.getMessage());
+                }
+            });
+
+        from("direct:uploadFile")
+            .routeId("uploadFileRoute")
+            .log("Uploading file: ${header.filename}")
+            .process(exchange -> {
+                try {
+                    String filename = exchange.getIn().getHeader("filename", String.class);
+                    String uploadFolder = "E:\\CODING\\Upload\\";
+                    
+                    // Create upload directory if it doesn't exist
+                    java.io.File uploadDir = new java.io.File(uploadFolder);
+                    if (!uploadDir.exists()) {
+                        uploadDir.mkdirs();
+                        Utils.logTextToFile(Constants.LOG_FILE_PATH, "Created upload directory: " + uploadFolder);
+                    }
+                    
+                    String filePath = uploadFolder + filename;
+                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "Attempting to upload file: " + filePath);
+                    
+                    // Get file content from request body
+                    byte[] fileBytes = exchange.getIn().getBody(byte[].class);
+                    
+                    if (fileBytes == null || fileBytes.length == 0) {
+                        Utils.logTextToFile(Constants.LOG_FILE_PATH, "No file content received");
+                        exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 400);
+                        exchange.getIn().setBody("{\"success\": false, \"message\": \"No file content received\"}");
+                        exchange.getIn().setHeader("Content-Type", "application/json");
+                        return;
+                    }
+                    
+                    // Write file to disk
+                    java.nio.file.Files.write(
+                        java.nio.file.Paths.get(filePath),
+                        fileBytes,
+                        java.nio.file.StandardOpenOption.CREATE,
+                        java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
+                    );
+                    
+                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "File uploaded successfully: " + filename + " (" + fileBytes.length + " bytes)");
+                    
+                    exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 200);
+                    exchange.getIn().setBody("{\"success\": true, \"message\": \"File uploaded successfully\", \"filename\": \"" + filename + "\", \"size\": " + fileBytes.length + "}");
+                    exchange.getIn().setHeader("Content-Type", "application/json");
+                } catch (Exception e) {
+                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "Error uploading file: " + e.getMessage());
+                    exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 500);
+                    exchange.getIn().setBody("{\"success\": false, \"message\": \"Error uploading file: " + e.getMessage() + "\"}");
+                    exchange.getIn().setHeader("Content-Type", "application/json");
                 }
             });
     }
