@@ -36,6 +36,7 @@ public class EventSourcingDemoMain {
         AuditLogEventHandler auditHandler = new AuditLogEventHandler();
         StatisticsEventHandler statsHandler = new StatisticsEventHandler();
         
+        // Add external handlers
         eventBus.register(auditHandler);
         eventBus.register(statsHandler);
 
