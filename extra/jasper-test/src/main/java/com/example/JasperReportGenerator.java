@@ -24,6 +24,7 @@ public class JasperReportGenerator {
             List<Map<String, Object>> dataList = new ArrayList<>();
             Map<String, Object> dataRow = new HashMap<>();
             dataRow.put("CUSTOMER_NAME", "LÊ PHẠM DUY THÔNG#CÙI VĂN BẮP");
+            dataRow.put("TICK_1", "NO");
             dataList.add(dataRow);
             
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(dataList);
