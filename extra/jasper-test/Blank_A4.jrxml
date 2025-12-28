@@ -6,6 +6,7 @@
 		<![CDATA[]]>
 	</queryString>
 	<field name="DATA_ID" class="java.lang.String"/>
+	<field name="CUSTOMER_NAME" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -22,7 +23,12 @@
 		<band height="125" splitType="Stretch">
 			<textField>
 				<reportElement x="0" y="30" width="420" height="30" uuid="8845e4b3-c2c9-4b7b-a9d1-581820fc5bcc"/>
-				<textFieldExpression><![CDATA[($F{DATA_ID}).split("#")[0]]]></textFieldExpression>
+				<textElement>
+					<font fontName="DejaVu Sans" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{CUSTOMER_NAME} != null && !$F{CUSTOMER_NAME}.trim().isEmpty() && $F{CUSTOMER_NAME}.split("#").length > 0)
+? $F{CUSTOMER_NAME}.split("#")[0]
+: ""]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

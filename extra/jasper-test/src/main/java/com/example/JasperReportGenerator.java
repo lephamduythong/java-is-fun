@@ -23,7 +23,7 @@ public class JasperReportGenerator {
             // Tạo datasource với field DATA_ID
             List<Map<String, Object>> dataList = new ArrayList<>();
             Map<String, Object> dataRow = new HashMap<>();
-            dataRow.put("DATA_ID", "123#456");
+            dataRow.put("CUSTOMER_NAME", "LÊ PHẠM DUY THÔNG#CÙI VĂN BẮP");
             dataList.add(dataRow);
             
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(dataList);
