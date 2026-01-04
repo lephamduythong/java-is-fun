@@ -1,14 +1,41 @@
 package com.example.springboottemplate.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HelloController {
 
+    private static final Logger logger = LogManager.getLogger(HelloController.class);
+
     @GetMapping("/")
     public String hello() {
+        logger.info("Hello endpoint was called");
+        logger.debug("This is a DEBUG level log message");
         return "Hello, Spring Boot with Java 11!";
+    }
+
+    @GetMapping("/log-demo")
+    public String logDemo(@RequestParam(defaultValue = "World") String name) {
+        logger.trace("TRACE level log - Entering logDemo method");
+        logger.debug("DEBUG level log - Parameter received: {}", name);
+        logger.info("INFO level log - Processing request for name: {}", name);
+        logger.warn("WARN level log - This is a warning message");
+        
+        try {
+            // Simulate a potential error scenario
+            if ("error".equalsIgnoreCase(name)) {
+                throw new RuntimeException("Simulated error for demonstration");
+            }
+        } catch (Exception e) {
+            logger.error("ERROR level log - An error occurred: {}", e.getMessage(), e);
+        }
+        
+        logger.info("Successfully processed request for: {}", name);
+        return String.format("Log demo completed! Check logs folder for output. Hello, %s!", name);
     }
 
 }
