@@ -5,6 +5,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class VibiStoreContextAPI { // WARNING: Change this name class for only 1 DB name only
 
@@ -12,6 +15,8 @@ public class VibiStoreContextAPI { // WARNING: Change this name class for only 1
     private Connection connection;
     private final String dbPath;
     private static final String BASE_DIR = "./VIBI_STORE_CONTEXT_API/"; // WARNING: Change this BASE_DIR
+    private ScheduledExecutorService reconnectScheduler;
+    private static final long RECONNECT_CHECK_INTERVAL = 30; // seconds
 
     // Private constructor to ensure singleton pattern
     private VibiStoreContextAPI() throws SQLException {
@@ -38,6 +43,9 @@ public class VibiStoreContextAPI { // WARNING: Change this name class for only 1
 
         // Create default table
         createDefaultTable();
+        
+        // Start auto-reconnect job
+        startAutoReconnectJob();
     }
 
     /**
@@ -96,18 +104,60 @@ public class VibiStoreContextAPI { // WARNING: Change this name class for only 1
     }
 
     /**
+     * Start auto-reconnect job to check connection periodically
+     */
+    private void startAutoReconnectJob() {
+        reconnectScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread thread = new Thread(r, "DB-Auto-Reconnect");
+            thread.setDaemon(true);
+            return thread;
+        });
+
+        reconnectScheduler.scheduleWithFixedDelay(() -> {
+            try {
+                // Check if connection is valid
+                if (connection == null || connection.isClosed() || !connection.isValid(5)) {
+                    System.out.println("[Auto-Reconnect] Connection lost, attempting to reconnect...");
+                    synchronized (this) {
+                        if (connection != null && !connection.isClosed()) {
+                            connection.close();
+                        }
+                        initializeConnection();
+                        System.out.println("[Auto-Reconnect] Successfully reconnected to database");
+                    }
+                }
+            } catch (SQLException e) {
+                System.err.println("[Auto-Reconnect] Failed to reconnect: " + e.getMessage());
+            }
+        }, RECONNECT_CHECK_INTERVAL, RECONNECT_CHECK_INTERVAL, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Stop auto-reconnect job
+     */
+    private void stopAutoReconnectJob() {
+        if (reconnectScheduler != null && !reconnectScheduler.isShutdown()) {
+            reconnectScheduler.shutdown();
+            try {
+                if (!reconnectScheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                    reconnectScheduler.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                reconnectScheduler.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    /**
      * Get current connection (thread-safe)
      * 
      * @return Connection object
      * @throws SQLException If connection is invalid
      */
-    public Connection getConnection() throws SQLException {
+    public synchronized Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
-
-            if (connection == null || connection.isClosed()) {
-                initializeConnection();
-            }
-
+            initializeConnection();
         }
         return connection;
     }
@@ -116,6 +166,7 @@ public class VibiStoreContextAPI { // WARNING: Change this name class for only 1
      * Close database connection
      */
     public void closeConnection() throws SQLException {
+        stopAutoReconnectJob();
         if (connection != null && !connection.isClosed()) {
             connection.close();
         }
