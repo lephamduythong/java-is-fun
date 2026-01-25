@@ -88,23 +88,42 @@ public class MainTest {
         }
     }
     
-    public static void main(String[] args) {
+    public static void main(String[] args)  {
+        
+        VibiStoreContextAPI storeContextApi = null;
         try {
             System.out.println("=== Starting VibiStoreContextAPI Test ===\n");
-            
+            storeContextApi = VibiStoreContextAPI.getInstance("N:\\DB\\CLGT.db");
+        } catch (Exception e) {
+            System.err.println("❌ Error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
+           
+        try {
+            storeContextApi.write("33", "22");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-            IVibiStoreAPI requestStoreApi = VibiRequestStoreAPI.getInstance();
-            IVibiStoreAPI responseStoreApi = VibiResponseStoreAPI.getInstance();
+        try {
+            Thread.sleep(10000000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+            // IVibiStoreAPI requestStoreApi = VibiRequestStoreAPI.getInstance();
+            // IVibiStoreAPI responseStoreApi = VibiResponseStoreAPI.getInstance();
             
-            // Test sendAndWait method
-            String testId = "id3";
-            String testValue = "GGWP2";
-            String response = sendAndWait(requestStoreApi, responseStoreApi, testId, testValue);
+            // // Test sendAndWait method
+            // String testId = "id3";
+            // String testValue = "GGWP2";
+            // String response = sendAndWait(requestStoreApi, responseStoreApi, testId, testValue);
 
             
             
-            System.out.println("\n=== Test completed successfully! ===");
-            System.out.println("Final response: " + response);
+            // System.out.println("\n=== Test completed successfully! ===");
+            // System.out.println("Final response: " + response);
 
         
             //     System.out.println("   ✓ Database created at: " + api.getDatabasePath());
@@ -162,9 +181,6 @@ public class MainTest {
             
         //     System.out.println("\n=== Test completed successfully! ===");
             
-        } catch (Exception e) {
-            System.err.println("❌ Error occurred: " + e.getMessage());
-            e.printStackTrace();
-        }
+        
     }
 }

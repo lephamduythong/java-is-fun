@@ -16,7 +16,8 @@ public class VibiStoreContextAPI { // WARNING: Change this name class for only 1
     private final String dbPath;
     private static final String BASE_DIR = "./VIBI_STORE_CONTEXT_API/"; // WARNING: Change this BASE_DIR
     private ScheduledExecutorService reconnectScheduler;
-    private static final long RECONNECT_CHECK_INTERVAL = 30; // seconds
+    private static final long RECONNECT_CHECK_INTERVAL = 5; // seconds
+    private boolean isFirstConnection = true;
 
     // Private constructor to ensure singleton pattern
     private VibiStoreContextAPI() throws SQLException {
@@ -33,6 +34,9 @@ public class VibiStoreContextAPI { // WARNING: Change this name class for only 1
         File dbFile = new File(this.dbPath);
         boolean isNewDatabase = !dbFile.exists();
 
+        // Start auto-reconnect job
+        startAutoReconnectJob();
+
         // Initialize connection
         initializeConnection();
 
@@ -43,9 +47,27 @@ public class VibiStoreContextAPI { // WARNING: Change this name class for only 1
 
         // Create default table
         createDefaultTable();
-        
+    }
+
+    private VibiStoreContextAPI(String customPath) throws SQLException {
+        // Use custom path for database file
+        this.dbPath = customPath;
+        File dbFile = new File(this.dbPath);
+        boolean isNewDatabase = !dbFile.exists();
+
         // Start auto-reconnect job
         startAutoReconnectJob();
+
+        // Initialize connection
+        initializeConnection();
+
+        // If new database, enable WAL mode
+        if (isNewDatabase) {
+            enableWALMode();
+        }
+
+        // Create default table
+        createDefaultTable();
     }
 
     /**
@@ -67,19 +89,39 @@ public class VibiStoreContextAPI { // WARNING: Change this name class for only 1
     }
 
     /**
+     * Get instance of VibiStoreContextAPI with custom database path (thread-safe double-checked locking)
+     * 
+     * @param customPath Custom path for the database file
+     * @return Unique instance of the class
+     * @throws SQLException If error occurs during database initialization
+     */
+    public static VibiStoreContextAPI getInstance(String customPath) throws SQLException {
+        if (instance == null) {
+            synchronized (VibiStoreContextAPI.class) {
+                if (instance == null) {
+                    instance = new VibiStoreContextAPI(customPath);
+                }
+            }
+        }
+        return instance;
+    }
+
+
+
+    /**
      * Initialize connection to database
      */
-    private void initializeConnection() throws SQLException {
+    private void initializeConnection() {
         try {
             // Load SQLite JDBC driver
             Class.forName("org.sqlite.JDBC");
-
             // Create connection to SQLite
             String url = "jdbc:sqlite:" + dbPath;
             connection = DriverManager.getConnection(url);
-
+        } catch (SQLException e) {
+            e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            throw new SQLException("SQLite JDBC driver not found", e);
+            e.printStackTrace();
         }
     }
 
@@ -115,7 +157,12 @@ public class VibiStoreContextAPI { // WARNING: Change this name class for only 1
 
         reconnectScheduler.scheduleWithFixedDelay(() -> {
             try {
+                if (isFirstConnection) {
+                    isFirstConnection = false;
+                    return;
+                }
                 // Check if connection is valid
+                System.out.println("Checking DB connection validity...");
                 if (connection == null || connection.isClosed() || !connection.isValid(5)) {
                     System.out.println("[Auto-Reconnect] Connection lost, attempting to reconnect...");
                     synchronized (this) {
@@ -123,7 +170,6 @@ public class VibiStoreContextAPI { // WARNING: Change this name class for only 1
                             connection.close();
                         }
                         initializeConnection();
-                        System.out.println("[Auto-Reconnect] Successfully reconnected to database");
                     }
                 }
             } catch (SQLException e) {
