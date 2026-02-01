@@ -126,20 +126,18 @@ public class WonderQueueSrvConsumer {
                         String text = textMessage.getText();
                         _logger.debug("Async message received from ActiveMQ server: " + text);
 
-                        // try {
-                        //     _logger.debug("Writing message to DB...");
-                        //     storeDbSrv.write(UUID.randomUUID().toString(), text);
-                        // } catch (SQLException e) {
-                        //     _logger.error("Error accessing WonderDbStoreSrv: " + e.getMessage());
-                        // }
+                        try {
+                            _logger.debug("Writing message to DB...");
+                            storeDbSrv.write(WonderUtils.generateTimestampId(WonderUtils.generateRandomHash(8)), text);
+                        } catch (SQLException e) {
+                            _logger.error("Error accessing WonderDbStoreSrv: " + e.getMessage());
+                        }
 
                         // Write direct to file on disk
                         try {
-                            WonderUtils.writeTextToFile("E:/CODING/Files/" + 
-                                WonderUtils.generateTimestampId(
-                                    WonderUtils.generateRandomHash(8)
-                                ) + 
-                                ".data"
+                            WonderUtils.writeTextToFile(
+                                WonderQueueSrvConfig.getInstance().getDataMsgStoragePath() + 
+                                WonderUtils.generateTimestampId(WonderUtils.generateRandomHash(8)) + ".data"
                             , text);
                         } catch (IOException e) {
                             _logger.error("Error writing message to file: " + e.getMessage());

@@ -22,19 +22,25 @@ public class WonderQueueSrvConfig {
     private final String password;
     private final long reconnectIntervalSeconds;
     private final boolean trustAllPackages;
+    private final String dataMsgStoragePath;
     
     private WonderQueueSrvConfig() {
+        
+        // Change config here - START
         this.brokerUrl = System.getenv("ACTIVEMQ_BROKER_URL");
         this.username = System.getenv("ACTIVEMQ_USERNAME");
         this.password = System.getenv("ACTIVEMQ_PASSWORD");
         this.reconnectIntervalSeconds = 10;
         this.trustAllPackages = true;
+        this.dataMsgStoragePath =  "E:/CODING/Files/";
+        // Change config here - END
 
         _logger.debug("ActiveMQ Config - Broker URL: " + brokerUrl);
         _logger.debug("ActiveMQ Config - Username: " + username);
         _logger.debug("ActiveMQ Config - Password: " + password);
         _logger.debug("ActiveMQ Config - Reconnect Interval Seconds: " + reconnectIntervalSeconds);
         _logger.debug("ActiveMQ Config - Trust All Packages: " + trustAllPackages);
+        _logger.debug("ActiveMQ Config - Data Message Storage Path: " + dataMsgStoragePath);
     }
     
     public static WonderQueueSrvConfig getInstance() {
@@ -80,5 +86,9 @@ public class WonderQueueSrvConfig {
     
     public boolean isTrustAllPackages() {
         return trustAllPackages;
+    }
+
+    public String getDataMsgStoragePath() {
+        return dataMsgStoragePath;
     }
 }

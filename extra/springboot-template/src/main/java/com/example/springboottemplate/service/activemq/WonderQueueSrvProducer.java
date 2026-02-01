@@ -11,20 +11,11 @@ import org.slf4j.LoggerFactory;
  */
 public class WonderQueueSrvProducer {
     private static final Logger _logger = LoggerFactory.getLogger("MY_SYSTEM");
-
-    private static final String DEFAULT_QUEUE = "thong.queue.request";
     
     private Connection connection;
     private Session session;
     private javax.jms.MessageProducer jmsProducer;
     private Destination destination;
-
-    /**
-     * Initialize producer with default queue
-     */
-    public WonderQueueSrvProducer() throws JMSException {
-        this(DEFAULT_QUEUE, false);
-    }
 
     /**
      * Initialize producer with custom destination
@@ -99,7 +90,7 @@ public class WonderQueueSrvProducer {
         WonderQueueSrvProducer producer = null;
         try {
             // Create producer
-            producer = new WonderQueueSrvProducer();
+            producer = new WonderQueueSrvProducer("thong.topic.request", true);
             
             // Send single message
             producer.sendMessage("Hello from ActiveMQ!");

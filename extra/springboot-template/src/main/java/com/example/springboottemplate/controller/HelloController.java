@@ -63,7 +63,7 @@ public class HelloController {
             logger.info("==1");
 
             // Create producer
-            producer = new WonderQueueSrvProducer();
+            producer = new WonderQueueSrvProducer("thong.topic.request", true);
             
             logger.info("==2");
 
