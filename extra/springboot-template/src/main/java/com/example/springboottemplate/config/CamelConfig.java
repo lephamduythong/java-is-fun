@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.example.springboottemplate.Utils;
-import com.example.springboottemplate.service.activemq.ActiveMQConsumerSingleton;
+import com.example.springboottemplate.service.activemq.WonderQueueSrvConsumerSingleton;
 import com.example.springboottemplate.Constants;
 
 @Component
@@ -228,14 +228,14 @@ public class CamelConfig extends RouteBuilder {
             .process(exchange -> {
                 _logger.debug("Consumer check START");
                 try {
-                    var consumer = ActiveMQConsumerSingleton.getInstance();
+                    var consumer = WonderQueueSrvConsumerSingleton.getInstance();
                     _logger.debug("Starting ActiveMQ Consumer...");
                     consumer.startListening();
                     _logger.debug("ActiveMQ Consumer started successfully and listening for messages");
                 } catch (Exception e) {
-                    ActiveMQConsumerSingleton consumer = null;
+                    WonderQueueSrvConsumerSingleton consumer = null;
                     try {
-                        consumer = ActiveMQConsumerSingleton.getInstance();
+                        consumer = WonderQueueSrvConsumerSingleton.getInstance();
                     } catch (JMSException e1) {
                         _logger.error("Consumer error init: " + e1.getMessage(), e1);
                     }

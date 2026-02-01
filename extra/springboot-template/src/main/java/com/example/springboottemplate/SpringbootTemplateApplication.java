@@ -14,8 +14,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 
-import com.example.springboottemplate.service.activemq.ActiveMQConsumer;
-import com.example.springboottemplate.service.activemq.ActiveMQConsumerSingleton;
+import com.example.springboottemplate.service.activemq.WonderQueueSrvConsumer;
+import com.example.springboottemplate.service.activemq.WonderQueueSrvConsumerSingleton;
 import com.example.springboottemplate.service.jms.JmsConsumer;
 
 @SpringBootApplication

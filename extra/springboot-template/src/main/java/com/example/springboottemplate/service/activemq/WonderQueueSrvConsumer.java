@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
  * ActiveMQ Message Consumer
  * Receives messages from a queue or topic
  */
-public class ActiveMQConsumer {
+public class WonderQueueSrvConsumer {
     private static final String DEFAULT_QUEUE = "thong.queue.request";
 
     private static final Logger _logger = LoggerFactory.getLogger("MY_SYSTEM");
@@ -23,7 +23,7 @@ public class ActiveMQConsumer {
     /**
      * Initialize consumer with default queue
      */
-    public ActiveMQConsumer() throws JMSException {
+    public WonderQueueSrvConsumer() throws JMSException {
         this(DEFAULT_QUEUE, false);
     }
 
@@ -32,8 +32,8 @@ public class ActiveMQConsumer {
      * @param destinationName Name of queue or topic
      * @param isTopic true for topic, false for queue
      */
-    public ActiveMQConsumer(String destinationName, boolean isTopic) throws JMSException {
-        connection = ActiveMQGateway.getInstance().getConnection();
+    public WonderQueueSrvConsumer(String destinationName, boolean isTopic) throws JMSException {
+        connection = WonderQueueSrv.getInstance().getConnection();
         // false: no transactions
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         
@@ -99,7 +99,7 @@ public class ActiveMQConsumer {
         if (jmsConsumer == null) {
             throw new JMSException("Consumer not initialized");
         }
-        if (!ActiveMQGateway.getInstance().checkConnection()) {
+        if (!WonderQueueSrv.getInstance().checkConnection()) {
             throw new JMSException("ActiveMQ connection is not active");
         }
         if (isFirstLoad) {
@@ -154,9 +154,9 @@ public class ActiveMQConsumer {
      * Example usage - Synchronous receive
      */
     public static void exampleSyncReceive() {
-        ActiveMQConsumer consumer = null;
+        WonderQueueSrvConsumer consumer = null;
         try {
-            consumer = new ActiveMQConsumer();
+            consumer = new WonderQueueSrvConsumer();
             
             _logger.debug("Waiting for messages (5 second timeout)...");
             
@@ -176,7 +176,7 @@ public class ActiveMQConsumer {
             if (consumer != null) {
                 consumer.close();
             }
-            ActiveMQGateway.getInstance().closeConnection();
+            WonderQueueSrv.getInstance().closeConnection();
         }
     }
 
@@ -184,9 +184,9 @@ public class ActiveMQConsumer {
      * Example usage - Asynchronous listener
      */
     public static void exampleAsyncListener() {
-        ActiveMQConsumer consumer = null;
+        WonderQueueSrvConsumer consumer = null;
         try {
-            consumer = new ActiveMQConsumer();
+            consumer = new WonderQueueSrvConsumer();
             
             // Start listening
             consumer.startListening();
@@ -203,7 +203,7 @@ public class ActiveMQConsumer {
             if (consumer != null) {
                 consumer.close();
             }
-            ActiveMQGateway.getInstance().closeConnection();
+            WonderQueueSrv.getInstance().closeConnection();
         }
     }
 

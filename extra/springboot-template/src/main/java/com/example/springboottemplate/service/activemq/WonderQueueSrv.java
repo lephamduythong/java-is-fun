@@ -14,10 +14,10 @@ import javax.jms.JMSException;
  * Ensures only one connection is created and shared across the application
  * Uses ActiveMQ's built-in failover transport for automatic reconnection
  */
-public class ActiveMQGateway {
+public class WonderQueueSrv {
 
     // Singleton instance
-    private static volatile ActiveMQGateway instance;
+    private static volatile WonderQueueSrv instance;
     
     private final ConnectionFactory connectionFactory;
     private Connection connection;
@@ -27,10 +27,10 @@ public class ActiveMQGateway {
     /**
      * Private constructor to prevent external instantiation
      */
-    private ActiveMQGateway() {
+    private WonderQueueSrv() {
         _logger.debug("Starting ActiveMQGateway initialization");
 
-        ActiveMQConfig config = ActiveMQConfig.getInstance();
+        WonderQueueSrvConfig config = WonderQueueSrvConfig.getInstance();
         
         ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
         
@@ -83,11 +83,11 @@ public class ActiveMQGateway {
     /**
      * Get singleton instance (thread-safe double-checked locking)
      */
-    public static ActiveMQGateway getInstance() {
+    public static WonderQueueSrv getInstance() {
         if (instance == null) {
-            synchronized (ActiveMQGateway.class) {
+            synchronized (WonderQueueSrv.class) {
                 if (instance == null) {
-                    instance = new ActiveMQGateway();
+                    instance = new WonderQueueSrv();
                 }
             }
         }

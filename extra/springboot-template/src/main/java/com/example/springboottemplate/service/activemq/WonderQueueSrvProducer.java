@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
  * ActiveMQ Message Producer
  * Sends messages to a queue or topic
  */
-public class ActiveMQProducer {
+public class WonderQueueSrvProducer {
     private static final Logger _logger = LoggerFactory.getLogger("MY_SYSTEM");
 
     private static final String DEFAULT_QUEUE = "thong.queue.request";
@@ -22,7 +22,7 @@ public class ActiveMQProducer {
     /**
      * Initialize producer with default queue
      */
-    public ActiveMQProducer() throws JMSException {
+    public WonderQueueSrvProducer() throws JMSException {
         this(DEFAULT_QUEUE, false);
     }
 
@@ -31,8 +31,8 @@ public class ActiveMQProducer {
      * @param destinationName Name of queue or topic
      * @param isTopic true for topic, false for queue
      */
-    public ActiveMQProducer(String destinationName, boolean isTopic) throws JMSException {
-        connection = ActiveMQGateway.getInstance().getConnection();
+    public WonderQueueSrvProducer(String destinationName, boolean isTopic) throws JMSException {
+        connection = WonderQueueSrv.getInstance().getConnection();
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         
         if (isTopic) {
@@ -96,10 +96,10 @@ public class ActiveMQProducer {
      * Example usage
      */
     public static void main(String[] args) {
-        ActiveMQProducer producer = null;
+        WonderQueueSrvProducer producer = null;
         try {
             // Create producer
-            producer = new ActiveMQProducer();
+            producer = new WonderQueueSrvProducer();
             
             // Send single message
             producer.sendMessage("Hello from ActiveMQ!");

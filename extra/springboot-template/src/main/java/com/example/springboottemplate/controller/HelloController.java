@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.springboottemplate.service.activemq.ActiveMQProducer;
+import com.example.springboottemplate.service.activemq.WonderQueueSrvProducer;
 import com.example.springboottemplate.service.jms.JmsGateway;
 import com.example.springboottemplate.service.jms.JmsProducer;
 import com.example.springboottemplate.service.other.JmsQueueExample;
@@ -57,13 +57,13 @@ public class HelloController {
 
     @GetMapping("/activemq-queue-test")
     public String queueTest() {
-        ActiveMQProducer producer = null;
+        WonderQueueSrvProducer producer = null;
         try {
 
             logger.info("==1");
 
             // Create producer
-            producer = new ActiveMQProducer();
+            producer = new WonderQueueSrvProducer();
             
             logger.info("==2");
 

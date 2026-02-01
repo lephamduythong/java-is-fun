@@ -7,30 +7,30 @@ import javax.jms.MessageListener;
  * Singleton wrapper for ActiveMQConsumer
  * Ensures only one consumer instance exists for the default queue
  */
-public class ActiveMQConsumerSingleton {
+public class WonderQueueSrvConsumerSingleton {
     
     // Singleton instance - lazy initialization with thread safety
-    private static volatile ActiveMQConsumerSingleton instance;
+    private static volatile WonderQueueSrvConsumerSingleton instance;
     
     // The actual consumer instance
-    private ActiveMQConsumer consumer;
+    private WonderQueueSrvConsumer consumer;
     
     /**
      * Private constructor to prevent external instantiation
      */
-    private ActiveMQConsumerSingleton() throws JMSException {
+    private WonderQueueSrvConsumerSingleton() throws JMSException {
         // Initialize with default queue
-        consumer = new ActiveMQConsumer();
+        consumer = new WonderQueueSrvConsumer();
     }
     
     /**
      * Get the singleton instance (thread-safe, double-checked locking)
      */
-    public static ActiveMQConsumerSingleton getInstance() throws JMSException {
+    public static WonderQueueSrvConsumerSingleton getInstance() throws JMSException {
         if (instance == null) {
-            synchronized (ActiveMQConsumerSingleton.class) {
+            synchronized (WonderQueueSrvConsumerSingleton.class) {
                 if (instance == null) {
-                    instance = new ActiveMQConsumerSingleton();
+                    instance = new WonderQueueSrvConsumerSingleton();
                 }
             }
         }
@@ -38,7 +38,7 @@ public class ActiveMQConsumerSingleton {
     }
 
     public void resetSession() throws JMSException {
-        instance = new ActiveMQConsumerSingleton();
+        instance = new WonderQueueSrvConsumerSingleton();
     }
     
     /**
@@ -84,7 +84,7 @@ public class ActiveMQConsumerSingleton {
         if (consumer != null) {
             consumer.close();
         }
-        synchronized (ActiveMQConsumerSingleton.class) {
+        synchronized (WonderQueueSrvConsumerSingleton.class) {
             instance = null;
         }
     }
@@ -95,7 +95,7 @@ public class ActiveMQConsumerSingleton {
     public static void main(String[] args) {
         try {
             // Get singleton instance
-            ActiveMQConsumerSingleton consumerSingleton = ActiveMQConsumerSingleton.getInstance();
+            WonderQueueSrvConsumerSingleton consumerSingleton = WonderQueueSrvConsumerSingleton.getInstance();
             
             // Start listening for messages
             consumerSingleton.startListening();
@@ -110,8 +110,8 @@ public class ActiveMQConsumerSingleton {
             e.printStackTrace();
         } finally {
             try {
-                ActiveMQConsumerSingleton.getInstance().close();
-                ActiveMQGateway.getInstance().closeConnection();
+                WonderQueueSrvConsumerSingleton.getInstance().close();
+                WonderQueueSrv.getInstance().closeConnection();
             } catch (JMSException e) {
                 System.err.println("Error closing: " + e.getMessage());
             }

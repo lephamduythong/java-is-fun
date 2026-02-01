@@ -9,9 +9,9 @@ import java.util.Properties;
  * Configuration class for ActiveMQ settings
  * Reads from config/activemq.properties
  */
-public class ActiveMQConfig {
+public class WonderQueueSrvConfig {
     
-    private static ActiveMQConfig instance;
+    private static WonderQueueSrvConfig instance;
     
     private final String brokerUrl;
     private final String username;
@@ -19,7 +19,7 @@ public class ActiveMQConfig {
     private final long reconnectIntervalSeconds;
     private final boolean trustAllPackages;
     
-    private ActiveMQConfig() {
+    private WonderQueueSrvConfig() {
         Properties properties = loadProperties();
         this.brokerUrl = properties.getProperty("activemq.broker.url", "tcp://localhost:61616");
         this.username = properties.getProperty("activemq.username", "admin");
@@ -28,11 +28,11 @@ public class ActiveMQConfig {
         this.trustAllPackages = Boolean.parseBoolean(properties.getProperty("activemq.trust.all.packages", "true"));
     }
     
-    public static ActiveMQConfig getInstance() {
+    public static WonderQueueSrvConfig getInstance() {
         if (instance == null) {
-            synchronized (ActiveMQConfig.class) {
+            synchronized (WonderQueueSrvConfig.class) {
                 if (instance == null) {
-                    instance = new ActiveMQConfig();
+                    instance = new WonderQueueSrvConfig();
                 }
             }
         }
