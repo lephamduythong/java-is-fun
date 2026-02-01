@@ -1,45 +1,36 @@
-package com.example.springboottemplate.service.activemq;
+package com.example.springboottemplate.service.jms;
 
 import javax.jms.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * ActiveMQ Message Consumer
- * Receives messages from a queue or topic
+ * JMS Message Consumer using JNDI lookup
+ * Receives messages from a queue configured via JNDI
  */
-public class ActiveMQConsumer {
-    private static final String DEFAULT_QUEUE = "thong.queue.request";
+public class JmsConsumer {
+    private static final Logger _logger = LoggerFactory.getLogger("MY_SYSTEM");
     
     private Connection connection;
     private Session session;
     private javax.jms.MessageConsumer jmsConsumer;
-    private Destination destination;
+    private Queue queue;
 
     /**
-     * Initialize consumer with default queue
+     * Initialize consumer using JmsGateway
      */
-    public ActiveMQConsumer() throws JMSException {
-        this(DEFAULT_QUEUE, false);
-    }
-
-    /**
-     * Initialize consumer with custom destination
-     * @param destinationName Name of queue or topic
-     * @param isTopic true for topic, false for queue
-     */
-    public ActiveMQConsumer(String destinationName, boolean isTopic) throws JMSException {
-        connection = ActiveMQGateway.getInstance().getConnection();
+    public JmsConsumer() throws JMSException {
+        connection = JmsGateway.getInstance().getConnection();
         // false: no transactions
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         
-        if (isTopic) {
-            destination = session.createTopic(destinationName);
-        } else {
-            destination = session.createQueue(destinationName);
-        }
+        // Get queue from JNDI lookup via JmsGateway
+        queue = JmsGateway.getInstance().getQueue();
         
-        jmsConsumer = session.createConsumer(destination);
+        jmsConsumer = session.createConsumer(queue);
         
-        System.out.println("Consumer initialized for: " + destinationName);
+        _logger.debug("JmsConsumer initialized for queue: " + queue.getQueueName());
     }
 
     /**
@@ -51,7 +42,7 @@ public class ActiveMQConsumer {
         if (message instanceof TextMessage) {
             TextMessage textMessage = (TextMessage) message;
             String text = textMessage.getText();
-            System.out.println("Message received: " + text);
+            _logger.debug("Cute Message received: " + text);
             return text;
         }
         return null;
@@ -72,7 +63,7 @@ public class ActiveMQConsumer {
         if (message instanceof TextMessage) {
             TextMessage textMessage = (TextMessage) message;
             String text = textMessage.getText();
-            System.out.println("Message received: " + text);
+            _logger.debug("Message received: " + text);
             return text;
         }
         return null;
@@ -83,7 +74,7 @@ public class ActiveMQConsumer {
      */
     public void setMessageListener(MessageListener listener) throws JMSException {
         jmsConsumer.setMessageListener(listener);
-        System.out.println("Message listener set up");
+        _logger.debug("Message listener set up");
     }
 
     /**
@@ -97,20 +88,20 @@ public class ActiveMQConsumer {
                     if (message instanceof TextMessage) {
                         TextMessage textMessage = (TextMessage) message;
                         String text = textMessage.getText();
-                        System.out.println("Async message received from ActiveMQ server: " + text);
+                        _logger.info("Async message received: " + text);
                         
                         // Check for custom properties
                         if (message.propertyExists("priority")) {
                             String priority = message.getStringProperty("priority");
-                            System.out.println("  Priority: " + priority);
+                            _logger.info("  Priority: " + priority);
                         }
                     }
                 } catch (JMSException e) {
-                    System.err.println("Error processing message from ActiveMQ server: " + e.getMessage());
+                    _logger.error("Error processing message: " + e.getMessage(), e);
                 }
             }
         });
-        System.out.println("Started listening for messages from ActiveMQ server...");
+        _logger.debug("Started listening for messages...");
     }
 
     /**
@@ -124,9 +115,9 @@ public class ActiveMQConsumer {
             if (session != null) {
                 session.close();
             }
-            System.out.println("Consumer closed");
+            _logger.debug("JmsConsumer closed");
         } catch (JMSException e) {
-            System.err.println("Error closing consumer: " + e.getMessage());
+            _logger.error("Error closing consumer: " + e.getMessage(), e);
         }
     }
 
@@ -134,29 +125,29 @@ public class ActiveMQConsumer {
      * Example usage - Synchronous receive
      */
     public static void exampleSyncReceive() {
-        ActiveMQConsumer consumer = null;
+        JmsConsumer consumer = null;
         try {
-            consumer = new ActiveMQConsumer();
+            consumer = new JmsConsumer();
             
-            System.out.println("Waiting for messages (5 second timeout)...");
+            _logger.info("Waiting for messages (5 second timeout)...");
             
             // Receive up to 5 messages with 5 second timeout
             for (int i = 0; i < 5; i++) {
                 String message = consumer.receiveMessage(5000);
                 if (message == null) {
-                    System.out.println("No more messages");
+                    _logger.info("No more messages");
                     break;
                 }
             }
             
         } catch (JMSException e) {
-            System.err.println("Error: " + e.getMessage());
+            _logger.error("Error: " + e.getMessage(), e);
             e.printStackTrace();
         } finally {
             if (consumer != null) {
                 consumer.close();
             }
-            ActiveMQGateway.getInstance().closeConnection();
+            JmsGateway.getInstance().closeConnection();
         }
     }
 
@@ -164,26 +155,26 @@ public class ActiveMQConsumer {
      * Example usage - Asynchronous listener
      */
     public static void exampleAsyncListener() {
-        ActiveMQConsumer consumer = null;
+        JmsConsumer consumer = null;
         try {
-            consumer = new ActiveMQConsumer();
+            consumer = new JmsConsumer();
             
             // Start listening
             consumer.startListening();
             
-            System.out.println("Listening for messages. Press Ctrl+C to stop...");
+            _logger.info("Listening for messages. Press Ctrl+C to stop...");
             
             // Keep the application running
             Thread.sleep(60000); // Listen for 1 minute
             
         } catch (JMSException | InterruptedException e) {
-            System.err.println("Error: " + e.getMessage());
+            _logger.error("Error: " + e.getMessage(), e);
             e.printStackTrace();
         } finally {
             if (consumer != null) {
                 consumer.close();
             }
-            ActiveMQGateway.getInstance().closeConnection();
+            JmsGateway.getInstance().closeConnection();
         }
     }
 
@@ -191,7 +182,7 @@ public class ActiveMQConsumer {
      * Main method - runs async listener example
      */
     public static void main(String[] args) {
-        System.out.println("Starting ActiveMQ Consumer (Async mode)...");
+        _logger.info("Starting JMS Consumer (Async mode)...");
         exampleAsyncListener();
         
         // To run sync mode instead, uncomment:

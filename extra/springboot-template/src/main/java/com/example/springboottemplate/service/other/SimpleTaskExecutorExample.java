@@ -1,4 +1,4 @@
-package com.example.springboottemplate.service.activemq;
+package com.example.springboottemplate.service.other;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

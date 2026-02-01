@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.springboottemplate.service.activemq.ActiveMQProducer;
+import com.example.springboottemplate.service.jms.JmsGateway;
+import com.example.springboottemplate.service.jms.JmsProducer;
 import com.example.springboottemplate.service.jms.JmsQueueExample;
 
 @RestController
@@ -112,6 +114,22 @@ public class HelloController {
             logger.error("Error sending JMS message: {}", e.getMessage(), e);
             return "Error sending message to JMS Queue: " + e.getMessage();
         }
+    }
+
+    @GetMapping("/send-jms-2")
+    public String sendJmsMessage2(@RequestParam(defaultValue = "Hello WildFly JMS!") String message)  {
+        logger.info("Sending message to WildFly JMS Queue 2: {}", message);
+        
+        try {
+            var jmsService = new JmsProducer();
+            jmsService.sendMessage(message);
+            logger.info("JMS message sent successfully");
+        } catch (Exception e) {
+            logger.error("Error sending JMS message: {}", e.getMessage(), e);
+            return "Error sending message to JMS Queue: " + e.getMessage();
+        }
+
+        return "Message sent to JMS Queue 2 successfully!";
     }
 
 }
