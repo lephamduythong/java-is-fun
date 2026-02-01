@@ -2,15 +2,22 @@ package com.example.springboottemplate.config;
 
 import java.io.IOException;
 
+import javax.jms.JMSException;
+
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.example.springboottemplate.Utils;
+import com.example.springboottemplate.service.activemq.ActiveMQConsumerSingleton;
 import com.example.springboottemplate.Constants;
 
 @Component
 public class CamelConfig extends RouteBuilder {
+
+    private static final Logger _logger = LoggerFactory.getLogger("MY_SYSTEM");
 
     @Override
     public void configure() throws Exception {
@@ -214,6 +221,37 @@ public class CamelConfig extends RouteBuilder {
                     }
                 }
             });
+
+        // Timer route - runs every 5 seconds
+        from("timer://periodicTimer?period=5000")
+            .routeId("periodicTimerRoute")
+            .process(exchange -> {
+                _logger.debug("Consumer check START");
+                try {
+                    var consumer = ActiveMQConsumerSingleton.getInstance();
+                    _logger.debug("Starting ActiveMQ Consumer...");
+                    consumer.startListening();
+                    _logger.debug("ActiveMQ Consumer started successfully and listening for messages");
+                } catch (Exception e) {
+                    ActiveMQConsumerSingleton consumer = null;
+                    try {
+                        consumer = ActiveMQConsumerSingleton.getInstance();
+                    } catch (JMSException e1) {
+                        _logger.error("Consumer error init: " + e1.getMessage(), e1);
+                    }
+                    _logger.error("Failed to start ActiveMQ Consumer: " + e.getMessage(), e);
+                    if (consumer != null) {
+                        consumer.close();
+                        try {
+                            consumer.resetSession();
+                        } catch (JMSException e1) {
+                            _logger.error("Failed to reset ActiveMQ Consumer session: " + e1.getMessage(), e1);
+                        }
+                    }
+                }
+                _logger.debug("Consumer check END");
+            });
+            
     }
 
     // Inner class for User model

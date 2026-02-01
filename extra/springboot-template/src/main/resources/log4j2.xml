@@ -58,5 +58,12 @@
             <AppenderRef ref="Console"/>
             <AppenderRef ref="FileAppender"/>
         </Logger>
+        
+        <!-- MY_SYSTEM logger for custom logging -->
+        <Logger name="MY_SYSTEM" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
     </Loggers>
 </Configuration>

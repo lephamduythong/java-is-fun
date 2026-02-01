@@ -2,12 +2,17 @@ package com.example.springboottemplate.service.activemq;
 
 import javax.jms.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * ActiveMQ Message Consumer
  * Receives messages from a queue or topic
  */
 public class ActiveMQConsumer {
     private static final String DEFAULT_QUEUE = "thong.queue.request";
+
+    private static final Logger _logger = LoggerFactory.getLogger("MY_SYSTEM");
     
     private Connection connection;
     private Session session;
@@ -39,7 +44,7 @@ public class ActiveMQConsumer {
         
         jmsConsumer = session.createConsumer(destination);
         
-        System.out.println("Consumer initialized for: " + destinationName);
+        _logger.debug("Consumer initialized for: " + destinationName);
     }
 
     /**
@@ -51,7 +56,7 @@ public class ActiveMQConsumer {
         if (message instanceof TextMessage) {
             TextMessage textMessage = (TextMessage) message;
             String text = textMessage.getText();
-            System.out.println("Message received: " + text);
+            _logger.debug("Message received: " + text);
             return text;
         }
         return null;
@@ -72,7 +77,7 @@ public class ActiveMQConsumer {
         if (message instanceof TextMessage) {
             TextMessage textMessage = (TextMessage) message;
             String text = textMessage.getText();
-            System.out.println("Message received: " + text);
+            _logger.debug("Message received: " + text);
             return text;
         }
         return null;
@@ -83,7 +88,7 @@ public class ActiveMQConsumer {
      */
     public void setMessageListener(MessageListener listener) throws JMSException {
         jmsConsumer.setMessageListener(listener);
-        System.out.println("Message listener set up");
+        _logger.debug("Message listener set up");
     }
 
     /**
@@ -97,12 +102,12 @@ public class ActiveMQConsumer {
                     if (message instanceof TextMessage) {
                         TextMessage textMessage = (TextMessage) message;
                         String text = textMessage.getText();
-                        System.out.println("Async message received from ActiveMQ server: " + text);
+                        _logger.debug("Async message received from ActiveMQ server: " + text);
                         
                         // Check for custom properties
                         if (message.propertyExists("priority")) {
                             String priority = message.getStringProperty("priority");
-                            System.out.println("  Priority: " + priority);
+                            _logger.debug("  Priority: " + priority);
                         }
                     }
                 } catch (JMSException e) {
@@ -110,7 +115,7 @@ public class ActiveMQConsumer {
                 }
             }
         });
-        System.out.println("Started listening for messages from ActiveMQ server...");
+        _logger.debug("Started listening for messages from ActiveMQ server...");
     }
 
     /**
@@ -124,7 +129,7 @@ public class ActiveMQConsumer {
             if (session != null) {
                 session.close();
             }
-            System.out.println("Consumer closed");
+            _logger.debug("Consumer closed");
         } catch (JMSException e) {
             System.err.println("Error closing consumer: " + e.getMessage());
         }
@@ -138,13 +143,13 @@ public class ActiveMQConsumer {
         try {
             consumer = new ActiveMQConsumer();
             
-            System.out.println("Waiting for messages (5 second timeout)...");
+            _logger.debug("Waiting for messages (5 second timeout)...");
             
             // Receive up to 5 messages with 5 second timeout
             for (int i = 0; i < 5; i++) {
                 String message = consumer.receiveMessage(5000);
                 if (message == null) {
-                    System.out.println("No more messages");
+                    _logger.debug("No more messages");
                     break;
                 }
             }
@@ -171,7 +176,7 @@ public class ActiveMQConsumer {
             // Start listening
             consumer.startListening();
             
-            System.out.println("Listening for messages. Press Ctrl+C to stop...");
+            _logger.debug("Listening for messages. Press Ctrl+C to stop...");
             
             // Keep the application running
             Thread.sleep(60000); // Listen for 1 minute
@@ -191,7 +196,7 @@ public class ActiveMQConsumer {
      * Main method - runs async listener example
      */
     public static void main(String[] args) {
-        System.out.println("Starting ActiveMQ Consumer (Async mode)...");
+        _logger.debug("Starting ActiveMQ Consumer (Async mode)...");
         exampleAsyncListener();
         
         // To run sync mode instead, uncomment:
