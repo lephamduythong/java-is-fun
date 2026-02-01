@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Configuration class for ActiveMQ settings
  * Reads from config/activemq.properties
@@ -12,6 +15,7 @@ import java.util.Properties;
 public class WonderQueueSrvConfig {
     
     private static WonderQueueSrvConfig instance;
+    private static final Logger _logger = LoggerFactory.getLogger("MY_SYSTEM");
     
     private final String brokerUrl;
     private final String username;
@@ -20,12 +24,17 @@ public class WonderQueueSrvConfig {
     private final boolean trustAllPackages;
     
     private WonderQueueSrvConfig() {
-        Properties properties = loadProperties();
-        this.brokerUrl = properties.getProperty("activemq.broker.url", "tcp://localhost:61616");
-        this.username = properties.getProperty("activemq.username", "admin");
-        this.password = properties.getProperty("activemq.password", "admin");
-        this.reconnectIntervalSeconds = Long.parseLong(properties.getProperty("activemq.reconnect.interval.seconds", "10"));
-        this.trustAllPackages = Boolean.parseBoolean(properties.getProperty("activemq.trust.all.packages", "true"));
+        this.brokerUrl = System.getenv("ACTIVEMQ_BROKER_URL");
+        this.username = System.getenv("ACTIVEMQ_USERNAME");
+        this.password = System.getenv("ACTIVEMQ_PASSWORD");
+        this.reconnectIntervalSeconds = 10;
+        this.trustAllPackages = true;
+
+        _logger.debug("ActiveMQ Config - Broker URL: " + brokerUrl);
+        _logger.debug("ActiveMQ Config - Username: " + username);
+        _logger.debug("ActiveMQ Config - Password: " + password);
+        _logger.debug("ActiveMQ Config - Reconnect Interval Seconds: " + reconnectIntervalSeconds);
+        _logger.debug("ActiveMQ Config - Trust All Packages: " + trustAllPackages);
     }
     
     public static WonderQueueSrvConfig getInstance() {
