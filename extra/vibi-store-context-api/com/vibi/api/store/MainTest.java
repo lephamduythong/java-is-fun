@@ -1,5 +1,6 @@
 package com.vibi.api.store;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -87,24 +88,60 @@ public class MainTest {
             }
         }
     }
+
+    private static VibiStoreContextAPI storeContextApi = null;
     
-    public static void main(String[] args) {
+    public static void main(String[] args)  {
+        
         try {
             System.out.println("=== Starting VibiStoreContextAPI Test ===\n");
-            
+            storeContextApi = VibiStoreContextAPI.getInstance("N:\\DB\\CLGT.db");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+           
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        executor.submit(() -> {
+            while (true) {
+                System.out.println("Writing a random data every 3 seconds...");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
+                try {
+                    if (storeContextApi == null) {
+                        storeContextApi = VibiStoreContextAPI.getInstance("N:\\DB\\CLGT.db");
+                    }
+                    storeContextApi.write(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
-            IVibiStoreAPI requestStoreApi = VibiRequestStoreAPI.getInstance();
-            IVibiStoreAPI responseStoreApi = VibiResponseStoreAPI.getInstance();
+        try {
+            Thread.sleep(10000000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        executor.shutdown(); // Luôn nhớ đóng executor khi xong việc
+
+
+            // IVibiStoreAPI requestStoreApi = VibiRequestStoreAPI.getInstance();
+            // IVibiStoreAPI responseStoreApi = VibiResponseStoreAPI.getInstance();
             
-            // Test sendAndWait method
-            String testId = "id3";
-            String testValue = "GGWP2";
-            String response = sendAndWait(requestStoreApi, responseStoreApi, testId, testValue);
+            // // Test sendAndWait method
+            // String testId = "id3";
+            // String testValue = "GGWP2";
+            // String response = sendAndWait(requestStoreApi, responseStoreApi, testId, testValue);
 
             
             
-            System.out.println("\n=== Test completed successfully! ===");
-            System.out.println("Final response: " + response);
+            // System.out.println("\n=== Test completed successfully! ===");
+            // System.out.println("Final response: " + response);
 
         
             //     System.out.println("   ✓ Database created at: " + api.getDatabasePath());
@@ -162,9 +199,6 @@ public class MainTest {
             
         //     System.out.println("\n=== Test completed successfully! ===");
             
-        } catch (Exception e) {
-            System.err.println("❌ Error occurred: " + e.getMessage());
-            e.printStackTrace();
-        }
+        
     }
 }
