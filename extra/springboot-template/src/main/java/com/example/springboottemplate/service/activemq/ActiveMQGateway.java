@@ -105,6 +105,7 @@ public class ActiveMQGateway {
             connection.start();
             _logger.debug("ActiveMQ connection established");
         }
+        // Retry connection if transport failed
         if (connection != null 
             && ((org.apache.activemq.ActiveMQConnection) connection).isTransportFailed()
         ) {
@@ -114,6 +115,15 @@ public class ActiveMQGateway {
             _logger.debug("ActiveMQ connection re-established after failure");
         }
         return connection;
+    }
+
+    public boolean checkConnection() {
+        try {
+            Connection conn = getConnection();
+            return conn != null && !((org.apache.activemq.ActiveMQConnection) conn).isClosed();
+        } catch (JMSException e) {
+            return false;
+        }
     }
 
     /**

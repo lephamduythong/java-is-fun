@@ -18,6 +18,7 @@ public class ActiveMQConsumer {
     private Session session;
     private javax.jms.MessageConsumer jmsConsumer;
     private Destination destination;
+    private boolean isFirstLoad = true;
 
     /**
      * Initialize consumer with default queue
@@ -95,6 +96,21 @@ public class ActiveMQConsumer {
      * Start listening with default message handler
      */
     public void startListening() throws JMSException {
+        if (jmsConsumer == null) {
+            throw new JMSException("Consumer not initialized");
+        }
+        if (!ActiveMQGateway.getInstance().checkConnection()) {
+            throw new JMSException("ActiveMQ connection is not active");
+        }
+        if (isFirstLoad) {
+            _logger.debug("First load - setting up listener");
+            setListener();
+            isFirstLoad = false;
+        }
+        _logger.debug("Started listening for messages from ActiveMQ server...");
+    }
+
+    private void setListener() throws JMSException {
         jmsConsumer.setMessageListener(new MessageListener() {
             @Override
             public void onMessage(Message message) {
@@ -115,7 +131,6 @@ public class ActiveMQConsumer {
                 }
             }
         });
-        _logger.debug("Started listening for messages from ActiveMQ server...");
     }
 
     /**
