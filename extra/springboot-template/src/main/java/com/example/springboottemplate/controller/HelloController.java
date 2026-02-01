@@ -3,11 +3,17 @@ package com.example.springboottemplate.controller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.jms.JMSException;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.MediaType;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.springboottemplate.service.activemq.ActiveMQProducer;
 import com.example.springboottemplate.service.jms.JmsGateway;
 import com.example.springboottemplate.service.jms.JmsProducer;
-import com.example.springboottemplate.service.jms.JmsQueueExample;
+import com.example.springboottemplate.service.other.JmsQueueExample;
 
 @RestController
 public class HelloController {
@@ -49,12 +55,8 @@ public class HelloController {
         return String.format("Log demo completed! Check logs folder for output. Hello, %s!", name);
     }
 
-    @GetMapping("/api2/queue-test")
+    @GetMapping("/activemq-queue-test")
     public String queueTest() {
-        
-        
-
-        
         ActiveMQProducer producer = null;
         try {
 
@@ -130,6 +132,24 @@ public class HelloController {
         }
 
         return "Message sent to JMS Queue 2 successfully!";
+    }
+
+    @GetMapping(value = "/read-html", produces = MediaType.TEXT_HTML_VALUE)
+    public String readHtml() {
+        logger.info("Reading HTML file from resources");
+        
+        try {
+            ClassPathResource resource = new ClassPathResource("static/html/test.html");
+            InputStream inputStream = resource.getInputStream();
+            String htmlContent = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+            
+            logger.info("HTML file read successfully");
+            return htmlContent;
+            
+        } catch (IOException e) {
+            logger.error("Error reading HTML file: {}", e.getMessage(), e);
+            return "<html><body><h1>Error</h1><p>Could not read HTML file: " + e.getMessage() + "</p></body></html>";
+        }
     }
 
 }

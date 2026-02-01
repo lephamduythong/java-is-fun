@@ -1,4 +1,4 @@
-package com.example.springboottemplate.service.jms;
+package com.example.springboottemplate.service.other;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
