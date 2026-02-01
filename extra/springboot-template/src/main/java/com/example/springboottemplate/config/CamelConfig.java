@@ -1,7 +1,5 @@
 package com.example.springboottemplate.config;
 
-import java.io.IOException;
-
 import javax.jms.JMSException;
 
 import org.apache.camel.builder.RouteBuilder;
@@ -12,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.springboottemplate.Utils;
 import com.example.springboottemplate.service.activemq.WonderQueueSrvConsumerSingleton;
+import com.example.springboottemplate.service.dbstore.WonderDbFileStoreSrv;
 import com.example.springboottemplate.Constants;
 
 @Component
@@ -251,7 +250,21 @@ public class CamelConfig extends RouteBuilder {
                 }
                 _logger.debug("Consumer check END");
             });
-            
+
+
+        // Timer route - runs every 5 seconds
+        from("timer://periodicTimer?period=5000")
+            .routeId("periodicTimerRoute2")
+            .process(exchange -> {
+                _logger.debug("DB check START");
+                try {
+                    WonderDbFileStoreSrv.getInstance();
+                    _logger.debug("WonderDbStoreSrv connection is healthy");
+                } catch (Exception e) {
+                    _logger.error("WonderDbStoreSrv connection error: " + e.getMessage(), e);
+                }
+                _logger.debug("DB check END");
+            });
     }
 
     // Inner class for User model

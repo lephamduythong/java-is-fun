@@ -1,9 +1,14 @@
 package com.example.springboottemplate.service.activemq;
 
+import java.sql.SQLException;
+import java.util.UUID;
+
 import javax.jms.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.example.springboottemplate.service.dbstore.WonderDbFileStoreSrv;
 
 /**
  * ActiveMQ Message Consumer
@@ -17,6 +22,8 @@ public class WonderQueueSrvConsumer {
     private javax.jms.MessageConsumer jmsConsumer;
     private Destination destination;
     private boolean isFirstLoad = true;
+
+    private WonderDbFileStoreSrv storeDbSrv;
 
     /**
      * Initialize consumer with custom destination
@@ -37,6 +44,12 @@ public class WonderQueueSrvConsumer {
         jmsConsumer = session.createConsumer(destination);
         
         _logger.debug("Consumer initialized for: " + destinationName);
+
+        try {
+            storeDbSrv = WonderDbFileStoreSrv.getInstance();
+        } catch (SQLException e) {
+            _logger.error("Error initializing WonderDbStoreSrv: " + e.getMessage());
+        }
     }
 
     /**
@@ -110,7 +123,16 @@ public class WonderQueueSrvConsumer {
                         TextMessage textMessage = (TextMessage) message;
                         String text = textMessage.getText();
                         _logger.debug("Async message received from ActiveMQ server: " + text);
+
+                        try {
+                            _logger.debug("Writing message to DB...");
+                            storeDbSrv.write(UUID.randomUUID().toString(), text);
+                        } catch (SQLException e) {
+                            _logger.error("Error accessing WonderDbStoreSrv: " + e.getMessage());
+                        }
                         
+                        _logger.debug("Done writing message to DB");
+
                         // Check for custom properties
                         if (message.propertyExists("priority")) {
                             String priority = message.getStringProperty("priority");
