@@ -9,6 +9,9 @@ import javax.jms.MessageListener;
  */
 public class WonderQueueSrvConsumerSingleton {
     
+    private static final String QUEUE_NAME = "thong.queue.request";
+    private static final boolean IS_TOPIC = false;
+
     // Singleton instance - lazy initialization with thread safety
     private static volatile WonderQueueSrvConsumerSingleton instance;
     
@@ -20,7 +23,7 @@ public class WonderQueueSrvConsumerSingleton {
      */
     private WonderQueueSrvConsumerSingleton() throws JMSException {
         // Initialize with default queue
-        consumer = new WonderQueueSrvConsumer();
+        consumer = new WonderQueueSrvConsumer(QUEUE_NAME, IS_TOPIC);
     }
     
     /**

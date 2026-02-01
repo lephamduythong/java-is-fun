@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
  * Receives messages from a queue or topic
  */
 public class WonderQueueSrvConsumer {
-    private static final String DEFAULT_QUEUE = "thong.queue.request";
-
     private static final Logger _logger = LoggerFactory.getLogger("MY_SYSTEM");
     
     private Connection connection;
@@ -19,13 +17,6 @@ public class WonderQueueSrvConsumer {
     private javax.jms.MessageConsumer jmsConsumer;
     private Destination destination;
     private boolean isFirstLoad = true;
-
-    /**
-     * Initialize consumer with default queue
-     */
-    public WonderQueueSrvConsumer() throws JMSException {
-        this(DEFAULT_QUEUE, false);
-    }
 
     /**
      * Initialize consumer with custom destination
@@ -150,69 +141,69 @@ public class WonderQueueSrvConsumer {
         }
     }
 
-    /**
-     * Example usage - Synchronous receive
-     */
-    public static void exampleSyncReceive() {
-        WonderQueueSrvConsumer consumer = null;
-        try {
-            consumer = new WonderQueueSrvConsumer();
+    // /**
+    //  * Example usage - Synchronous receive
+    //  */
+    // public static void exampleSyncReceive() {
+    //     WonderQueueSrvConsumer consumer = null;
+    //     try {
+    //         consumer = new WonderQueueSrvConsumer();
             
-            _logger.debug("Waiting for messages (5 second timeout)...");
+    //         _logger.debug("Waiting for messages (5 second timeout)...");
             
-            // Receive up to 5 messages with 5 second timeout
-            for (int i = 0; i < 5; i++) {
-                String message = consumer.receiveMessage(5000);
-                if (message == null) {
-                    _logger.debug("No more messages");
-                    break;
-                }
-            }
+    //         // Receive up to 5 messages with 5 second timeout
+    //         for (int i = 0; i < 5; i++) {
+    //             String message = consumer.receiveMessage(5000);
+    //             if (message == null) {
+    //                 _logger.debug("No more messages");
+    //                 break;
+    //             }
+    //         }
             
-        } catch (JMSException e) {
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            if (consumer != null) {
-                consumer.close();
-            }
-            WonderQueueSrv.getInstance().closeConnection();
-        }
-    }
+    //     } catch (JMSException e) {
+    //         System.err.println("Error: " + e.getMessage());
+    //         e.printStackTrace();
+    //     } finally {
+    //         if (consumer != null) {
+    //             consumer.close();
+    //         }
+    //         WonderQueueSrv.getInstance().closeConnection();
+    //     }
+    // }
 
-    /**
-     * Example usage - Asynchronous listener
-     */
-    public static void exampleAsyncListener() {
-        WonderQueueSrvConsumer consumer = null;
-        try {
-            consumer = new WonderQueueSrvConsumer();
+    // /**
+    //  * Example usage - Asynchronous listener
+    //  */
+    // public static void exampleAsyncListener() {
+    //     WonderQueueSrvConsumer consumer = null;
+    //     try {
+    //         consumer = new WonderQueueSrvConsumer();
             
-            // Start listening
-            consumer.startListening();
+    //         // Start listening
+    //         consumer.startListening();
             
-            _logger.debug("Listening for messages. Press Ctrl+C to stop...");
+    //         _logger.debug("Listening for messages. Press Ctrl+C to stop...");
             
-            // Keep the application running
-            Thread.sleep(60000); // Listen for 1 minute
+    //         // Keep the application running
+    //         Thread.sleep(60000); // Listen for 1 minute
             
-        } catch (JMSException | InterruptedException e) {
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            if (consumer != null) {
-                consumer.close();
-            }
-            WonderQueueSrv.getInstance().closeConnection();
-        }
-    }
+    //     } catch (JMSException | InterruptedException e) {
+    //         System.err.println("Error: " + e.getMessage());
+    //         e.printStackTrace();
+    //     } finally {
+    //         if (consumer != null) {
+    //             consumer.close();
+    //         }
+    //         WonderQueueSrv.getInstance().closeConnection();
+    //     }
+    // }
 
     /**
      * Main method - runs async listener example
      */
     public static void main(String[] args) {
         _logger.debug("Starting ActiveMQ Consumer (Async mode)...");
-        exampleAsyncListener();
+        // exampleAsyncListener();
         
         // To run sync mode instead, uncomment:
         // exampleSyncReceive();
