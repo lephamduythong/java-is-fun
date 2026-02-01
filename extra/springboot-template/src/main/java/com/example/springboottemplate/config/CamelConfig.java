@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.example.springboottemplate.Utils;
+import com.example.springboottemplate.WonderUtils;
 import com.example.springboottemplate.service.activemq.WonderQueueSrvConsumerSingleton;
 import com.example.springboottemplate.service.dbstore.WonderDbFileStoreSrv;
 import com.example.springboottemplate.Constants;
@@ -94,7 +94,7 @@ public class CamelConfig extends RouteBuilder {
             })
             .setHeader("Content-Type", constant("application/json"));
         
-        Utils.logTextToFile(Constants.LOG_FILE_PATH, "Camel route started");
+        WonderUtils.logTextToFile(Constants.LOG_FILE_PATH, "Camel route started");
 
         from("direct:getCatImage")
             .routeId("getCatImageRoute")
@@ -106,9 +106,9 @@ public class CamelConfig extends RouteBuilder {
                         .getResourceAsStream("static/img/cat.jpg")
                         .readAllBytes();
                     exchange.getIn().setBody(imageBytes);
-                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "Cat image read successfully");
+                    WonderUtils.logTextToFile(Constants.LOG_FILE_PATH, "Cat image read successfully");
                 } catch (Exception e) {
-                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "Error reading cat image: " + e.getMessage());
+                    WonderUtils.logTextToFile(Constants.LOG_FILE_PATH, "Error reading cat image: " + e.getMessage());
                     throw e;
                 }
             })
@@ -123,11 +123,11 @@ public class CamelConfig extends RouteBuilder {
                     String filename = exchange.getIn().getHeader("filename", String.class);
                     String filePath = "E:\\CODING\\Download\\" + filename;
                     
-                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "Attempting to download file: " + filePath);
+                    WonderUtils.logTextToFile(Constants.LOG_FILE_PATH, "Attempting to download file: " + filePath);
                     
                     java.io.File file = new java.io.File(filePath);
                     if (!file.exists() || !file.isFile()) {
-                        Utils.logTextToFile(Constants.LOG_FILE_PATH, "File not found: " + filePath);
+                        WonderUtils.logTextToFile(Constants.LOG_FILE_PATH, "File not found: " + filePath);
                         exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 404);
                         exchange.getIn().setBody("File not found: " + filename);
                         return;
@@ -148,9 +148,9 @@ public class CamelConfig extends RouteBuilder {
                     exchange.getIn().setHeader("Content-Length", file.length());
                     exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 200);
                     
-                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "File download started: " + filename + " (" + file.length() + " bytes)");
+                    WonderUtils.logTextToFile(Constants.LOG_FILE_PATH, "File download started: " + filename + " (" + file.length() + " bytes)");
                 } catch (Exception e) {
-                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "Error downloading file: " + e.getMessage());
+                    WonderUtils.logTextToFile(Constants.LOG_FILE_PATH, "Error downloading file: " + e.getMessage());
                     exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 500);
                     exchange.getIn().setBody("Error downloading file: " + e.getMessage());
                 }
@@ -170,17 +170,17 @@ public class CamelConfig extends RouteBuilder {
                     java.io.File uploadDir = new java.io.File(uploadFolder);
                     if (!uploadDir.exists()) {
                         uploadDir.mkdirs();
-                        Utils.logTextToFile(Constants.LOG_FILE_PATH, "Created upload directory: " + uploadFolder);
+                        WonderUtils.logTextToFile(Constants.LOG_FILE_PATH, "Created upload directory: " + uploadFolder);
                     }
                     
                     String filePath = uploadFolder + filename;
-                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "Attempting to upload file: " + filePath);
+                    WonderUtils.logTextToFile(Constants.LOG_FILE_PATH, "Attempting to upload file: " + filePath);
                     
                     // Get input stream from request body (streaming, no memory loading)
                     inputStream = exchange.getIn().getBody(java.io.InputStream.class);
                     
                     if (inputStream == null) {
-                        Utils.logTextToFile(Constants.LOG_FILE_PATH, "No file content received");
+                        WonderUtils.logTextToFile(Constants.LOG_FILE_PATH, "No file content received");
                         exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 400);
                         exchange.getIn().setBody("{\"success\": false, \"message\": \"No file content received\"}");
                         exchange.getIn().setHeader("Content-Type", "application/json");
@@ -200,13 +200,13 @@ public class CamelConfig extends RouteBuilder {
                     
                     outputStream.flush();
                     
-                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "File uploaded successfully: " + filename + " (" + totalBytes + " bytes)");
+                    WonderUtils.logTextToFile(Constants.LOG_FILE_PATH, "File uploaded successfully: " + filename + " (" + totalBytes + " bytes)");
                     
                     exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 200);
                     exchange.getIn().setBody("{\"success\": true, \"message\": \"File uploaded successfully\", \"filename\": \"" + filename + "\", \"size\": " + totalBytes + "}");
                     exchange.getIn().setHeader("Content-Type", "application/json");
                 } catch (Exception e) {
-                    Utils.logTextToFile(Constants.LOG_FILE_PATH, "Error uploading file: " + e.getMessage());
+                    WonderUtils.logTextToFile(Constants.LOG_FILE_PATH, "Error uploading file: " + e.getMessage());
                     exchange.getIn().setHeader(org.apache.camel.Exchange.HTTP_RESPONSE_CODE, 500);
                     exchange.getIn().setBody("{\"success\": false, \"message\": \"Error uploading file: " + e.getMessage() + "\"}");
                     exchange.getIn().setHeader("Content-Type", "application/json");

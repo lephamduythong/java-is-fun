@@ -1,6 +1,6 @@
 package com.example.springboottemplate.main;
 
-import com.example.springboottemplate.Utils;
+import com.example.springboottemplate.WonderUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -117,10 +117,10 @@ public class MergeFiles {
                     
                     // Merge files
                     String outputPath = mergedFolder + File.separator + baseName;
-                    Utils.mergeFiles(partPaths, outputPath);
+                    WonderUtils.mergeFiles(partPaths, outputPath);
                     
                     // Get merged file size
-                    double mergedSizeMB = Utils.getFileSizeInMB(outputPath);
+                    double mergedSizeMB = WonderUtils.getFileSizeInMB(outputPath);
                     
                     System.out.println("  Output: " + outputPath);
                     System.out.println("  Size: " + mergedSizeMB + " MB");

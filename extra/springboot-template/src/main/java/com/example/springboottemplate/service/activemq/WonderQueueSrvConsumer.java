@@ -1,5 +1,6 @@
 package com.example.springboottemplate.service.activemq;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -8,6 +9,7 @@ import javax.jms.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.springboottemplate.WonderUtils;
 import com.example.springboottemplate.service.dbstore.WonderDbFileStoreSrv;
 
 /**
@@ -124,23 +126,35 @@ public class WonderQueueSrvConsumer {
                         String text = textMessage.getText();
                         _logger.debug("Async message received from ActiveMQ server: " + text);
 
+                        // try {
+                        //     _logger.debug("Writing message to DB...");
+                        //     storeDbSrv.write(UUID.randomUUID().toString(), text);
+                        // } catch (SQLException e) {
+                        //     _logger.error("Error accessing WonderDbStoreSrv: " + e.getMessage());
+                        // }
+
+                        // Write direct to file on disk
                         try {
-                            _logger.debug("Writing message to DB...");
-                            storeDbSrv.write(UUID.randomUUID().toString(), text);
-                        } catch (SQLException e) {
-                            _logger.error("Error accessing WonderDbStoreSrv: " + e.getMessage());
+                            WonderUtils.writeTextToFile("E:/CODING/Files/" + 
+                                WonderUtils.generateTimestampId(
+                                    WonderUtils.generateRandomHash(8)
+                                ) + 
+                                ".data"
+                            , text);
+                        } catch (IOException e) {
+                            _logger.error("Error writing message to file: " + e.getMessage());
                         }
                         
-                        _logger.debug("Done writing message to DB");
+                        _logger.debug("Done writing message to File DB or Disk");
 
                         // Check for custom properties
                         if (message.propertyExists("priority")) {
                             String priority = message.getStringProperty("priority");
-                            _logger.debug("  Priority: " + priority);
+                            _logger.debug(" Priority: " + priority);
                         }
                     }
                 } catch (JMSException e) {
-                    System.err.println("Error processing message from ActiveMQ server: " + e.getMessage());
+                    _logger.error("Error processing message from ActiveMQ server: " + e.getMessage());
                 }
             }
         });
@@ -159,7 +173,7 @@ public class WonderQueueSrvConsumer {
             }
             _logger.debug("Consumer closed");
         } catch (JMSException e) {
-            System.err.println("Error closing consumer: " + e.getMessage());
+            _logger.error("Error closing consumer/session: " + e.getMessage());
         }
     }
 

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Utils {
+public class WonderUtils {
     
     /**
      * Transform string by replacing characters according to specific rules:
@@ -529,6 +529,31 @@ public class Utils {
         String time = now.format(DateTimeFormatter.ofPattern("HHmmss"));
         
         return date + "-" + time + "-" + (input != null ? input : "");
+    }
+
+    /**
+     * Generate a random alphanumeric hash string with specified length
+     * Characters include: 0-9 and A-Z
+     * 
+     * @param inputNum the length of the hash string to generate
+     * @return randomly generated alphanumeric string
+     * @throws IllegalArgumentException if inputNum is less than or equal to 0
+     */
+    public static String generateRandomHash(int inputNum) {
+        if (inputNum <= 0) {
+            throw new IllegalArgumentException("Length must be greater than 0");
+        }
+        
+        String characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        StringBuilder hash = new StringBuilder(inputNum);
+        java.util.Random random = new java.util.Random();
+        
+        for (int i = 0; i < inputNum; i++) {
+            int index = random.nextInt(characters.length());
+            hash.append(characters.charAt(index));
+        }
+        
+        return hash.toString();
     }
 
     /**

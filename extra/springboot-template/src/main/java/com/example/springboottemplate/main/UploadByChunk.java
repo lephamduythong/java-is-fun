@@ -1,6 +1,6 @@
 package com.example.springboottemplate.main;
 
-import com.example.springboottemplate.Utils;
+import com.example.springboottemplate.WonderUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -39,13 +39,13 @@ public class UploadByChunk {
                 return;
             }
             
-            double fileSizeMB = Utils.getFileSizeInMB(filePath);
+            double fileSizeMB = WonderUtils.getFileSizeInMB(filePath);
             System.out.println("File size: " + fileSizeMB + " MB");
             System.out.println();
             
             // Split file into chunks
             System.out.println("Step 1: Splitting file into " + chunkSizeInMB + "MB chunks...");
-            List<String> partFiles = Utils.splitFile(filePath, chunkSizeInMB, tempFolder);
+            List<String> partFiles = WonderUtils.splitFile(filePath, chunkSizeInMB, tempFolder);
             System.out.println("Created " + partFiles.size() + " chunks");
             System.out.println();
             
@@ -117,7 +117,7 @@ public class UploadByChunk {
                 System.out.println("Cleaning up temporary files...");
                 for (String partFilePath : partFiles) {
                     try {
-                        Utils.deleteFile(partFilePath);
+                        WonderUtils.deleteFile(partFilePath);
                         System.out.println("  Deleted: " + new File(partFilePath).getName());
                     } catch (IOException e) {
                         System.err.println("  Failed to delete: " + partFilePath);
