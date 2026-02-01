@@ -1,0 +1,86 @@
+2026-01-04 09:00:16.854 [main] INFO  com.example.springboottemplate.SpringbootTemplateApplication - Starting SpringbootTemplateApplication using Java 21.0.8 on Admin-PC with PID 4248 (E:\CODING\java-is-fun\extra\springboot-template\target\classes started by Admin in E:\CODING\java-is-fun\extra\springboot-template)
+2026-01-04 09:00:16.866 [main] DEBUG com.example.springboottemplate.SpringbootTemplateApplication - Running with Spring Boot v2.7.18, Spring v5.3.31
+2026-01-04 09:00:16.868 [main] INFO  com.example.springboottemplate.SpringbootTemplateApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-04 09:00:18.310 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 5000 (http)
+2026-01-04 09:00:18.318 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-5000"]
+2026-01-04 09:00:18.322 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-04 09:00:18.323 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.83]
+2026-01-04 09:00:18.548 [main] INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-04 09:00:18.548 [main] INFO  org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1594 ms
+2026-01-04 09:00:18.588 [main] INFO  org.springframework.boot.web.servlet.RegistrationBean - Servlet CamelServlet was not registered (possibly already registered?)
+2026-01-04 09:00:19.471 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-5000"]
+2026-01-04 09:00:19.508 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 5000 (http) with context path ''
+2026-01-04 09:00:19.821 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext - Apache Camel 3.18.8 (camel-1) is starting
+2026-01-04 09:00:19.838 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext - Routes startup (started:12)
+2026-01-04 09:00:19.839 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started getUserRoute (direct://getUser)
+2026-01-04 09:00:19.839 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started getAllUsersRoute (direct://getAllUsers)
+2026-01-04 09:00:19.839 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started createUserRoute (direct://createUser)
+2026-01-04 09:00:19.839 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started getCatImageRoute (direct://getCatImage)
+2026-01-04 09:00:19.840 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started downloadFileRoute (direct://downloadFile)
+2026-01-04 09:00:19.840 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started uploadFileRoute (direct://uploadFile)
+2026-01-04 09:00:19.840 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started route1 (rest://get:/users:/%7Bid%7D)
+2026-01-04 09:00:19.840 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started route2 (rest://get:/users)
+2026-01-04 09:00:19.840 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started route3 (rest://post:/users)
+2026-01-04 09:00:19.841 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started route4 (rest://get:/images:/cat)
+2026-01-04 09:00:19.841 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started route5 (rest://get:/download:/%7Bfilename%7D)
+2026-01-04 09:00:19.842 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started route6 (rest://post:/upload:/%7Bfilename%7D)
+2026-01-04 09:00:19.842 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext - Apache Camel 3.18.8 (camel-1) started in 312ms (build:56ms init:236ms start:20ms)
+2026-01-04 09:00:19.848 [main] INFO  com.example.springboottemplate.SpringbootTemplateApplication - Started SpringbootTemplateApplication in 3.465 seconds (JVM running for 4.489)
+2026-01-04 09:00:24.990 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext - Apache Camel 3.18.8 (camel-1) is shutting down (timeout:45s)
+2026-01-04 09:00:25.002 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext - Routes stopped (stopped:12)
+2026-01-04 09:00:25.002 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped route6 (rest://post:/upload:/%7Bfilename%7D)
+2026-01-04 09:00:25.003 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped route5 (rest://get:/download:/%7Bfilename%7D)
+2026-01-04 09:00:25.003 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped route4 (rest://get:/images:/cat)
+2026-01-04 09:00:25.004 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped route3 (rest://post:/users)
+2026-01-04 09:00:25.004 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped route2 (rest://get:/users)
+2026-01-04 09:00:25.004 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped route1 (rest://get:/users:/%7Bid%7D)
+2026-01-04 09:00:25.005 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped uploadFileRoute (direct://uploadFile)
+2026-01-04 09:00:25.006 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped downloadFileRoute (direct://downloadFile)
+2026-01-04 09:00:25.006 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped getCatImageRoute (direct://getCatImage)
+2026-01-04 09:00:25.006 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped createUserRoute (direct://createUser)
+2026-01-04 09:00:25.007 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped getAllUsersRoute (direct://getAllUsers)
+2026-01-04 09:00:25.007 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped getUserRoute (direct://getUser)
+2026-01-04 09:00:25.010 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext - Apache Camel 3.18.8 (camel-1) shutdown in 20ms (uptime:5s)
+2026-01-04 09:01:18.280 [main] INFO  com.example.springboottemplate.SpringbootTemplateApplication - Starting SpringbootTemplateApplication using Java 21.0.8 on Admin-PC with PID 22068 (E:\CODING\java-is-fun\extra\springboot-template\target\classes started by Admin in E:\CODING\java-is-fun\extra\springboot-template)
+2026-01-04 09:01:18.290 [main] DEBUG com.example.springboottemplate.SpringbootTemplateApplication - Running with Spring Boot v2.7.18, Spring v5.3.31
+2026-01-04 09:01:18.291 [main] INFO  com.example.springboottemplate.SpringbootTemplateApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-04 09:01:19.690 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 5000 (http)
+2026-01-04 09:01:19.697 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-5000"]
+2026-01-04 09:01:19.700 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-04 09:01:19.701 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.83]
+2026-01-04 09:01:19.887 [main] INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-04 09:01:19.888 [main] INFO  org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1545 ms
+2026-01-04 09:01:19.927 [main] INFO  org.springframework.boot.web.servlet.RegistrationBean - Servlet CamelServlet was not registered (possibly already registered?)
+2026-01-04 09:01:20.711 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-5000"]
+2026-01-04 09:01:20.757 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 5000 (http) with context path ''
+2026-01-04 09:01:21.118 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext - Apache Camel 3.18.8 (camel-1) is starting
+2026-01-04 09:01:21.132 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext - Routes startup (started:12)
+2026-01-04 09:01:21.133 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started getUserRoute (direct://getUser)
+2026-01-04 09:01:21.133 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started getAllUsersRoute (direct://getAllUsers)
+2026-01-04 09:01:21.133 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started createUserRoute (direct://createUser)
+2026-01-04 09:01:21.133 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started getCatImageRoute (direct://getCatImage)
+2026-01-04 09:01:21.133 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started downloadFileRoute (direct://downloadFile)
+2026-01-04 09:01:21.135 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started uploadFileRoute (direct://uploadFile)
+2026-01-04 09:01:21.135 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started route1 (rest://get:/users:/%7Bid%7D)
+2026-01-04 09:01:21.135 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started route2 (rest://get:/users)
+2026-01-04 09:01:21.136 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started route3 (rest://post:/users)
+2026-01-04 09:01:21.136 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started route4 (rest://get:/images:/cat)
+2026-01-04 09:01:21.137 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started route5 (rest://get:/download:/%7Bfilename%7D)
+2026-01-04 09:01:21.137 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Started route6 (rest://post:/upload:/%7Bfilename%7D)
+2026-01-04 09:01:21.137 [main] INFO  org.apache.camel.impl.engine.AbstractCamelContext - Apache Camel 3.18.8 (camel-1) started in 340ms (build:47ms init:274ms start:19ms)
+2026-01-04 09:01:21.141 [main] INFO  com.example.springboottemplate.SpringbootTemplateApplication - Started SpringbootTemplateApplication in 3.262 seconds (JVM running for 4.541)
+2026-01-04 09:04:38.004 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext - Apache Camel 3.18.8 (camel-1) is shutting down (timeout:45s)
+2026-01-04 09:04:38.017 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext - Routes stopped (stopped:12)
+2026-01-04 09:04:38.017 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped route6 (rest://post:/upload:/%7Bfilename%7D)
+2026-01-04 09:04:38.019 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped route5 (rest://get:/download:/%7Bfilename%7D)
+2026-01-04 09:04:38.019 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped route4 (rest://get:/images:/cat)
+2026-01-04 09:04:38.019 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped route3 (rest://post:/users)
+2026-01-04 09:04:38.020 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped route2 (rest://get:/users)
+2026-01-04 09:04:38.020 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped route1 (rest://get:/users:/%7Bid%7D)
+2026-01-04 09:04:38.020 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped uploadFileRoute (direct://uploadFile)
+2026-01-04 09:04:38.021 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped downloadFileRoute (direct://downloadFile)
+2026-01-04 09:04:38.021 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped getCatImageRoute (direct://getCatImage)
+2026-01-04 09:04:38.023 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped createUserRoute (direct://createUser)
+2026-01-04 09:04:38.023 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped getAllUsersRoute (direct://getAllUsers)
+2026-01-04 09:04:38.024 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext -     Stopped getUserRoute (direct://getUser)
+2026-01-04 09:04:38.028 [SpringApplicationShutdownHook] INFO  org.apache.camel.impl.engine.AbstractCamelContext - Apache Camel 3.18.8 (camel-1) shutdown in 24ms (uptime:3m16s)
