@@ -1,7 +1,7 @@
 <section class="section">
     <div class="container">
         <h1 class="title">Application</h1>
-        <!-- Auth status -->
+        <!-- Status bar -->
         @if (authState.isAuthenticated) {
         <div class="notification is-success mb-4">
             <div class="spinner-row">
@@ -28,6 +28,7 @@
         </div>
         }
         <div>
+            @if (!authState.isAuthenticated) {
             <form class="box">
                 <div class="field">
                     <label class="label">Username</label>
@@ -45,13 +46,53 @@
                 <span class="mr-2"></span>
                 <button class="button is-light" (click)="signUp($event)">Sign up</button>
             </form>
+            }
         </div>
-        @if (isShowQRScan) {
         <div>
+            @if (isShowQRScan) {
             <br />
             <canvas #qrCodeEl></canvas>
-            <p class="mb-2">Vui lòng quét mã QR trên app Google/Microsoft Authenticator, code này chỉ hiển thị 1 lần duy nhất</p>
+            <p class="mb-2">Vui lòng quét mã QR trên app Google/Microsoft Authenticator, code này chỉ hiển thị 1 lần duy
+                nhất</p>
+            }
         </div>
-        }
+        <div>
+            @if (authState.isAuthenticated) {
+            <br />
+            <button class="button is-warning is-active">Refresh</button>
+            <span class="mr-2"></span>
+            <button class="button is-active">Log out</button>
+            }
+        </div>
+        <div>
+            @if (authState.isAuthenticated) {
+            <br />
+            <table id="tbl-test" class="table is-bordered is-fullwidth">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">#</th>
+                        <th>File name</th>
+                        <th style="width: 15%;">Datetime</th>
+                        <th style="width: 8%;">Download</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>1</th>
+                        <td>File-1.pdf</td>
+                        <td>2024-06-01 10:00</td>
+                        <td><button class="button is-info is-rounded"><i class="fa-solid fa-download"></i></button></td>
+                    </tr>
+                    <tr>
+                        <th>2</th>
+                        <td>File-2.pdf</td>
+                        <td>2024-06-01 11:00</td>
+                        <td><button class="button is-info is-rounded"><i class="fa-solid fa-download"></i></button></td>
+                    </tr>
+                </tbody>
+            </table>
+            }
+        </div>
     </div>
 </section>
