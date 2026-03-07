@@ -1,12 +1,14 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { AuthService } from '../service/auth.service';
 import QRCode from 'qrcode';
+import { delay } from '../common/utils';
 
 @Component({
     selector: 'app-root',
     standalone: true,
     imports: [],
     templateUrl: './app.component.html',
+    styleUrl: './app.component.css',
 })
 export class AppComponent implements AfterViewInit {
     private cdr = inject(ChangeDetectorRef);
@@ -35,16 +37,22 @@ export class AppComponent implements AfterViewInit {
         return this.authService.getAuthState();
     }
 
-    login(event: Event): void {
+    async login(event: Event): Promise<void> {
         event.preventDefault();
         console.log('Logging in...');
-        
+        this.isLoading = true;
+        await delay(1000);
         let isLoginFirstOk = this.authService.loginFirst('admin', '123456');
         if (!isLoginFirstOk) {
             console.error('Login failed: Invalid username or password');
+            this.isLoading = false;
+            this.cdr.detectChanges();
             return;
         }
         this.authService.checkOTP('123456');
+        console.log('Login successful');
+        this.isLoading = false;
+        this.cdr.detectChanges();
     }
 
     logout(): void {

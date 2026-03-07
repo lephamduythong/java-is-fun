@@ -4,11 +4,27 @@
         <!-- Auth status -->
         @if (authState.isAuthenticated) {
         <div class="notification is-success mb-4">
-            Đã đăng nhập với tên <strong>{{ authState.username }}</strong>
+            <div class="spinner-row">
+                <span>Chưa đăng nhập &nbsp;</span>
+                @if (isLoading) {
+                <div class="sk-swing">
+                    <div class="sk-swing-dot"></div>
+                    <div class="sk-swing-dot"></div>
+                </div>
+                }
+            </div>
         </div>
         } @else {
         <div class="notification is-warning mb-4">
-            Chưa đăng nhập
+            <div class="spinner-row">
+                <span>Chưa đăng nhập &nbsp;</span>
+                @if (isLoading) {
+                <div class="sk-swing">
+                    <div class="sk-swing-dot"></div>
+                    <div class="sk-swing-dot"></div>
+                </div>
+                }
+            </div>
         </div>
         }
         <div>
@@ -32,7 +48,6 @@
         </div>
         @if (isShowQRScan) {
         <div>
-            
             <br />
             <canvas #qrCodeEl></canvas>
             <p class="mb-2">Vui lòng quét mã QR trên app Google/Microsoft Authenticator, code này chỉ hiển thị 1 lần duy nhất</p>
