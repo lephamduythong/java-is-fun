@@ -1,18 +1,27 @@
 {
   "name": "fe",
   "version": "1.0.0",
-  "description": "Frontend TypeScript project",
+  "description": "Frontend Angular project",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch",
-    "dev": "tsc --watch",
-    "start": "serve ."
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
-    "serve": "^14.2.6",
-    "typescript": "^5.0.0"
+    "@analogjs/vite-plugin-angular": "latest",
+    "@angular/build": "^21.2.1",
+    "@angular/compiler-cli": "^21.2.1",
+    "typescript": "^5.0.0",
+    "vite": "latest"
   },
   "dependencies": {
-    "bulma": "^1.0.4"
+    "@angular/common": "^21.2.1",
+    "@angular/compiler": "^21.2.1",
+    "@angular/core": "^21.2.1",
+    "@angular/forms": "^21.2.1",
+    "@angular/platform-browser": "^21.2.1",
+    "bulma": "^1.0.4",
+    "rxjs": "^7.8.2",
+    "zone.js": "^0.16.1"
   }
 }
