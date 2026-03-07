@@ -1,0 +1,15 @@
+{
+  "name": "fe",
+  "version": "1.0.0",
+  "description": "Frontend TypeScript project",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "dev": "tsc --watch",
+    "start": "serve ."
+  },
+  "devDependencies": {
+    "serve": "^14.2.6",
+    "typescript": "^5.0.0"
+  }
+}
