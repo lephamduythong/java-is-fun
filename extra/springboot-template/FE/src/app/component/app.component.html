@@ -1,0 +1,42 @@
+<section class="section">
+    <div class="container">
+        <h1 class="title">Application</h1>
+        <!-- Auth status -->
+        @if (authState.isAuthenticated) {
+        <div class="notification is-success mb-4">
+            Đã đăng nhập với tên <strong>{{ authState.username }}</strong>
+        </div>
+        } @else {
+        <div class="notification is-warning mb-4">
+            Chưa đăng nhập
+        </div>
+        }
+        <div>
+            <form class="box">
+                <div class="field">
+                    <label class="label">Username</label>
+                    <div class="control">
+                        <input class="input" type="email" placeholder="e.g. alex@example.com" />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control">
+                        <input class="input" type="password" placeholder="********" />
+                    </div>
+                </div>
+                <button class="button is-primary" (click)="login($event)">Sign in</button>
+                <span class="mr-2"></span>
+                <button class="button is-light" (click)="signUp($event)">Sign up</button>
+            </form>
+        </div>
+        @if (isShowQRScan) {
+        <div>
+            
+            <br />
+            <canvas #qrCodeEl></canvas>
+            <p class="mb-2">Vui lòng quét mã QR trên app Google/Microsoft Authenticator, code này chỉ hiển thị 1 lần duy nhất</p>
+        </div>
+        }
+    </div>
+</section>

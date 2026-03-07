@@ -6,6 +6,7 @@
     "moduleResolution": "bundler",
     "strict": true,
     "experimentalDecorators": true,
+    "lib": ["ES2022", "dom"],
     "sourceMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
