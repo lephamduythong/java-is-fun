@@ -1,26 +1,30 @@
 // Auth state management
 interface AuthState {
   isAuthenticated: boolean;
-  token: string | null;
+  pw: string | null;
   username: string | null;
+  accessToken: string | null;
 }
 
 const authState: AuthState = {
   isAuthenticated: false,
-  token: null,
+  pw: null,
   username: null,
+  accessToken: null,
 };
 
-export function login(username: string, token: string): void {
+export function login(username: string, pw: string): void {
   authState.isAuthenticated = true;
-  authState.token = token;
+  authState.pw = pw;
   authState.username = username;
+  authState.accessToken = "sample-token-123"; // Simulate token generation
 }
 
 export function logout(): void {
   authState.isAuthenticated = false;
-  authState.token = null;
+  authState.pw = null;
   authState.username = null;
+  authState.accessToken = null;
 }
 
 export function getAuthState(): AuthState {
