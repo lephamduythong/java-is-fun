@@ -11,9 +11,10 @@
         </div>
         <!-- User infomation -->
         @if (authState.isAuthenticated) {
-        <div class="block" style="text-align: right;">
-            <span class="mr-1" style="color: white;">thong.lepham</span>
+        <div class="block" style="display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem;">
+            <span style="color: white;">thong.lepham</span>
             <i class="fa-solid fa-user"></i>
+            <button class="button is-active" (click)="logout()">Log out</button>
         </div>
         }
         <!-- Notification: floating toast -->
@@ -31,18 +32,20 @@
                 <div class="field">
                     <label class="label">Username</label>
                     <div class="control">
-                        <input class="input" type="email" placeholder="e.g. alex@example.com" />
+                        <input class="input" type="email" placeholder="e.g. alex@example.com" 
+                        [(ngModel)]="username" name="username" />
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Password</label>
                     <div class="control">
-                        <input class="input" type="password" placeholder="********" />
+                        <input class="input" type="password" placeholder="********" 
+                        [(ngModel)]="password" name="password" />
                     </div>
                 </div>
-                <button class="button is-primary" (click)="login($event)">Sign in</button>
+                <button class="button is-primary" [class.is-loading]="isLoading" (click)="login($event)">Sign in</button>
                 <span class="mr-2"></span>
-                <button class="button is-light" (click)="signUp($event)">Sign up</button>
+                <button class="button is-light" (click)="signUp($event)" [class.is-loading]="isLoading">Sign up</button>
             </form>
             
         </div>
@@ -51,7 +54,6 @@
         <div class="block">
             <button class="button is-warning is-active" (click)="refresh()">Refresh</button>
             <span class="mr-2"></span>
-            <button class="button is-active" (click)="logout()">Log out</button>
         </div>
         }
         @if (authState.isAuthenticated) {
@@ -92,7 +94,11 @@
                 <svg viewBox="0 0 448 512" class="bell"><path d="M224 0c-17.7 0-32 14.3-32 32V49.9C119.5 61.4 64 124.2 64 200v33.4c0 45.4-15.5 89.5-43.8 124.9L5.3 377c-5.8 7.2-6.9 17.1-2.9 25.4S14.8 416 24 416H424c9.2 0 17.6-5.3 21.6-13.6s2.9-18.2-2.9-25.4l-14.9-18.6C399.5 322.9 384 278.8 384 233.4V200c0-75.8-55.5-138.6-128-150.1V32c0-17.7-14.3-32-32-32zm0 96h8c57.4 0 104 46.6 104 104v33.4c0 47.9 13.9 94.6 39.7 134.6H72.3C98.1 328 112 281.3 112 233.4V200c0-57.4 46.6-104 104-104h8zm64 352H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7s18.7-28.3 18.7-45.3z"></path></svg>
             </button>
         </div> -->
+        <div class="block">
+            
+        </div>
     </div>
 </section>
 <app-logout-modal></app-logout-modal>
+<app-otp-modal></app-otp-modal>
 <app-qrscan-modal></app-qrscan-modal>

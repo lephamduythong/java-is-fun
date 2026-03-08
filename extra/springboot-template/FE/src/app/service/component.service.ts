@@ -7,6 +7,15 @@ export class ComponentService {
     notiText = signal('');
     isQrModalVisible = signal(false);
     qrMsg = signal('');
+    isOtpModalVisible = signal(false);
+
+    openOtpModal(): void {
+        this.isOtpModalVisible.set(true);
+    }
+
+    closeOtpModal(): void {
+        this.isOtpModalVisible.set(false);
+    }
 
     open(): void {
         this.isLogoutModalVisible.set(true);

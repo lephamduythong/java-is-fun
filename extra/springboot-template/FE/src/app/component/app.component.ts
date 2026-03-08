@@ -1,16 +1,22 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
 import { ComponentService as ComponentService } from '../service/component.service';
 import { LogoutModalComponent } from './logout-modal/logout-modal.component';
+import { OtpModalComponent } from './otp-modal/otp-modal.component';
 import { QrscanModalComponent } from './qrscan-modal/qrscan-modal.component';
 import { delay } from '../common/js/utils';
 
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [LogoutModalComponent, QrscanModalComponent],
+    imports: [FormsModule, LogoutModalComponent, OtpModalComponent, QrscanModalComponent],
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css', '../common/css/bell.css'],
+    styleUrls: [
+        './app.component.css', 
+        '../common/css/bell.css',
+        '../common/css/loading-spinner.css'
+    ],
 })
 export class AppComponent {
     private cdr = inject(ChangeDetectorRef);
@@ -18,6 +24,8 @@ export class AppComponent {
     componentService = inject(ComponentService);
     authService = inject(AuthService);
     isLoading = false;
+    username = '';
+    password = '';
 
     get authState() {
         return this.authService.getAuthState();
@@ -28,17 +36,21 @@ export class AppComponent {
         console.log('Logging in...');
         this.isLoading = true;
         await delay(1000);
-        let isLoginFirstOk = this.authService.loginFirst('admin', '123456');
+
+        // Show OTP if firstLogin passed
+        let isLoginFirstOk = this.authService.loginFirst(this.username, this.password);
         if (!isLoginFirstOk) {
             console.error('Login failed: Invalid username or password');
+            this.componentService.showNotiError('Invalid username or password');
             this.isLoading = false;
+
             this.cdr.detectChanges();
             return;
         }
-        this.authService.checkOTP('123456');
-        this.componentService.showNotiSuccess('Login successful');
-        console.log('Login successful');
+
         this.isLoading = false;
+        this.componentService.openOtpModal();
+
         this.cdr.detectChanges();
     }
 
@@ -46,18 +58,23 @@ export class AppComponent {
         this.componentService.open();
     }
 
-    signUp(event: Event): void {
+    async signUp(event: Event): Promise<void> {
         event.preventDefault();
-        console.log('Signing up...');
-        this.authService.signUp('thongle', '654321');
-        // const qrMsg = this.generateRandomString(16);
-
+        console.log('Signing up... with username: ' + this.username);
+        const isOk = this.authService.signUp(this.username, this.password);
+        await delay(500);
+        if (!isOk) {
+            this.componentService.showNotiError('User is existing');
+            this.cdr.detectChanges();
+            return;
+        }  
         const issuer = 'VIB';
         const account = 'thong.lepham@vib.com.vn';
         const secret = 'Y36SEEQAQOGCLT5F5HZIDMQF5YWMHZXB';
-
         const qrMsg = `otpauth://totp/${issuer}:${account}?secret=${secret}&issuer=${issuer}`;
         this.componentService.openQrModal(qrMsg);
+        this.cdr.detectChanges();
+        return;
     }
 
     toggleLoading(): void {

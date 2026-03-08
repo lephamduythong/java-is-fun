@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 interface AuthState {
     // Login state
+    isLoginFirstOk: boolean;
     isAuthenticated: boolean;
     accessToken: string | null;
     username: string | null;
@@ -10,6 +11,7 @@ interface AuthState {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
     private state: AuthState = {
+        isLoginFirstOk: false,
         isAuthenticated: false,
         username: null,
         accessToken: null
@@ -17,7 +19,10 @@ export class AuthService {
 
     signUp(username: string, pw: string): boolean {
         // Check if username already exists, if not create new user in Database
-        return true;
+        if (username !== 'admin') {
+            return true;
+        }
+        return false;
     }
 
     getQRScan(username: string): string {
@@ -32,7 +37,8 @@ export class AuthService {
 
         // Set state
         this.state = {
-            isAuthenticated: true,
+            isLoginFirstOk: true,
+            isAuthenticated: false,
             username,
             accessToken: 'sample-token-123',
         };
@@ -42,15 +48,17 @@ export class AuthService {
 
     // Return access token if OTP is correct
     checkOTP(otp: string): void {
-        let accessToken = '123456789abcdef';
+        const accessToken = '123456789abcdef';
         // Set access token if OTP is correct
-        if (otp === '123456') {
+        if (otp === '111111') {
             this.state.accessToken = accessToken;
+            this.state.isAuthenticated = true;
         }
     }
 
     logout(): boolean {
         this.state = {
+            isLoginFirstOk: false,
             isAuthenticated: false,
             username: null,
             accessToken: null,

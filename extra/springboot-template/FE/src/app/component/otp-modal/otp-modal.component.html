@@ -1,0 +1,29 @@
+<div class="modal" [class.is-active]="componentService.isOtpModalVisible()">
+    <div class="modal-background" (click)="cancel()"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <span class="modal-card-title">Xác thực OTP</span>
+            <button class="delete" aria-label="close" (click)="cancel()"></button>
+        </header>
+        <section class="modal-card-body">
+            <div class="field">
+                <label class="label">Nhập mã OTP từ ứng dụng Authenticator</label>
+                <div class="control">
+                    <input
+                        class="input"
+                        type="text"
+                        placeholder="000000"
+                        maxlength="6"
+                        [(ngModel)]="otpValue"
+                        (keyup.enter)="confirm()"
+                        autofocus
+                    />
+                </div>
+            </div>
+        </section>
+        <footer class="modal-card-foot" style="justify-content: flex-end; gap: 0.5rem;">
+            <button class="button" (click)="cancel()">Huỷ</button>
+            <button class="button is-primary" [class.is-loading]="isLoading" (click)="confirm()">Xác nhận</button>
+        </footer>
+    </div>
+</div>
