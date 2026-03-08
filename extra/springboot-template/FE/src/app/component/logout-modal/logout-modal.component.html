@@ -1,0 +1,16 @@
+<div class="modal" [class.is-active]="componentService.isLogoutModalVisible()">
+    <div class="modal-background" (click)="cancel()"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Xác nhận đăng xuất</p>
+            <button class="delete" aria-label="close" (click)="cancel()"></button>
+        </header>
+        <section class="modal-card-body">
+            Bạn có chắc chắn muốn đăng xuất không?
+        </section>
+        <footer class="modal-card-foot" style="justify-content: flex-end;">
+            <button class="button" (click)="cancel()">Huỷ</button>
+            <button class="button is-danger" (click)="confirm()">Đăng xuất</button>
+        </footer>
+    </div>
+</div>

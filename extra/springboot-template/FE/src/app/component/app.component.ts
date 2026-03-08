@@ -1,17 +1,20 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { AuthService } from '../service/auth.service';
+import { ComponentService as ComponentService } from '../service/component.service';
+import { LogoutModalComponent } from './logout-modal/logout-modal.component';
 import QRCode from 'qrcode';
 import { delay } from '../common/utils';
 
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [],
+    imports: [LogoutModalComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
 })
 export class AppComponent implements AfterViewInit {
     private cdr = inject(ChangeDetectorRef);
+    private componentService = inject(ComponentService);
 
     authService = inject(AuthService);
     isLoading = false;
@@ -56,8 +59,7 @@ export class AppComponent implements AfterViewInit {
     }
 
     logout(): void {
-        console.log('Logging out...');
-        this.authService.logout();
+        this.componentService.open();
     }
 
     signUp(event: Event): void {
