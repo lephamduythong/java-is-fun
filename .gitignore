@@ -31,3 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
+extra/springboot-template/src/main/resources/application.properties
