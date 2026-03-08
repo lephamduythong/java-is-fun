@@ -7,30 +7,23 @@
             <p style="color: white;">thong.lepham</p>
         </div>
         }
-        <!-- Status bar -->
-        @if (authState.isAuthenticated) {
-        <div class="block notification is-success mb-4">
+        @if (isLoading) {
+        <div class="block">
             <div class="spinner-row">
-                <span>Chưa đăng nhập &nbsp;</span>
-                @if (isLoading) {
                 <div class="sk-swing">
                     <div class="sk-swing-dot"></div>
                     <div class="sk-swing-dot"></div>
                 </div>
-                }
             </div>
         </div>
-        } @else {
-        <div class="block notification is-warning mb-4">
-            <div class="spinner-row">
-                <span>Chưa đăng nhập &nbsp;</span>
-                @if (isLoading) {
-                <div class="sk-swing">
-                    <div class="sk-swing-dot"></div>
-                    <div class="sk-swing-dot"></div>
-                </div>
-                }
-            </div>
+        }
+        <!-- Notification: floating toast -->
+        @if (componentService.notiText()) {
+        <div class="notification toast-noti" 
+            [class.is-success]="!componentService.isNotiHasError()" 
+            [class.is-danger]="componentService.isNotiHasError()"
+        >
+            <strong>{{componentService.notiText()}}</strong>
         </div>
         }
         @if (!authState.isAuthenticated) {
@@ -57,7 +50,6 @@
         }
         @if (isShowQRScan) {
         <div class="block">
-            <br />
             <canvas #qrCodeEl></canvas>
             <p class="mb-2">Vui lòng quét mã QR trên app Google/Microsoft Authenticator, code này chỉ hiển thị 1 lần duy
                 nhất</p>
@@ -65,8 +57,7 @@
         }
         @if (authState.isAuthenticated) {
         <div class="block">
-            <br />
-            <button class="button is-warning is-active">Refresh</button>
+            <button class="button is-warning is-active" (click)="refresh()">Refresh</button>
             <span class="mr-2"></span>
             <button class="button is-active" (click)="logout()">Log out</button>
         </div>

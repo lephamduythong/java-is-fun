@@ -14,8 +14,8 @@ import { delay } from '../common/utils';
 })
 export class AppComponent implements AfterViewInit {
     private cdr = inject(ChangeDetectorRef);
-    private componentService = inject(ComponentService);
-
+    
+    componentService = inject(ComponentService);
     authService = inject(AuthService);
     isLoading = false;
     isShowQRScan = false;
@@ -53,6 +53,7 @@ export class AppComponent implements AfterViewInit {
             return;
         }
         this.authService.checkOTP('123456');
+        this.componentService.showNotiSuccess('Login successful');
         console.log('Login successful');
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -75,6 +76,14 @@ export class AppComponent implements AfterViewInit {
 
     toggleLoading(): void {
         this.isLoading = !this.isLoading;
+    }
+
+    async refresh(): Promise<void> {
+        console.log('Refreshing data...');
+        this.isLoading = true;
+        await delay(1000);
+        this.isLoading = false;
+        this.cdr.detectChanges();
     }
 
     private generateRandomString(length: number): string {

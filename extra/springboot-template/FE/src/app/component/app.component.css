@@ -1,7 +1,17 @@
-.spinner-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.toast-noti {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 9999;
+    animation: fadeInOut 3s ease forwards;
+    min-width: 200px;
+}
+
+@keyframes fadeInOut {
+    0%   { opacity: 0; transform: translateY(-4px); }
+    15%  { opacity: 1; transform: translateY(0); }
+    75%  { opacity: 1; }
+    100% { opacity: 0; }
 }
 
 .sk-swing {
