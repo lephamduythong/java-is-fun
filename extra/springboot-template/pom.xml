@@ -92,6 +92,18 @@
             <version>3.42.0.0</version>
         </dependency>
 
+        <!-- QR Code Generation Libraries -->
+        <dependency>
+            <groupId>com.warrenstrange</groupId>
+            <artifactId>googleauth</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.5.3</version>
+        </dependency>
+
     </dependencies>
     
     <build>

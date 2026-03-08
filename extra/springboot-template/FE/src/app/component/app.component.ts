@@ -3,14 +3,14 @@ import { AuthService } from '../service/auth.service';
 import { ComponentService as ComponentService } from '../service/component.service';
 import { LogoutModalComponent } from './logout-modal/logout-modal.component';
 import { QrscanModalComponent } from './qrscan-modal/qrscan-modal.component';
-import { delay } from '../common/utils';
+import { delay } from '../common/js/utils';
 
 @Component({
     selector: 'app-root',
     standalone: true,
     imports: [LogoutModalComponent, QrscanModalComponent],
     templateUrl: './app.component.html',
-    styleUrl: './app.component.css',
+    styleUrls: ['./app.component.css', '../common/css/bell.css'],
 })
 export class AppComponent {
     private cdr = inject(ChangeDetectorRef);
@@ -50,7 +50,13 @@ export class AppComponent {
         event.preventDefault();
         console.log('Signing up...');
         this.authService.signUp('thongle', '654321');
-        const qrMsg = this.generateRandomString(16);
+        // const qrMsg = this.generateRandomString(16);
+
+        const issuer = 'VIB';
+        const account = 'thong.lepham@vib.com.vn';
+        const secret = 'Y36SEEQAQOGCLT5F5HZIDMQF5YWMHZXB';
+
+        const qrMsg = `otpauth://totp/${issuer}:${account}?secret=${secret}&issuer=${issuer}`;
         this.componentService.openQrModal(qrMsg);
     }
 

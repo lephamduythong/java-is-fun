@@ -8,10 +8,23 @@
 }
 
 @keyframes fadeInOut {
-    0%   { opacity: 0; transform: translateY(-4px); }
-    15%  { opacity: 1; transform: translateY(0); }
-    75%  { opacity: 1; }
-    100% { opacity: 0; }
+    0% {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    15% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    75% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 .sk-swing {
@@ -26,4 +39,47 @@
 
 .sk-swing-dot:nth-child(2) {
     /* animation-delay: -0.125s !important;  */
+}
+
+.checkbox {
+    display: none;
+}
+
+.slider {
+    width: 45px;
+    height: 22.5px;
+    background-color: lightgray;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    border: 4px solid transparent;
+    transition: .3s;
+    box-shadow: 0 0 10px 0 rgb(0, 0, 0, 0.25) inset;
+    cursor: pointer;
+}
+
+.slider::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    transform: translateX(-22.5px);
+    border-radius: 20px;
+    transition: .3s;
+    box-shadow: 0 0 10px 3px rgb(0, 0, 0, 0.25);
+}
+
+.checkbox:checked~.slider::before {
+    transform: translateX(22.5px);
+    box-shadow: 0 0 10px 3px rgb(0, 0, 0, 0.25);
+}
+
+.checkbox:checked~.slider {
+    background-color: #2196F3;
+}
+
+.checkbox:active~.slider::before {
+    transform: translate(0);
 }
