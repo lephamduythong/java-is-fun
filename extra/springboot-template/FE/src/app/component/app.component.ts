@@ -1,40 +1,23 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { AuthService } from '../service/auth.service';
 import { ComponentService as ComponentService } from '../service/component.service';
 import { LogoutModalComponent } from './logout-modal/logout-modal.component';
-import QRCode from 'qrcode';
+import { QrscanModalComponent } from './qrscan-modal/qrscan-modal.component';
 import { delay } from '../common/utils';
 
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [LogoutModalComponent],
+    imports: [LogoutModalComponent, QrscanModalComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent {
     private cdr = inject(ChangeDetectorRef);
     
     componentService = inject(ComponentService);
     authService = inject(AuthService);
     isLoading = false;
-    isShowQRScan = false;
-    qrMsg = '';
-
-    @ViewChild('qrCodeEl') canvasRef!: ElementRef<HTMLCanvasElement>;
-
-    ngAfterViewInit(): void {
-        if (!this.qrMsg) {
-            this.generateQR(this.qrMsg);
-        }
-    }
-
-    generateQR(msg: string): void {
-        QRCode.toCanvas(this.canvasRef.nativeElement, msg, (error: any) => {
-            if (error) console.error(error);
-            else console.log('QR Code generated:', msg);
-        });
-    }
 
     get authState() {
         return this.authService.getAuthState();
@@ -67,11 +50,8 @@ export class AppComponent implements AfterViewInit {
         event.preventDefault();
         console.log('Signing up...');
         this.authService.signUp('thongle', '654321');
-        // const qrMsg = this.authService.getQRScan('thongle');
         const qrMsg = this.generateRandomString(16);
-        this.isShowQRScan = true;
-        this.cdr.detectChanges();
-        this.generateQR(qrMsg);
+        this.componentService.openQrModal(qrMsg);
     }
 
     toggleLoading(): void {

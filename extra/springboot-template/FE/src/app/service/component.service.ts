@@ -5,6 +5,8 @@ export class ComponentService {
     isLogoutModalVisible = signal(false);
     isNotiHasError = signal(false);
     notiText = signal('');
+    isQrModalVisible = signal(false);
+    qrMsg = signal('');
 
     open(): void {
         this.isLogoutModalVisible.set(true);
@@ -12,6 +14,16 @@ export class ComponentService {
 
     close(): void {
         this.isLogoutModalVisible.set(false);
+    }
+
+    openQrModal(msg: string): void {
+        this.qrMsg.set(msg);
+        this.isQrModalVisible.set(true);
+    }
+
+    closeQrModal(): void {
+        this.isQrModalVisible.set(false);
+        this.qrMsg.set('');
     }
 
     showNotiSuccess(text: string): void {

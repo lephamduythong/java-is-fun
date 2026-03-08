@@ -1,20 +1,18 @@
 <section class="section">
     <div class="container">
-        <h1 class="title">Application</h1>
+        <div class="block" style="display: flex; align-items: center; gap: 1rem;">
+            <h1 class="title mb-0">Application</h1>
+            @if (isLoading) {
+            <div class="sk-swing">
+                <div class="sk-swing-dot"></div>
+                <div class="sk-swing-dot"></div>
+            </div>
+            }
+        </div>
         <!-- User infomation -->
         @if (authState.isAuthenticated) {
         <div class="block" style="text-align: right;">
             <p style="color: white;">thong.lepham</p>
-        </div>
-        }
-        @if (isLoading) {
-        <div class="block">
-            <div class="spinner-row">
-                <div class="sk-swing">
-                    <div class="sk-swing-dot"></div>
-                    <div class="sk-swing-dot"></div>
-                </div>
-            </div>
         </div>
         }
         <!-- Notification: floating toast -->
@@ -48,13 +46,6 @@
             
         </div>
         }
-        @if (isShowQRScan) {
-        <div class="block">
-            <canvas #qrCodeEl></canvas>
-            <p class="mb-2">Vui lòng quét mã QR trên app Google/Microsoft Authenticator, code này chỉ hiển thị 1 lần duy
-                nhất</p>
-        </div>
-        }
         @if (authState.isAuthenticated) {
         <div class="block">
             <button class="button is-warning is-active" (click)="refresh()">Refresh</button>
@@ -62,7 +53,6 @@
             <button class="button is-active" (click)="logout()">Log out</button>
         </div>
         }
-        <app-logout-modal></app-logout-modal>
         @if (authState.isAuthenticated) {
         <div class="block">
             <table style="background-color: #24292e" id="tbl-test" class="table is-bordered is-fullwidth">
@@ -91,3 +81,5 @@
         }
     </div>
 </section>
+<app-logout-modal></app-logout-modal>
+<app-qrscan-modal></app-qrscan-modal>
