@@ -5,12 +5,13 @@ export default defineConfig({
   plugins: [
     angular({ tsconfig: './tsconfig.json' }),
   ],
+  base: 'test-api/app/',
   build: {
     rollupOptions: {
       output: {
-        entryFileNames: 'assets/[name].[hash].js',
-        chunkFileNames: 'assets/[name].[hash].js',
-        assetFileNames: 'assets/[name].[hash][extname]',
+        entryFileNames: '[name].[hash].js',
+        chunkFileNames: '[name].[hash].js',
+        assetFileNames: '[name].[hash][extname]',
       },
     },
   },
