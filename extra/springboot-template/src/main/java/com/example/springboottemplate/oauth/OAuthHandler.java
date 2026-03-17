@@ -30,11 +30,11 @@ public class OAuthHandler {
                     .contentType(MediaType.parseMediaType(MediaType.TEXT_HTML_VALUE))
                     .body(wrapHtml("OAuth Not Configured",
                             "<h2>OAuth Not Configured</h2>"
-                            + "<p>Google OAuth credentials are missing. "
-                            + "Please set <code>google.client.id</code> and "
-                            + "<code>google.client.secret</code> in "
-                            + "<code>application.properties</code> or via environment variables "
-                            + "<code>GOOGLE_CLIENT_ID</code> / <code>GOOGLE_CLIENT_SECRET</code>.</p>"));
+                                    + "<p>Google OAuth credentials are missing. "
+                                    + "Please set <code>google.client.id</code> and "
+                                    + "<code>google.client.secret</code> in "
+                                    + "<code>application.properties</code> or via environment variables "
+                                    + "<code>GOOGLE_CLIENT_ID</code> / <code>GOOGLE_CLIENT_SECRET</code>.</p>"));
         }
         try {
             String authUrl = googleOAuth.getAuthorizationUrl();

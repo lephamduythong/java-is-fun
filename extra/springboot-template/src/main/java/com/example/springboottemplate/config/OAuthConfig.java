@@ -12,7 +12,7 @@ public class OAuthConfig {
     @Value("${google.client.secret:}")
     private String clientSecret;
 
-    @Value("${google.redirect.uri:http://localhost:5000/oauth/callback}")
+    @Value("${google.redirect.uri:http://localhost:8080/test-api/oauth/callback}")
     private String redirectUri;
 
     @Value("${google.auth.uri:https://accounts.google.com/o/oauth2/v2/auth}")

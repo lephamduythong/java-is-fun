@@ -50,7 +50,8 @@ echo ======================================
 echo.
 echo Copying WAR file to WildFly...
 
-copy /Y "target\test-api.war" "E:\CODING\wildfly-26.1.3.Final\standalone\deployments\test-api.war"
+@REM copy /Y "target\test-api.war" "E:\CODING\wildfly-26.1.3.Final\standalone\deployments\test-api.war"
+copy /Y "target\test-api.war" "D:\Fun\wildfly-26.1.3.Final\standalone\deployments\test-api.war"
 
 if %ERRORLEVEL% EQU 0 (
     echo.
