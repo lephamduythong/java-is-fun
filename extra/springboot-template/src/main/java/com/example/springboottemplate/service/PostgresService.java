@@ -1,28 +1,46 @@
 package com.example.springboottemplate.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
 
-@Service
 public class PostgresService {
 
-    @Value("${postgres.jndi-name}")
-    private String jndiName;
+    private static final String PROPERTIES_FILE = "/application.properties";
+    private static final String JNDI_KEY = "postgres.jndi-name";
 
-    private DataSource dataSource;
+    private static volatile PostgresService instance;
 
-    @PostConstruct
-    public void init() throws NamingException {
+    private final DataSource dataSource;
+
+    private PostgresService() throws NamingException, IOException {
+        Properties props = new Properties();
+        try (InputStream is = PostgresService.class.getResourceAsStream(PROPERTIES_FILE)) {
+            if (is == null) {
+                throw new IOException("Cannot find " + PROPERTIES_FILE);
+            }
+            props.load(is);
+        }
+        String jndiName = props.getProperty(JNDI_KEY);
         dataSource = (DataSource) new InitialContext().lookup(jndiName);
+    }
+
+    public static PostgresService getInstance() throws NamingException, IOException {
+        if (instance == null) {
+            synchronized (PostgresService.class) {
+                if (instance == null) {
+                    instance = new PostgresService();
+                }
+            }
+        }
+        return instance;
     }
 
     public String getXmlRecord(String recid) throws SQLException {
