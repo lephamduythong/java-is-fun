@@ -6,7 +6,7 @@
     <div>
         <button class="button is-danger" (click)="onItemClick()">User {{id}} Action!</button>
     </div>
-    @if (isSelected) {
+    <!-- @if (isSelected) {
         <div>
             <p>✅ Is Selected</p>
         </div>
@@ -14,5 +14,13 @@
         <div>
             <p>❌ Not Selected</p>
         </div>
-    }
+    } -->
+    <div *ngIf="isSelected; else notSelected">
+        <p>✅ Is Selected</p>
+    </div>
+    <ng-template #notSelected>
+        <div>
+            <p>❌ Not Selected</p>
+        </div>
+    </ng-template>
 </div>
