@@ -34,4 +34,9 @@ export class LearningTestComponent {
     onItemClick(id: number) {
         console.log(`Item clicked in parent component with id: ${id}`);
     }
+
+    onItemDelete(id: number) {
+        console.log(`Item delete in parent component with id: ${id}`);
+        this.items = this.items.filter(item => item.id !== id);
+    }
 }
