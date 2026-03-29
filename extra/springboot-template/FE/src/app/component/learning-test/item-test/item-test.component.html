@@ -4,7 +4,13 @@
         <p>Item Name: {{itemTest.name}}</p>
     </div>
     <div>
-        <button class="button is-danger" (click)="onItemClick()">User {{itemTest.name}} Action!</button>
+        <button class="button" 
+            [class.is-primary]="isSelected" 
+            [class.is-danger]="!isSelected" 
+            (click)="onItemClick()"
+        >
+            User {{itemTest.name}} Action!
+        </button>
     </div>
     @if (isSelected) {
         <div>
