@@ -9,6 +9,9 @@
         <button class="button is-primary mt-3" (click)="onTest1()">Detect Changes</button>
     </div>
     <div>
+        <div>
+            <button class="button is-warning mt-3" (click)="onAddItem()">Add item</button>
+        </div>
         <ul>
             @for (item of items; track item.id) {
                 <li>

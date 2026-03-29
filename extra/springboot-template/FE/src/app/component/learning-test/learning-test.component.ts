@@ -39,4 +39,12 @@ export class LearningTestComponent {
         console.log(`Item delete in parent component with id: ${id}`);
         this.items = this.items.filter(item => item.id !== id);
     }
+
+    onAddItem() {
+        const newItem = {
+            id: this.items.length > 0 ? Math.max(...this.items.map(item => item.id)) + 1 : 1,
+            name: `Item ${this.items.length + 1}`,
+        };
+        this.items = [...this.items, newItem];
+    }
 }
