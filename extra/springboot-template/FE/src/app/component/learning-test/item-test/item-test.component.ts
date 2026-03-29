@@ -9,6 +9,6 @@ import Constants from '../../../common/js/constants';
     templateUrl: './item-test.component.html',
 })
 export class ItemTestComponent {
-    @Input() id!: number;
-    @Input() name!: string;
+    @Input({required: true}) id!: number;
+    @Input({required: true}) name!: string;
 }
