@@ -12,7 +12,7 @@
         <ul>
             @for (item of items; track item.id) {
                 <li>
-                    <app-item-test [id]="item.id" [name]="item.name" (itemClicked)="onItemClick($event)" />
+                    <app-item-test [itemTest]="item" (itemClicked)="onItemClick($event)" />
                 </li>
             }
         </ul>
