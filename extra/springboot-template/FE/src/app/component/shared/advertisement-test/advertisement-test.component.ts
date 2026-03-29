@@ -4,8 +4,11 @@ import { CommonModule, DatePipe } from '@angular/common';
 
 @Component({
     selector: 'app-shared-advertisement-test',
-    standalone: false,
+    standalone: true,
     templateUrl: './advertisement-test.component.html',
+    imports: [
+        DatePipe,
+    ],
     styleUrls: [
         // './advertisement-test.component.css', 
     ],
