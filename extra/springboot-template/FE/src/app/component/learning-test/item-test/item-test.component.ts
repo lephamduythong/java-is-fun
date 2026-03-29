@@ -13,8 +13,11 @@ export class ItemTestComponent {
     @Input({required: true}) name!: string;
     @Output() itemClicked = new EventEmitter<number>();
 
+    isSelected: boolean = false;
+
     onItemClick() {
         console.log(`Clicked item with id: ${this.id} and name: ${this.name}`);
+        this.isSelected = !this.isSelected;
         this.itemClicked.emit(this.id);
     }
 }

@@ -6,4 +6,13 @@
     <div>
         <button class="button is-danger" (click)="onItemClick()">User {{id}} Action!</button>
     </div>
+    @if (isSelected) {
+        <div>
+            <p>✅ Is Selected</p>
+        </div>
+    } @else {
+        <div>
+            <p>❌ Not Selected</p>
+        </div>
+    }
 </div>
