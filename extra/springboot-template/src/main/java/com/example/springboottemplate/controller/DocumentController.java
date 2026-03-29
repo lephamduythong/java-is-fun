@@ -14,12 +14,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.springboottemplate.service.PostgresService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.List;
 
 @RestController
 public class DocumentController {
+
+    private final PostgresService postgresService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public DocumentController(PostgresService postgresService) {
+        this.postgresService = postgresService;
+    }
 
     @GetMapping("/download-document")
     public ResponseEntity<byte[]> getDocument() throws Exception {
@@ -63,5 +73,16 @@ public class DocumentController {
                 }
             }
         }
+    }
+
+    @GetMapping(value = "/read-db", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getTest1() throws Exception {
+        String xmlrecord = postgresService.getXmlRecord("A1");
+        if (xmlrecord == null) {
+            return ResponseEntity.notFound().build();
+        }
+        // Parse the jsonb string into a generic Object so it's returned as proper JSON
+        Object json = objectMapper.readTree(xmlrecord);
+        return ResponseEntity.ok(json);
     }
 }
