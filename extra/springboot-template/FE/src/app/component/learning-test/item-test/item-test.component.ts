@@ -6,8 +6,7 @@ import { LearningTestService } from '../../../service/learning-test.service';
 
 @Component({
     selector: 'app-item-test',
-    standalone: true,
-    imports: [FormsModule],
+    standalone: false,
     templateUrl: './item-test.component.html',
 })
 export class ItemTestComponent {

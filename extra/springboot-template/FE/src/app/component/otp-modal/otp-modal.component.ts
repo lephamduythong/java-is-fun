@@ -6,8 +6,7 @@ import { delay } from '../../common/js/utils';
 
 @Component({
     selector: 'app-otp-modal',
-    standalone: true,
-    imports: [FormsModule],
+    standalone: false,
     templateUrl: './otp-modal.component.html',
     styleUrls: ['./otp-modal.component.css', '../../common/css/loading-spinner.css'],
 })

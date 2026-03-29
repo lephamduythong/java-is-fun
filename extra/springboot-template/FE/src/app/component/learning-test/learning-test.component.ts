@@ -10,8 +10,8 @@ import { LearningTestService } from '../../service/learning-test.service';
 
 @Component({
     selector: 'app-learning-test',
-    standalone: true,
-    imports: [FormsModule, ItemTestComponent, NewItemTestComponent, SharedAdvertisementTestComponent],
+    standalone: false,
+    // imports: [FormsModule, ItemTestComponent, NewItemTestComponent, SharedAdvertisementTestComponent],
     templateUrl: './learning-test.component.html',
     styleUrls: [
         './learning-test.component.css', 
