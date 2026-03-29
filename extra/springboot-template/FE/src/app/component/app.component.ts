@@ -6,11 +6,12 @@ import { LogoutModalComponent } from './logout-modal/logout-modal.component';
 import { OtpModalComponent } from './otp-modal/otp-modal.component';
 import { QrscanModalComponent } from './qrscan-modal/qrscan-modal.component';
 import { delay } from '../common/js/utils';
+import { LearningTestComponent } from './learning-test/learning-test.component';
 
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [FormsModule, LogoutModalComponent, OtpModalComponent, QrscanModalComponent],
+    imports: [FormsModule, LogoutModalComponent, OtpModalComponent, QrscanModalComponent, LearningTestComponent],
     templateUrl: './app.component.html',
     styleUrls: [
         './app.component.css', 
