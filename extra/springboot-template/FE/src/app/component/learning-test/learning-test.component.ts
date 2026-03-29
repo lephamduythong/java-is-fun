@@ -1,12 +1,13 @@
-import { ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, Input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import Constants from '../../common/js/constants';
 import { generateRandomString } from '../../common/js/utils';
+import { ItemTestComponent } from "./item-test/item-test.component";
 
 @Component({
     selector: 'app-learning-test',
     standalone: true,
-    imports: [FormsModule],
+    imports: [FormsModule, ItemTestComponent],
     templateUrl: './learning-test.component.html',
     styleUrls: [
         './learning-test.component.css', 
@@ -14,6 +15,8 @@ import { generateRandomString } from '../../common/js/utils';
 })
 export class LearningTestComponent {
     private cdr = inject(ChangeDetectorRef);
+
+    items = Constants.DUMMY_LIST;
 
     textTest1 = signal('test1');
     textTest2 = computed(() => this.textTest1() + ' computed');

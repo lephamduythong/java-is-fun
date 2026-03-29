@@ -8,4 +8,17 @@
         <p>{{textTest2()}}</p>
         <button class="button is-primary mt-3" (click)="onTest1()">Detect Changes</button>
     </div>
+    <div>
+        <ul>
+            <li>
+                <app-item-test [id]="items[0].id" [name]="items[0].name" />
+            </li>
+            <li>
+                <app-item-test [id]="items[1].id" [name]="items[1].name" />
+            </li>
+            <li>
+                <app-item-test [id]="items[2].id" [name]="items[2].name" />
+            </li>
+        </ul>
+    </div>
 </div>
