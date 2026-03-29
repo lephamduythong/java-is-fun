@@ -5,11 +5,12 @@ import { generateRandomString } from '../../common/js/utils';
 import { ItemTestComponent } from "./item-test/item-test.component";
 import { NewItemTestComponent } from './new-item-test/new-item-test.component';
 import { ItemTest } from './item-test/item-test.model';
+import { SharedAdvertisementTestComponent } from '../shared/advertisement-test/advertisement-test.component';
 
 @Component({
     selector: 'app-learning-test',
     standalone: true,
-    imports: [FormsModule, ItemTestComponent, NewItemTestComponent],
+    imports: [FormsModule, ItemTestComponent, NewItemTestComponent, SharedAdvertisementTestComponent],
     templateUrl: './learning-test.component.html',
     styleUrls: [
         './learning-test.component.css', 
