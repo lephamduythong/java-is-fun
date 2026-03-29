@@ -3,11 +3,13 @@ import { FormsModule } from '@angular/forms';
 import Constants from '../../common/js/constants';
 import { generateRandomString } from '../../common/js/utils';
 import { ItemTestComponent } from "./item-test/item-test.component";
+import { NewItemTestComponent } from './new-item-test/new-item-test.component';
+import { ItemTest } from './item-test/item-test.model';
 
 @Component({
     selector: 'app-learning-test',
     standalone: true,
-    imports: [FormsModule, ItemTestComponent],
+    imports: [FormsModule, ItemTestComponent, NewItemTestComponent],
     templateUrl: './learning-test.component.html',
     styleUrls: [
         './learning-test.component.css', 
@@ -16,11 +18,13 @@ import { ItemTestComponent } from "./item-test/item-test.component";
 export class LearningTestComponent {
     private cdr = inject(ChangeDetectorRef);
 
-    items = Constants.DUMMY_LIST;
+    items: ItemTest[] = [];
 
     textTest1 = signal('test1');
     textTest2 = computed(() => this.textTest1() + ' computed');
     // textTest2 = this.textTest1 + ' computed'; // => this will not work, because textTest1 is a signal, not a string
+
+    isAddingNewItem = false;
 
     get imgPath() {
         return `${Constants.IMG_STATIC_PATH}cat.jpg`;
@@ -41,10 +45,13 @@ export class LearningTestComponent {
     }
 
     onAddItem() {
-        const newItem = {
-            id: this.items.length > 0 ? Math.max(...this.items.map(item => item.id)) + 1 : 1,
-            name: `Item ${this.items.length + 1}`,
-        };
-        this.items = [...this.items, newItem];
+        this.isAddingNewItem = true;
+    }
+
+    onNewItemAdded(newItem: ItemTest) {
+        console.log('New item received in parent component:', newItem);
+        this.items.push(newItem);
+        this.isAddingNewItem = false;
+        console.log('New item added in parent component:', newItem);
     }
 }

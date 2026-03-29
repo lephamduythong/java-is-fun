@@ -12,6 +12,11 @@
         <div>
             <button class="button is-warning mt-3" (click)="onAddItem()">Add item</button>
         </div>
+        <div>
+            @if (isAddingNewItem) {
+                <app-new-item-test (saveNewItem)="onNewItemAdded($event)" />
+            }
+        </div>
         <ul>
             @for (item of items; track item.id) {
                 <li>
