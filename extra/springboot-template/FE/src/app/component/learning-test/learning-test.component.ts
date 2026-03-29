@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import Constants from '../../common/js/constants';
 import { generateRandomString } from '../../common/js/utils';
@@ -15,7 +15,9 @@ import { generateRandomString } from '../../common/js/utils';
 export class LearningTestComponent {
     private cdr = inject(ChangeDetectorRef);
 
-    textTest1 = 'test1';
+    textTest1 = signal('test1');
+    textTest2 = computed(() => this.textTest1() + ' computed');
+    // textTest2 = this.textTest1 + ' computed'; // => this will not work, because textTest1 is a signal, not a string
 
     get imgPath() {
         return `${Constants.IMG_STATIC_PATH}cat.jpg`;
@@ -23,6 +25,6 @@ export class LearningTestComponent {
 
     onTest1() {
         console.log('test1');
-        this.textTest1 = generateRandomString(10);
+        this.textTest1.set(generateRandomString(10));
     }
 }
