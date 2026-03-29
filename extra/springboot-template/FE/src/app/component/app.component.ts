@@ -97,4 +97,16 @@ export class AppComponent {
         }
         return result;
     }
+
+    async testPrint(): Promise<void> {
+        console.log('Testing print...');
+        const response = await fetch('assets/print-template/template1.html');
+        const html = await response.text();
+        console.log(html);
+        const modified = html.replaceAll('{{1}}', 'XYZ');
+        const blob = new Blob([modified], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        console.log(url);
+        window.open(url, '_blank');
+    }
 }
