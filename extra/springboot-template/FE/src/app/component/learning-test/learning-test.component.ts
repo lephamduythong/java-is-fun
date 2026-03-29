@@ -30,4 +30,8 @@ export class LearningTestComponent {
         console.log('test1');
         this.textTest1.set(generateRandomString(10));
     }
+
+    onItemClick(id: number) {
+        console.log(`Item clicked in parent component with id: ${id}`);
+    }
 }
