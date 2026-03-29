@@ -6,6 +6,7 @@ import { ItemTestComponent } from "./item-test/item-test.component";
 import { NewItemTestComponent } from './new-item-test/new-item-test.component';
 import { ItemTest } from './item-test/item-test.model';
 import { SharedAdvertisementTestComponent } from '../shared/advertisement-test/advertisement-test.component';
+import { LearningTestService } from '../../service/learning-test.service';
 
 @Component({
     selector: 'app-learning-test',
@@ -18,6 +19,8 @@ import { SharedAdvertisementTestComponent } from '../shared/advertisement-test/a
 })
 export class LearningTestComponent {
     private cdr = inject(ChangeDetectorRef);
+    
+    learningTestService = inject(LearningTestService);
 
     items: ItemTest[] = [];
 
