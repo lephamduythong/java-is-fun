@@ -22,6 +22,7 @@
     "@angular/core": "^21.2.1",
     "@angular/forms": "^21.2.1",
     "@angular/platform-browser": "^21.2.1",
+    "@angular/platform-browser-dynamic": "^21.2.1",
     "bulma": "^1.0.4",
     "qrcode": "^1.5.4",
     "rxjs": "^7.8.2",

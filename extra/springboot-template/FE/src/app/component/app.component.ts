@@ -10,8 +10,8 @@ import { LearningTestComponent } from './learning-test/learning-test.component';
 
 @Component({
     selector: 'app-root',
-    standalone: true,
-    imports: [FormsModule, LogoutModalComponent, OtpModalComponent, QrscanModalComponent, LearningTestComponent],
+    standalone: false,
+    // imports: [FormsModule, LogoutModalComponent, OtpModalComponent, QrscanModalComponent, LearningTestComponent],
     templateUrl: './app.component.html',
     styleUrls: [
         './app.component.css', 
