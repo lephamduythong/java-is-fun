@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, computed, inject, Input, signal } from '@angular/core';
-import { NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Constants from '../../common/js/constants';
 import { generateRandomString } from '../../common/js/utils';
@@ -8,7 +7,7 @@ import { ItemTestComponent } from "./item-test/item-test.component";
 @Component({
     selector: 'app-learning-test',
     standalone: true,
-    imports: [FormsModule, ItemTestComponent, NgFor],
+    imports: [FormsModule, ItemTestComponent],
     templateUrl: './learning-test.component.html',
     styleUrls: [
         './learning-test.component.css', 

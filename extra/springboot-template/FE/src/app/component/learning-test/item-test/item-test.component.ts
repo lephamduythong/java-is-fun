@@ -1,12 +1,11 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Constants from '../../../common/js/constants';
 
 @Component({
     selector: 'app-item-test',
     standalone: true,
-    imports: [FormsModule, NgIf],
+    imports: [FormsModule],
     templateUrl: './item-test.component.html',
 })
 export class ItemTestComponent {
