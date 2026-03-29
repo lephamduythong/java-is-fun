@@ -10,15 +10,11 @@
     </div>
     <div>
         <ul>
-            <li>
-                <app-item-test [id]="items[0].id" [name]="items[0].name" (itemClicked)="onItemClick($event)" />
-            </li>
-            <li>
-                <app-item-test [id]="items[1].id" [name]="items[1].name" (itemClicked)="onItemClick($event)" />
-            </li>
-            <li>
-                <app-item-test [id]="items[2].id" [name]="items[2].name" (itemClicked)="onItemClick($event)" />
-            </li>
+            @for (item of items; track item.id) {
+                <li>
+                    <app-item-test [id]="item.id" [name]="item.name" (itemClicked)="onItemClick($event)" />
+                </li>
+            }
         </ul>
     </div>
 </div>
