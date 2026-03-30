@@ -1,0 +1,28 @@
+<div class="mt-3">
+    <div>
+        <p>Item ID: {{itemTest.id}}</p>
+        <p>Item Name: {{itemTest.name}}</p>
+    </div>
+    <div>
+        <button class="button" 
+            [class.is-primary]="isSelected" 
+            [class.is-danger]="!isSelected" 
+            (click)="onItemClick()"
+        >
+            User {{itemTest.name}} Action!
+        </button>
+    </div>
+    @if (isSelected) {
+        <div>
+            <p>✅ Is Selected</p>
+        </div>
+    } @else {
+        <div>
+            <p>❌ Not Selected</p>
+        </div>
+    }
+    <div>
+        <button class="button mt-1" (click)="onItemDelete()">Delete using component</button>
+        <button class="button mt-1 ml-1" (click)="onItemDelete2()">Delete from Service</button>
+    </div>
+</div>

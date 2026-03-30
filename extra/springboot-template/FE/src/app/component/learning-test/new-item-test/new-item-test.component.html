@@ -1,0 +1,12 @@
+<div>
+    <div class="field">
+        <label class="label">Name</label>
+        <div class="control">
+            <input [(ngModel)]="newItemName" class="input" type="text" placeholder="In god we trust">
+        </div>
+    </div>
+    <div>
+        <button class="button is-primary mt-1" (click)="onNewItemSave()">Save using component</button>
+        <button class="button is-primary mt-1 ml-1" (click)="onNewItemSave2()">Save using service</button>
+    </div>
+</div>

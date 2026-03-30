@@ -4,8 +4,7 @@ import { ComponentService } from '../../service/component.service';
 
 @Component({
     selector: 'app-logout-modal',
-    standalone: true,
-    imports: [],
+    standalone: false,
     templateUrl: './logout-modal.component.html',
     styleUrl: './logout-modal.component.css',
 })

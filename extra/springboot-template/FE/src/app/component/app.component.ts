@@ -6,11 +6,12 @@ import { LogoutModalComponent } from './logout-modal/logout-modal.component';
 import { OtpModalComponent } from './otp-modal/otp-modal.component';
 import { QrscanModalComponent } from './qrscan-modal/qrscan-modal.component';
 import { delay } from '../common/js/utils';
+import { LearningTestComponent } from './learning-test/learning-test.component';
 
 @Component({
     selector: 'app-root',
-    standalone: true,
-    imports: [FormsModule, LogoutModalComponent, OtpModalComponent, QrscanModalComponent],
+    standalone: false,
+    // imports: [FormsModule, LogoutModalComponent, OtpModalComponent, QrscanModalComponent, LearningTestComponent],
     templateUrl: './app.component.html',
     styleUrls: [
         './app.component.css', 
@@ -96,5 +97,17 @@ export class AppComponent {
             result += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         return result;
+    }
+
+    async testPrint(): Promise<void> {
+        console.log('Testing print...');
+        const response = await fetch('assets/print-template/template1.html');
+        const html = await response.text();
+        console.log(html);
+        const modified = html.replaceAll('{{1}}', 'XYZ');
+        const blob = new Blob([modified], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        console.log(url);
+        window.open(url, '_blank');
     }
 }

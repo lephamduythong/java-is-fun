@@ -1,0 +1,40 @@
+<div class="mt-3">
+    <h1>Test component</h1>
+    <div>
+        <img style="max-height: 200px;" [src]="imgPath" alt="test image" class="img-fluid">
+    </div>
+    <div>
+        <p>{{textTest1()}}</p>
+        <p>{{textTest2()}}</p>
+        <button class="button is-primary mt-3" (click)="onTest1()">Detect Changes</button>
+    </div>
+    <div>
+        <div>
+            <button class="button is-warning mt-3" (click)="onAddItem()">Add item</button>
+        </div>
+        <div>
+            @if (isAddingNewItem) {
+                <app-new-item-test (saveNewItem)="onNewItemAdded($event)" />
+            }
+        </div>
+        <ul>
+            @for (item of items; track item.id) {
+                <li>
+                    <app-item-test [itemTest]="item" (itemClicked)="onItemClick($event)" (itemDeleted)="onItemDelete($event)" />
+                </li>
+            }
+        </ul>
+        <ul>
+            @for (item of learningTestService.items(); track item.id) {
+                <li>
+                    <app-item-test [itemTest]="item" />
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="mt-3">
+        <app-shared-advertisement-test>
+            <p>This is content projected into the advertisement component, only use for testing purposes.</p>
+        </app-shared-advertisement-test>
+    </div>
+</div>

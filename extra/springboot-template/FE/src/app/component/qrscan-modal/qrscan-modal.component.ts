@@ -4,8 +4,7 @@ import QRCode from 'qrcode';
 
 @Component({
     selector: 'app-qrscan-modal',
-    standalone: true,
-    imports: [],
+    standalone: false,
     templateUrl: './qrscan-modal.component.html',
     styleUrl: './qrscan-modal.component.css',
 })

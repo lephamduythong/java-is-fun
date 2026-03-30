@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [
     angular({ tsconfig: './tsconfig.json' }),
   ],
+  publicDir: 'assets',
   base: 'test-api/app/',
   build: {
     rollupOptions: {
