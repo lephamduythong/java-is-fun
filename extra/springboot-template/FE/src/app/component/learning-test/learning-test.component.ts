@@ -7,11 +7,19 @@ import { NewItemTestComponent } from './new-item-test/new-item-test.component';
 import { ItemTest } from './item-test/item-test.model';
 import { SharedAdvertisementTestComponent } from '../shared/advertisement-test/advertisement-test.component';
 import { LearningTestService } from '../../service/learning-test.service';
+import { SharedButtonTestComponent } from "../shared/button-test/button-test.component";
 
 @Component({
     selector: 'app-learning-test',
     standalone: true,
-    imports: [FormsModule, ItemTestComponent, NewItemTestComponent, SharedAdvertisementTestComponent],
+    imports: [
+        FormsModule, 
+        ItemTestComponent, 
+        NewItemTestComponent, 
+        SharedAdvertisementTestComponent, 
+        SharedAdvertisementTestComponent, 
+        SharedButtonTestComponent
+    ],
     templateUrl: './learning-test.component.html',
     styleUrls: [
         './learning-test.component.css', 
