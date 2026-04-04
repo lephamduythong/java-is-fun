@@ -10,21 +10,23 @@ import { ItemTestComponent } from './learning-test/item-test/item-test.component
 import { NewItemTestComponent } from './learning-test/new-item-test/new-item-test.component';
 import { SharedAdvertisementTestComponent } from './shared/advertisement-test/advertisement-test.component';
 import { DatePipe } from '@angular/common';
-import { LearningTestModule } from './learning-test.module';
-import { AuthModule } from './auth.module';
 
 @NgModule({
     bootstrap: [AppComponent],
     declarations: [
         AppComponent, 
+        LearningTestComponent,
+        LogoutModalComponent,
+        OtpModalComponent,
+        QrscanModalComponent,
+        ItemTestComponent, 
+        NewItemTestComponent, 
+        SharedAdvertisementTestComponent,
     ],
     imports: [
         BrowserModule, 
         FormsModule,
-        DatePipe,
-        SharedAdvertisementTestComponent,
-        LearningTestModule,
-        AuthModule,
+        DatePipe
     ],
     exports: [],
 })
