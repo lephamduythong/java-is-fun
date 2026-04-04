@@ -7,7 +7,8 @@ import { CommonModule } from '@angular/common';
     imports: [CommonModule],
     template: `
         <button class="button is-primary">
-            <span><i class="fa-solid fa-address-book"></i> Button</span>
+            <span><ng-content select=".my-icon"></ng-content></span> &nbsp;
+            <span><ng-content></ng-content></span>
         </button>
     `,
     styleUrls: [
