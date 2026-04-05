@@ -91,8 +91,11 @@
             <li appAuth="user">User</li>
             <li appAuth="guest">Guest</li>
         </ul> -->
-        <ng-template appAuth="admin">
+        <!-- <ng-template appAuth="admin">
             <p>Admin workspace only</p>
-        </ng-template>
+        </ng-template> -->
+        <p *appAuth="'admin'">Admin workspace only</p>
+        <p *appAuth="'user'">User workspace only</p>
+        <p *appAuth="'guest'">Guest workspace only</p>
     </div>
 </div>
