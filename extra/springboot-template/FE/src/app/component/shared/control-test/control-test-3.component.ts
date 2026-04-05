@@ -1,4 +1,4 @@
-import { AfterContentChecked, AfterViewChecked, AfterViewInit, Component, DoCheck, ElementRef, Host, HostBinding, HostListener, inject, Input, input, OnChanges, OnDestroy, OnInit, signal, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { AfterContentChecked, AfterViewChecked, AfterViewInit, Component, DestroyRef, DoCheck, ElementRef, Host, HostBinding, HostListener, inject, Input, input, OnChanges, OnDestroy, OnInit, signal, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as Math from 'mathjs';
@@ -22,9 +22,11 @@ import * as Math from 'mathjs';
     }
 })
 export class SharedControl3TestComponent implements
-    OnInit, OnChanges, DoCheck, AfterViewInit, AfterViewChecked, AfterContentChecked, OnDestroy {
+    OnInit, OnChanges, DoCheck, AfterViewInit, AfterViewChecked, AfterContentChecked {
         
     @Input({required: true}) textTest3!: string;
+
+    private destroyRef = inject(DestroyRef);
 
     constructor() {
         console.log(`${SharedControl3TestComponent.name} - constructor`);
@@ -34,6 +36,10 @@ export class SharedControl3TestComponent implements
     ngOnInit(): void {
         console.log(`${SharedControl3TestComponent.name} - ngOnInit`);
         console.log('Initial textTest3 value in ngOnInit:', this.textTest3);
+
+        this.destroyRef.onDestroy(() => {
+            console.log(`${SharedControl3TestComponent.name} - onDestroy callback`);
+        });
     }
 
     ngDoCheck(): void {
@@ -57,7 +63,7 @@ export class SharedControl3TestComponent implements
         console.log(changes);
     }
 
-    ngOnDestroy(): void {
-        console.log(`${SharedControl3TestComponent.name} - ngOnDestroy`);
-    }
+    // ngOnDestroy(): void {
+    //     console.log(`${SharedControl3TestComponent.name} - ngOnDestroy`);
+    // }
 }
