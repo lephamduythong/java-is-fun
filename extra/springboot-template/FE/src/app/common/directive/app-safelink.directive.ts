@@ -1,4 +1,4 @@
-import { Directive, input } from '@angular/core';
+import { Directive, ElementRef, inject, input } from '@angular/core';
 
 @Directive({ 
     selector: 'a[appSafeLink]',
@@ -9,6 +9,7 @@ import { Directive, input } from '@angular/core';
 })
 export class SafeLinkDirective {
     queryParam = input('');
+    private hostElRef = inject<ElementRef<HTMLAnchorElement>>(ElementRef);
 
     constructor() {
         console.log('SafeLinkDirective constructor');
@@ -20,7 +21,7 @@ export class SafeLinkDirective {
         const finalAddress = target.href + "search?q=" + this.queryParam();
         console.log('Address:', finalAddress);
         if (wantsToLeave) {
-            (event.target as HTMLAnchorElement).href = finalAddress;
+            this.hostElRef.nativeElement.href = finalAddress;
             return;
         }
         event.preventDefault();
