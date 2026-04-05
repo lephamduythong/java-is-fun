@@ -1,4 +1,4 @@
-import { Component, input, signal, ViewEncapsulation } from '@angular/core';
+import { Component, Host, HostBinding, HostListener, input, signal, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -19,9 +19,20 @@ import { CommonModule } from '@angular/common';
     `,
     encapsulation: ViewEncapsulation.None,
     host: {
-        class: 'control-test'
+        class: 'control-test',
+        '(click)': 'onHostClick2()' // This is recommended way to add host listener
     }
 })
 export class SharedControlTestComponent {
+    // @HostBinding('class') className = 'control-test'; // Deprecated, Not recomeneded
+    
+    // @HostListener('click') onHostClick1() { // Deprecated, Not recomeneded
+    //     console.log('Control clicked style 1');
+    // }
+    
     label = input.required<string>();
+
+    onHostClick2() {
+        console.log('Control clicked style 2');
+    }
 }
