@@ -9,6 +9,7 @@ import { SharedAdvertisementTestComponent } from '../shared/advertisement-test/a
 import { LearningTestService } from '../../service/learning-test.service';
 import { SharedButtonTestComponent } from "../shared/button-test/button-test.component";
 import { SharedControlTestComponent } from "../shared/control-test/control-test.component";
+import { SharedControl2TestComponent } from "../shared/control-test/control-test-2.component";
 
 @Component({
     selector: 'app-learning-test',
@@ -20,7 +21,8 @@ import { SharedControlTestComponent } from "../shared/control-test/control-test.
     SharedAdvertisementTestComponent,
     SharedAdvertisementTestComponent,
     SharedButtonTestComponent,
-    SharedControlTestComponent
+    SharedControlTestComponent,
+    SharedControl2TestComponent
 ],
     templateUrl: './learning-test.component.html',
     styleUrls: [
