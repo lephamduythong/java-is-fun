@@ -6,14 +6,24 @@ import { CommonModule } from '@angular/common';
     standalone: true,
     imports: [CommonModule],
     template: `
-        <input 
-            [class]="{
-                'button': true,
-                'is-primary': true, 
-                'custom-purple': currentStatus() === 'active'
-            }" 
-            [disabled]="currentStatus() !== 'active'" 
-        />
+        <div>
+            <input 
+                [class]="{
+                    'button': true,
+                    'is-primary': true, 
+                    'custom-purple': currentStatus() === 'active'
+                }" 
+                [disabled]="currentStatus() !== 'active'" 
+            />
+        </div>
+        <div>
+            <p [style]="{ 
+                'font-size': '48px',
+                'color': currentStatus() === 'active' ? 'green' : 'red',
+            }">
+                Current Status: {{currentStatus()}}
+            </p>
+        </div>
     `,
     styles: `
         .custom-purple {
@@ -26,5 +36,5 @@ import { CommonModule } from '@angular/common';
     }
 })
 export class SharedControl2TestComponent {
-    currentStatus = signal('active');  
+    currentStatus = signal('disabled');  
 }
