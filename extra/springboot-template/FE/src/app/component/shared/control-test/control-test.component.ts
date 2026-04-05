@@ -10,9 +10,12 @@ import { CommonModule } from '@angular/common';
         <ng-content select="input, textarea"></ng-content>
     `,
     styles: `
-        .custom-purple {
+        .control-test .custom-purple {
             background-color: purple !important;
         }
+        // :host .from-child-control-test {
+        //     background-color: red !important;
+        // }
     `,
     encapsulation: ViewEncapsulation.None
 })
