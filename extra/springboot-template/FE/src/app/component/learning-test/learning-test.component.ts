@@ -12,6 +12,7 @@ import { SharedControlTestComponent } from "../shared/control-test/control-test.
 import { SharedControl2TestComponent } from "../shared/control-test/control-test-2.component";
 import { SharedControl3TestComponent } from "../shared/control-test/control-test-3.component";
 import { SharedTemplateVarTestComponent } from '../shared/template-var-test/template-var-test.component';
+import { SharedSignalEffectTestComponent } from "../shared/signal-effect-test/signal-effect-test.component";
 
 @Component({
     selector: 'app-learning-test',
@@ -26,7 +27,8 @@ import { SharedTemplateVarTestComponent } from '../shared/template-var-test/temp
     SharedControlTestComponent,
     SharedControl2TestComponent,
     SharedControl3TestComponent,
-    SharedTemplateVarTestComponent
+    SharedTemplateVarTestComponent,
+    SharedSignalEffectTestComponent
 ],
     templateUrl: './learning-test.component.html',
     styleUrls: [
