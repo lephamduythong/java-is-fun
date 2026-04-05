@@ -1,4 +1,4 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, input, signal, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,9 +9,12 @@ import { CommonModule } from '@angular/common';
         <label>{{label()}}</label>
         <ng-content select="input, textarea"></ng-content>
     `,
-    styleUrls: [
-        // './control-test.component.css', 
-    ],
+    styles: `
+        .custom-purple {
+            background-color: purple !important;
+        }
+    `,
+    encapsulation: ViewEncapsulation.None
 })
 export class SharedControlTestComponent {
     label = input.required<string>();
