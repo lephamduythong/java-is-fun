@@ -1,4 +1,4 @@
-import { Component, Host, HostBinding, HostListener, input, signal, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, Host, HostBinding, HostListener, inject, input, signal, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -31,8 +31,11 @@ export class SharedControlTestComponent {
     // }
     
     label = input.required<string>();
+    private el = inject(ElementRef);
 
     onHostClick2() {
         console.log('Control clicked style 2');
+        const inputEl = this.el.nativeElement.querySelector('input, textarea') as HTMLInputElement | HTMLTextAreaElement | null;
+        console.log('value:', inputEl?.value);
     }
 }
