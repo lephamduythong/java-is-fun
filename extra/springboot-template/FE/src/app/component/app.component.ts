@@ -7,6 +7,7 @@ import { OtpModalComponent } from './otp-modal/otp-modal.component';
 import { QrscanModalComponent } from './qrscan-modal/qrscan-modal.component';
 import { delay } from '../common/js/utils';
 import { LearningTestComponent } from './learning-test/learning-test.component';
+import { LogDirective } from '../common/directive/log.directive';
 
 @Component({
     selector: 'app-root',
@@ -18,6 +19,9 @@ import { LearningTestComponent } from './learning-test/learning-test.component';
         '../common/css/bell.css',
         '../common/css/loading-spinner.css'
     ],
+    hostDirectives: [
+        LogDirective,
+    ]
 })
 export class AppComponent {
     private cdr = inject(ChangeDetectorRef);
