@@ -14,6 +14,7 @@ import { SharedControl3TestComponent } from "../shared/control-test/control-test
 import { SharedTemplateVarTestComponent } from '../shared/template-var-test/template-var-test.component';
 import { SharedSignalEffectTestComponent } from "../shared/signal-effect-test/signal-effect-test.component";
 import { SharedForLoopTestComponent } from "../shared/for-loop-test/app-for-loop-test.component";
+import { SafeLinkDirective } from '../../common/directive/app-safelink.directive';
 
 @Component({
     selector: 'app-learning-test',
@@ -30,7 +31,8 @@ import { SharedForLoopTestComponent } from "../shared/for-loop-test/app-for-loop
     SharedControl3TestComponent,
     SharedTemplateVarTestComponent,
     SharedSignalEffectTestComponent,
-    SharedForLoopTestComponent
+    SharedForLoopTestComponent,
+    SafeLinkDirective
 ],
     templateUrl: './learning-test.component.html',
     styleUrls: [
