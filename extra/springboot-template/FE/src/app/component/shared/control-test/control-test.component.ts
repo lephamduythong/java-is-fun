@@ -13,11 +13,14 @@ import { CommonModule } from '@angular/common';
         .control-test .custom-purple {
             background-color: purple !important;
         }
-        // :host .from-child-control-test {
+        // :host input,textarea {
         //     background-color: red !important;
         // }
     `,
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    host: {
+        class: 'control-test'
+    }
 })
 export class SharedControlTestComponent {
     label = input.required<string>();
