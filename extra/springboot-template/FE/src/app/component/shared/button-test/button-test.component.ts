@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-    selector: 'button[appButtonTest]',
+    selector: 'button[appButtonTest], a[appButtonTest]',
     standalone: true,
     imports: [CommonModule],
     template: `

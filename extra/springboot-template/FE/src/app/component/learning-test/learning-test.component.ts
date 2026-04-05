@@ -8,18 +8,20 @@ import { ItemTest } from './item-test/item-test.model';
 import { SharedAdvertisementTestComponent } from '../shared/advertisement-test/advertisement-test.component';
 import { LearningTestService } from '../../service/learning-test.service';
 import { SharedButtonTestComponent } from "../shared/button-test/button-test.component";
+import { SharedControlTestComponent } from "../shared/control-test/control-test.component";
 
 @Component({
     selector: 'app-learning-test',
     standalone: true,
     imports: [
-        FormsModule, 
-        ItemTestComponent, 
-        NewItemTestComponent, 
-        SharedAdvertisementTestComponent, 
-        SharedAdvertisementTestComponent, 
-        SharedButtonTestComponent
-    ],
+    FormsModule,
+    ItemTestComponent,
+    NewItemTestComponent,
+    SharedAdvertisementTestComponent,
+    SharedAdvertisementTestComponent,
+    SharedButtonTestComponent,
+    SharedControlTestComponent
+],
     templateUrl: './learning-test.component.html',
     styleUrls: [
         './learning-test.component.css', 
