@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
+import { Permission } from '../common/model/auth.model';
 
 interface AuthState {
     // Login state
@@ -10,6 +11,10 @@ interface AuthState {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+    currentUserTypeTest = signal<Permission>("admin");
+    // currentUserTypeTest = signal<Permission>("user");
+    // currentUserTypeTest = signal<Permission>("guest");
+    
     private state: AuthState = {
         isLoginFirstOk: false,
         isAuthenticated: false,
