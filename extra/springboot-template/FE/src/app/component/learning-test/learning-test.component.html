@@ -62,4 +62,11 @@
     <div class="mt-3">
         <app-control-2-test />
     </div>
+    <div class="mt-3">
+        <button class="button is-primary" (click)="onRandomNumberForTest3()">Random number</button>
+        <button class="button is-danger" (click)="onDestroyTest3()">Destroy component</button>
+        @if (isTest3Visible()) {
+            <app-control-3-test [textTest3]="textTest3()" />
+        }
+    </div>
 </div>

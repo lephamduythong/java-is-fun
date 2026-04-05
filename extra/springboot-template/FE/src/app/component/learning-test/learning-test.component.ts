@@ -10,6 +10,7 @@ import { LearningTestService } from '../../service/learning-test.service';
 import { SharedButtonTestComponent } from "../shared/button-test/button-test.component";
 import { SharedControlTestComponent } from "../shared/control-test/control-test.component";
 import { SharedControl2TestComponent } from "../shared/control-test/control-test-2.component";
+import { SharedControl3TestComponent } from "../shared/control-test/control-test-3.component";
 
 @Component({
     selector: 'app-learning-test',
@@ -22,7 +23,8 @@ import { SharedControl2TestComponent } from "../shared/control-test/control-test
     SharedAdvertisementTestComponent,
     SharedButtonTestComponent,
     SharedControlTestComponent,
-    SharedControl2TestComponent
+    SharedControl2TestComponent,
+    SharedControl3TestComponent
 ],
     templateUrl: './learning-test.component.html',
     styleUrls: [
@@ -69,5 +71,16 @@ export class LearningTestComponent {
         this.items.push(newItem);
         this.isAddingNewItem = false;
         console.log('New item added in parent component:', newItem);
+    }
+
+    textTest3 = signal('1.0');
+    isTest3Visible = signal(true);
+
+    onRandomNumberForTest3(): void {
+        this.textTest3.set(Math.random().toString());
+    }
+
+    onDestroyTest3() {
+        this.isTest3Visible.set(false);
     }
 }
