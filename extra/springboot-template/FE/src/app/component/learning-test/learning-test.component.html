@@ -98,4 +98,10 @@
         <p *appAuth="'user'">User workspace only</p>
         <p *appAuth="'guest'">Guest workspace only</p>
     </div>
+    <div class="mt-3">
+        <a href="https://angular.dev/guide/templates/pipes">Pipes Guide</a>
+        <p>DatePipe: {{ today | date: 'medium' }}</p>
+        <p>DecimalPipe: {{ 12345.6789 | number:'1.0-2' }}</p>
+        <p>Custom TemperaturePipe: {{ 25 | tempCtoF }}</p>
+    </div>
 </div>
