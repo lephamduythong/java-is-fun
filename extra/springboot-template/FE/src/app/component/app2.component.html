@@ -22,4 +22,12 @@
         <button class="ml-3 success" (click)="storeService.updateTask(1, { title: 'Task ' + (storeService.getTasks().length), description: 'Updated Task' })" >Update Task</button>
         <button class="ml-3 error" (click)="storeService.deleteTask(2)">Delete Task</button>
     </div>
+    <div>
+        <select>
+            <option value="">Select an option</option>
+            @for (opt of options; track opt.value) {
+                <option [value]="opt.value">{{opt.label}}</option>
+            }
+        </select>
+    </div>
 </div>
