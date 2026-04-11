@@ -61,5 +61,26 @@
             </tbody>
         </table>
     </div>
+    <div>
+        <h1>File download test</h1>
+        <div>
+            <button (click)="downloadFile()" [disabled]="downloadProgress() !== null && downloadProgress()! < 100">
+                Download File (100MB)
+            </button>
+        </div>
+        @if (downloadProgress() !== null) {
+            <div class="mt-5">
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" [style.width.%]="downloadProgress()"></div>
+                </div>
+                <span class="progress-label">{{ downloadProgress() }}%</span>
+            </div>
+        }
+        @if (downloadStatus()) {
+            <div class="mt-5">
+                <span [class.my-error-text]="downloadStatus().startsWith('Error')">{{ downloadStatus() }}</span>
+            </div>
+        }
+    </div>
 </div>
 <app-loading-overlay></app-loading-overlay>

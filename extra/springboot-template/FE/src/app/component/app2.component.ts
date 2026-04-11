@@ -25,6 +25,9 @@ export class App2Component implements OnInit {
     postsShow = signal<Post[]>([]);
     appMessage = signal('Hello from App2Component!');
 
+    downloadProgress = signal<number | null>(null);
+    downloadStatus = signal('');
+
     async fetchPosts() {
         this.storeService.isLoading.set(true);
         this.appMessage.set('Fetching posts from API...');
@@ -51,6 +54,47 @@ export class App2Component implements OnInit {
             }
         });
         this.destroyRef.onDestroy(() => sub.unsubscribe());
+    }
+
+    downloadFile() {
+        const url = 'http://localhost:8080/test-api/file/download';
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.responseType = 'blob';
+
+        this.downloadProgress.set(0);
+        this.downloadStatus.set('Downloading...');
+
+        xhr.onprogress = (event) => {
+            if (event.lengthComputable) {
+                const percent = Math.round((event.loaded / event.total) * 100);
+                this.downloadProgress.set(percent);
+            }
+        };
+
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                const blob = xhr.response as Blob;
+                const a = document.createElement('a');
+                const objectUrl = URL.createObjectURL(blob);
+                a.href = objectUrl;
+                a.download = '100MB.bin';
+                a.click();
+                URL.revokeObjectURL(objectUrl);
+                this.downloadProgress.set(100);
+                this.downloadStatus.set('Download complete!');
+            } else {
+                this.downloadStatus.set('Error: Download failed.');
+                this.downloadProgress.set(null);
+            }
+        };
+
+        xhr.onerror = () => {
+            this.downloadStatus.set('Error: Network error during download.');
+            this.downloadProgress.set(null);
+        };
+
+        xhr.send();
     }
 
     async ngOnInit() {
