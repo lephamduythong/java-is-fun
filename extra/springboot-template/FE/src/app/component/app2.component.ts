@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Post } from '../common/model/post.model';
 import { delay } from '../common/js/utils';
 import { LoadingOverlayComponent } from './shared/loading-overlay/loading-overlay.component';
+import _ from 'lodash';
 
 @Component({
     selector: 'app-root-2',
