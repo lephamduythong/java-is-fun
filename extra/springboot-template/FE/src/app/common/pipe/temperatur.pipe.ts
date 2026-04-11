@@ -11,7 +11,11 @@ export class TemperaturePipe implements PipeTransform {
     //     return value + '°C';
     // }
 
-    transform(value: string | number, inputType: 'cel' | 'fah', outputType: 'cel' | 'fah'): string {
+    transform(value: string | number | null, inputType: 'cel' | 'fah', outputType: 'cel' | 'fah'): string {
+        if (value === null || value === undefined) {
+            return '';
+        }
+        
         let val: number;
         if (typeof value === 'string') {
             val = parseFloat(value);
