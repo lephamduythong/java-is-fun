@@ -8,7 +8,7 @@ import { StoreService } from '../service/store.service';
     encapsulation: ViewEncapsulation.ShadowDom,
     styleUrls: ['app2.component.scss'],
     templateUrl: 'app2.component.html',
-    providers: [StoreService]
+    // providers: [StoreService]
 })
 export class App2Component {
     storeService = inject(StoreService);
