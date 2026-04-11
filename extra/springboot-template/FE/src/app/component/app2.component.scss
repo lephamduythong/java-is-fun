@@ -1,6 +1,14 @@
 @import url('../common/css/picnic.css');
 @import url('../common/css/margin.css');
 
+.my-container {
+    font-family: Arial, sans-serif;
+}
+
+.my-error-text {
+    color: red;
+}
+
 .loader {
     --dim: 1.5rem;
     width: var(--dim);

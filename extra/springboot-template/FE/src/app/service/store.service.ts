@@ -12,8 +12,14 @@ export class StoreService {
         { id: 3, title: 'Task 3', description: 'Description of Task 3' }
     ]);
 
+    isLoading = signal(false);
+    error = signal("");
+    action = signal("");
+    posts: any = signal([]);
+
     constructor() { }
 
+    // Tasks
     // Read
     getTasks() {
         return this.tasks();

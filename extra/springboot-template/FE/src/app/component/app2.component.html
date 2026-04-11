@@ -1,22 +1,24 @@
-<div>
-    <table class="primary">
-        <thead>
-            <tr>
-                <th>Task id</th>
-                <th>Task title</th>
-                <th>Task description</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (item of storeService.getTasks(); track item) {
+<div class="my-container">
+    <div>
+        <table class="primary">
+            <thead>
                 <tr>
-                    <td>{{item.id}}</td>
-                    <td>{{item.title}}</td>
-                    <td>{{item.description}}</td>
+                    <th>Task id</th>
+                    <th>Task title</th>
+                    <th>Task description</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @for (item of storeService.getTasks(); track item) {
+                    <tr>
+                        <td>{{item.id}}</td>
+                        <td>{{item.title}}</td>
+                        <td>{{item.description}}</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
     <div>
         <button (click)="storeService.addTask({ title: 'Task ' + (storeService.getTasks().length + 1), description: 'New Task' })">Add Task</button>
         <button class="ml-3 success" (click)="storeService.updateTask(1, { title: 'Task ' + (storeService.getTasks().length), description: 'Updated Task' })" >Update Task</button>
@@ -30,4 +32,34 @@
             }
         </select>
     </div>
+    <div>
+        <h1>HTTP Request Test</h1>
+        <div>
+            <button (click)="fetchPosts()">Fetch data</button>
+        </div>
+        <div class="mt-5 mb-5">
+            <span [class.my-error-text]="appMessage().startsWith('Error')" >{{appMessage()}}</span> 
+        </div>
+        <table class="primary">
+            <thead>
+                <tr>
+                    <th>User Id</th>
+                    <th>Id</th>
+                    <th>Title</th>
+                    <th>Body</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of postsShow(); track item.id) {
+                    <tr>
+                        <td>{{item.userId}}</td>
+                        <td>{{item.id}}</td>
+                        <td>{{item.title}}</td>
+                        <td>{{item.body}}</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
+<app-loading-overlay></app-loading-overlay>
