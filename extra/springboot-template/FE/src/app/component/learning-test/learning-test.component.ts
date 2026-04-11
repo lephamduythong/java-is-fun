@@ -18,6 +18,7 @@ import { SafeLinkDirective } from '../../common/directive/app-safelink.directive
 import { AuthDirective } from "../../common/directive/auth.directive";
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { TemperaturePipe } from '../../common/pipe/temperatur.pipe';
+import { SortPipe } from "../../common/pipe/sort.pipe";
 
 @Component({
     selector: 'app-learning-test',
@@ -37,7 +38,8 @@ import { TemperaturePipe } from '../../common/pipe/temperatur.pipe';
     SharedForLoopTestComponent,
     SafeLinkDirective,
     AuthDirective,
-    DatePipe, DecimalPipe, TemperaturePipe
+    DatePipe, DecimalPipe, TemperaturePipe,
+    SortPipe
 ],
     templateUrl: './learning-test.component.html',
     styleUrls: [
@@ -98,4 +100,6 @@ export class LearningTestComponent {
     }
 
     today = new Date();
+
+    numSortPipeTest: number[] = [5, 3, 8, 1, 2];
 }

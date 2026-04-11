@@ -104,4 +104,9 @@
         <p>DecimalPipe: {{ 12345.6789 | number:'1.0-2' | temp:'cel':'fah' }}</p>
         <p>Custom TemperaturePipe: {{ 25 | temp:'cel':'fah' }}</p>
     </div>
+    <div class="mt-3">
+        @for (num of numSortPipeTest | sort: 'desc'; track num) {
+            <p>{{ num }}</p>
+        }
+    </div>
 </div>
