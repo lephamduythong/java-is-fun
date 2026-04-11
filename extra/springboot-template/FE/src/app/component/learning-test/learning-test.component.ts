@@ -16,6 +16,8 @@ import { SharedSignalEffectTestComponent } from "../shared/signal-effect-test/si
 import { SharedForLoopTestComponent } from "../shared/for-loop-test/app-for-loop-test.component";
 import { SafeLinkDirective } from '../../common/directive/app-safelink.directive';
 import { AuthDirective } from "../../common/directive/auth.directive";
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { TemperaturePipe } from '../../common/pipe/temperatur.pipe';
 
 @Component({
     selector: 'app-learning-test',
@@ -34,7 +36,8 @@ import { AuthDirective } from "../../common/directive/auth.directive";
     SharedSignalEffectTestComponent,
     SharedForLoopTestComponent,
     SafeLinkDirective,
-    AuthDirective
+    AuthDirective,
+    DatePipe, DecimalPipe, TemperaturePipe
 ],
     templateUrl: './learning-test.component.html',
     styleUrls: [
@@ -93,4 +96,6 @@ export class LearningTestComponent {
     onDestroyTest3() {
         this.isTest3Visible.set(false);
     }
+
+    today = new Date();
 }
