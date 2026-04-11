@@ -30,6 +30,7 @@ public class FileController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDispositionFormData("attachment", file.getName());
         headers.setContentLength(file.length());
+        headers.set("Access-Control-Expose-Headers", "Content-Length, Content-Disposition");
 
         return ResponseEntity.ok()
                 .headers(headers)

@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { StoreService } from '../service/store.service';
 import { OPTIONS, OPTIONS_TOKEN } from '../common/js/LOV';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType } from '@angular/common/http';
 import { Post } from '../common/model/post.model';
 import { delay } from '../common/js/utils';
 import { LoadingOverlayComponent } from './shared/loading-overlay/loading-overlay.component';
@@ -58,43 +58,39 @@ export class App2Component implements OnInit {
 
     downloadFile() {
         const url = 'http://localhost:8080/test-api/file/download';
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.responseType = 'blob';
 
         this.downloadProgress.set(0);
         this.downloadStatus.set('Downloading...');
 
-        xhr.onprogress = (event) => {
-            if (event.lengthComputable) {
-                const percent = Math.round((event.loaded / event.total) * 100);
-                this.downloadProgress.set(percent);
-            }
-        };
-
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                const blob = xhr.response as Blob;
-                const a = document.createElement('a');
-                const objectUrl = URL.createObjectURL(blob);
-                a.href = objectUrl;
-                a.download = '100MB.bin';
-                a.click();
-                URL.revokeObjectURL(objectUrl);
-                this.downloadProgress.set(100);
-                this.downloadStatus.set('Download complete!');
-            } else {
+        const sub = this.httpClient.get(url, {
+            responseType: 'blob',
+            reportProgress: true,
+            observe: 'events'
+        }).subscribe({
+            next: (event) => {
+                if (event.type === HttpEventType.DownloadProgress) {
+                    const percent = event.total
+                        ? Math.round((event.loaded / event.total) * 100)
+                        : 0;
+                    this.downloadProgress.set(percent);
+                } else if (event.type === HttpEventType.Response) {
+                    const blob = event.body as Blob;
+                    const a = document.createElement('a');
+                    const objectUrl = URL.createObjectURL(blob);
+                    a.href = objectUrl;
+                    a.download = '100MB.bin';
+                    a.click();
+                    URL.revokeObjectURL(objectUrl);
+                    this.downloadProgress.set(100);
+                    this.downloadStatus.set('Download complete!');
+                }
+            },
+            error: () => {
                 this.downloadStatus.set('Error: Download failed.');
                 this.downloadProgress.set(null);
             }
-        };
-
-        xhr.onerror = () => {
-            this.downloadStatus.set('Error: Network error during download.');
-            this.downloadProgress.set(null);
-        };
-
-        xhr.send();
+        });
+        this.destroyRef.onDestroy(() => sub.unsubscribe());
     }
 
     async ngOnInit() {
