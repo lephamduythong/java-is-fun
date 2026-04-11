@@ -1,0 +1,25 @@
+<div>
+    <table class="primary">
+        <thead>
+            <tr>
+                <th>Task id</th>
+                <th>Task title</th>
+                <th>Task description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (item of storeService.getTasks(); track item) {
+                <tr>
+                    <td>{{item.id}}</td>
+                    <td>{{item.title}}</td>
+                    <td>{{item.description}}</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div>
+        <button (click)="storeService.addTask({ title: 'Task ' + (storeService.getTasks().length + 1), description: 'New Task' })">Add Task</button>
+        <button class="ml-3 success" (click)="storeService.updateTask(1, { title: 'Task ' + (storeService.getTasks().length), description: 'Updated Task' })" >Update Task</button>
+        <button class="ml-3 error" (click)="storeService.deleteTask(2)">Delete Task</button>
+    </div>
+</div>

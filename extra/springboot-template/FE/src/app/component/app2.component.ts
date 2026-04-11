@@ -1,19 +1,14 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { StoreService } from '../service/store.service';
 
 @Component({
     selector: 'app-root-2',
     standalone: true,
     imports: [],
     encapsulation: ViewEncapsulation.ShadowDom,
-    styles: `
-        @import url('../common/css/picnic.css');
-    `,
-    template: `
-        <div class="">
-            
-        </div>
-    `,
+    styleUrls: ['app2.component.scss'],
+    templateUrl: 'app2.component.html',
 })
 export class App2Component {
-
+    storeService = inject(StoreService);
 }
