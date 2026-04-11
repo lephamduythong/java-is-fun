@@ -106,7 +106,7 @@
     </div>
     <div class="mt-3">
         @for (num of numSortPipeTest | sort: 'desc'; track num) {
-            <p>{{ num }}</p>
+            <button (click)="onSortedTestItemClick($event, $index, +num)" class="button is-info mr-2 mb-2">{{ num }}</button>
         }
     </div>
 </div>

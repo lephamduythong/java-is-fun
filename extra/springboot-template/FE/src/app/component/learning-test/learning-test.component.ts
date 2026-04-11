@@ -47,6 +47,7 @@ import { SortPipe } from "../../common/pipe/sort.pipe";
     ],
 })
 export class LearningTestComponent {
+
     private cdr = inject(ChangeDetectorRef);
     
     learningTestService = inject(LearningTestService);
@@ -102,4 +103,13 @@ export class LearningTestComponent {
     today = new Date();
 
     numSortPipeTest: number[] = [5, 3, 8, 1, 2];
+    onSortedTestItemClick($event: PointerEvent, index: number, num: number) {
+        console.log('Sorted test item clicked:', $event);
+        console.log('Sorted test item clicked with index:', index);
+        console.log('Sorted test item clicked with num:', num);
+        // Change to a fixed number
+        const newArr = [...this.numSortPipeTest];
+        newArr[index] = 999;
+        this.numSortPipeTest = newArr;
+    }
 }
