@@ -6,6 +6,7 @@ import { Post } from '../common/model/post.model';
 import { delay } from '../common/js/utils';
 import { LoadingOverlayComponent } from './shared/loading-overlay/loading-overlay.component';
 import _ from 'lodash';
+import { interval, map, take } from 'rxjs';
 
 @Component({
     selector: 'app-root-2',
@@ -94,6 +95,26 @@ export class App2Component implements OnInit {
     }
 
     async ngOnInit() {
-        
+        const sub = interval(2000).pipe(
+            take(5), // Trigger "complete" after 5 emissions
+            map((val) => {
+                console.log('pipe map run:', val);
+                // throw new Error('Error in pipe map'); // Uncomment trigger "error"
+                return val * 2;
+            })
+        ).subscribe({
+            next: (val) => {
+                console.log('subscribe next:', val);
+            },
+            complete: () => console.log('Done'),
+            error: (err) => console.error('Error:', err),
+        });
+
+        setTimeout(() => {
+            sub.unsubscribe();
+            console.log('Interval subscription unsubscribed');
+        }, 10000);
+
+        this.destroyRef.onDestroy(() => sub.unsubscribe());
     }
 }
