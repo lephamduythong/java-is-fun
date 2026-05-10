@@ -1,5 +1,3 @@
-package com.example.springboottemplate;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,7 +14,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,6 +22,10 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -279,6 +280,61 @@ public class WonderUtils {
     }
 
     /**
+     * Make parallel HTTP requests to the specified URLs
+     * 
+     * @param urls        map of keys and URLs to make requests to
+     * @param method      HTTP method (GET, POST, PUT, DELETE)
+     * @param requestBody request body content (can be null for GET/DELETE)
+     * @param headers     request headers (can be null)
+     * @return map of keys and response bodies
+     * @throws InterruptedException if the request is interrupted
+     * @throws ExecutionException   if the request execution fails
+     */
+    public static Map<String, String> parallelHttpRequest(
+        Map<String, String> urls, 
+        String method, 
+        String requestBody, 
+        Map<String, String> headers
+    ) 
+        throws InterruptedException, ExecutionException   {
+
+        int totalRequests = urls.size();
+        int cpuCores = Runtime.getRuntime().availableProcessors();
+        int threadCount = Math.min(totalRequests, (cpuCores * (1 + 4)));
+
+        System.out.println("Total requests: " + totalRequests);
+        System.out.println("CPU cores: " + cpuCores);
+        System.out.println("Thread count: " + threadCount);
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+
+        Map<String, Future<String>> futures = new HashMap<>();
+        for (Map.Entry<String, String> entry : urls.entrySet()) {
+            final String key = entry.getKey();
+            final String url = entry.getValue();
+            Future<String> future = executor.submit(() -> {
+                try {
+                    String body = httpRequest(url, method, requestBody, headers);
+                    System.out.println("Done request to " + key + " | URL: " + url);
+                    return body;
+                } catch (Exception e) {
+                    return String.format("Error: %s", e.getMessage());
+                }
+            });
+            futures.put(key, future);
+        }
+
+        executor.shutdown();
+
+        Map<String, String> results = new HashMap<>();
+        for (Map.Entry<String, Future<String>> entry : futures.entrySet()) {
+            String result = entry.getValue().get();
+            results.put(entry.getKey(), result);
+        }
+
+        return results;
+    }
+
+    /**
      * Make simple GET request to the specified URL
      * 
      * @param url the URL to make GET request to
@@ -443,6 +499,74 @@ public class WonderUtils {
                 }
             }
         }
+    }
+
+    /**
+     * List all files in a directory sorted by name (ascending)
+     * 
+     * @param folderPath the path of the directory to list files from
+     * @return list of file paths sorted by file name
+     * @throws IOException if an I/O error occurs or path is not a directory
+     */
+    public static List<String> listFilesSortedByName(String folderPath) throws IOException {
+        if (folderPath == null) {
+            throw new IllegalArgumentException("Folder path cannot be null");
+        }
+
+        File folder = new File(folderPath);
+        if (!folder.exists()) {
+            throw new IOException("Directory does not exist: " + folderPath);
+        }
+        if (!folder.isDirectory()) {
+            throw new IOException("Path is not a directory: " + folderPath);
+        }
+
+        File[] files = folder.listFiles(File::isFile);
+        if (files == null) {
+            return new ArrayList<>();
+        }
+
+        java.util.Arrays.sort(files, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+
+        List<String> result = new ArrayList<>();
+        for (File file : files) {
+            result.add(file.getName());
+        }
+        return result;
+    }
+
+    /**
+     * List all files in a directory sorted by last modified date (newest first)
+     * 
+     * @param folderPath the path of the directory to list files from
+     * @return list of file paths sorted by last modified date descending
+     * @throws IOException if an I/O error occurs or path is not a directory
+     */
+    public static List<String> listFilesSortedByLastModified(String folderPath) throws IOException {
+        if (folderPath == null) {
+            throw new IllegalArgumentException("Folder path cannot be null");
+        }
+
+        File folder = new File(folderPath);
+        if (!folder.exists()) {
+            throw new IOException("Directory does not exist: " + folderPath);
+        }
+        if (!folder.isDirectory()) {
+            throw new IOException("Path is not a directory: " + folderPath);
+        }
+
+        File[] files = folder.listFiles(File::isFile);
+        if (files == null) {
+            return new ArrayList<>();
+        }
+
+        java.util.Arrays.sort(files, (a, b) -> Long.compare(b.lastModified(), a.lastModified()));
+
+        List<String> result = new ArrayList<>();
+        for (File file : files) {
+            result.add(file.getName());
+        }
+        return result;
     }
 
     /**
@@ -720,5 +844,151 @@ public class WonderUtils {
         }
 
         return result;
+    }
+
+    /**
+     * Upsert (INSERT hoặc UPDATE) một danh sách bản ghi vào bảng SQLite.
+     *
+     * Logic:
+     * - Nếu giá trị của cột idColumn trong row là null/rỗng → INSERT (tạo mới)
+     * - Nếu có giá trị idColumn → UPDATE theo điều kiện WHERE idColumn = ?
+     *
+     * @param conn      Active JDBC Connection (SQLite hoặc DB khác)
+     * @param tableName Tên bảng cần thao tác
+     * @param dataList  Danh sách row dữ liệu (key = tên cột, value = giá trị)
+     * @param idColumn  Tên cột định danh (primary key)
+     * @param mode      Chế độ xử lý: "INSERT" | "UPDATE" | "UPSERT"
+     * @throws SQLException nếu có lỗi SQL
+     */
+    public static void updateTableDB(
+            Connection conn,
+            String tableName,
+            List<HashMap<String, String>> dataList,
+            String idColumn,
+            String mode
+        ) throws SQLException {
+        
+        if (dataList == null || dataList.isEmpty()) {
+            return;
+        }
+
+        if (!"INSERT".equals(mode) && !"UPDATE".equals(mode) && !"UPSERT".equals(mode)) {
+            throw new IllegalArgumentException("mode phải là INSERT, UPDATE hoặc UPSERT, nhận được: " + mode);
+        }
+
+        boolean hasIdColumn = dataList.stream().anyMatch(r -> r.containsKey(idColumn));
+        if (!hasIdColumn) {
+            System.out.println("[SKIP] Không có row nào chứa cột idColumn: " + idColumn);
+            return;
+        }
+
+        boolean prevAutoCommit = conn.getAutoCommit();
+        conn.setAutoCommit(false);
+        try {
+            for (HashMap<String, String> row : dataList) {
+                String idValue = row.get(idColumn);
+                boolean isNew = (idValue == null || idValue.trim().isEmpty());
+
+                // Lọc theo mode
+                if ("INSERT".equals(mode) && !isNew) {
+                    System.out.println("[SKIP-MODE INSERT] Row đã có id, bỏ qua: " + row);
+                    continue;
+                }
+                if ("UPDATE".equals(mode) && isNew) {
+                    System.out.println("[SKIP-MODE UPDATE] Row chưa có id, bỏ qua: " + row);
+                    continue;
+                }
+
+                if (isNew) {
+                    // ── INSERT ──────────────────────────────────────────────
+                    List<String> columns = new ArrayList<>(row.keySet());
+
+                    StringBuilder sql = new StringBuilder("INSERT INTO ")
+                            .append(tableName).append(" (");
+                    StringBuilder placeholders = new StringBuilder();
+
+                    for (int i = 0; i < columns.size(); i++) {
+                        sql.append(columns.get(i));
+                        placeholders.append("?");
+                        if (i < columns.size() - 1) {
+                            sql.append(", ");
+                            placeholders.append(", ");
+                        }
+                    }
+                    sql.append(") VALUES (").append(placeholders).append(")");
+
+                    try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+                        for (int i = 0; i < columns.size(); i++) {
+                            ps.setString(i + 1, row.get(columns.get(i)));
+                        }
+                        ps.executeUpdate();
+                        System.out.println("[INSERT] " + row);
+                    }
+
+                } else {
+                    // ── UPDATE ──────────────────────────────────────────────
+                    List<String> updateCols = new ArrayList<>();
+                    for (String col : row.keySet()) {
+                        if (!col.equals(idColumn)) {
+                            updateCols.add(col);
+                        }
+                    }
+                    if (updateCols.isEmpty()) {
+                        System.out.println("[SKIP] Row chỉ có idColumn, không có gì để update: " + row);
+                        continue;
+                    }
+
+                    StringBuilder sql = new StringBuilder("UPDATE ")
+                            .append(tableName).append(" SET ");
+                    for (int i = 0; i < updateCols.size(); i++) {
+                        sql.append(updateCols.get(i)).append(" = ?");
+                        if (i < updateCols.size() - 1)
+                            sql.append(", ");
+                    }
+                    sql.append(" WHERE ").append(idColumn).append(" = ?");
+
+                    try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+                        for (int i = 0; i < updateCols.size(); i++) {
+                            ps.setString(i + 1, row.get(updateCols.get(i)));
+                        }
+                        ps.setString(updateCols.size() + 1, idValue);
+                        int affected = ps.executeUpdate();
+                        if (affected == 0) {
+                            // Bản ghi chưa tồn tại → INSERT
+                            List<String> allCols = new ArrayList<>(row.keySet());
+                            StringBuilder insertSql = new StringBuilder("INSERT INTO ")
+                                    .append(tableName).append(" (");
+                            StringBuilder placeholders = new StringBuilder();
+                            for (int i = 0; i < allCols.size(); i++) {
+                                insertSql.append(allCols.get(i));
+                                placeholders.append("?");
+                                if (i < allCols.size() - 1) {
+                                    insertSql.append(", ");
+                                    placeholders.append(", ");
+                                }
+                            }
+                            insertSql.append(") VALUES (").append(placeholders).append(")");
+                            try (PreparedStatement ins = conn.prepareStatement(insertSql.toString())) {
+                                for (int i = 0; i < allCols.size(); i++) {
+                                    ins.setString(i + 1, row.get(allCols.get(i)));
+                                }
+                                ins.executeUpdate();
+                                System.out.println("[INSERT fallback] " + row);
+                            }
+                        } else {
+                            System.out.println("[UPDATE] affected=" + affected + " | " + row);
+                        }
+                    }
+                }
+            }
+            conn.commit();
+            System.out.println("[TRANSACTION] commit thành công.");
+        } catch (SQLException e) {
+            conn.rollback();
+            System.out.println("[TRANSACTION] rollback do lỗi: " + e.getMessage());
+            throw e;
+        } finally {
+            conn.setAutoCommit(prevAutoCommit);
+        }
     }
 }
