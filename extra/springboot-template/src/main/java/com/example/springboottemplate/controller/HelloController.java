@@ -152,4 +152,15 @@ public class HelloController {
         }
     }
 
+    @GetMapping(value = "/test-property")
+    public String testProperty() {
+        String httpPort = System.getProperty("jboss.http.port", "8080");
+        String portOffset = System.getProperty("jboss.socket.binding.port-offset", "0");
+        
+        logger.info("Testing system property jboss.http.port: {}", httpPort);
+        logger.info("Testing system property jboss.socket.binding.port-offset: {}", portOffset);
+        
+        return "System property jboss.http.port: " + httpPort + ", jboss.socket.binding.port-offset: " + portOffset;
+    }
+
 }
