@@ -24,11 +24,12 @@ public class SessionRepository {
             "CREATE TABLE IF NOT EXISTS test.oauth_sessions ("
                     + "session_id VARCHAR(36) PRIMARY KEY, "
                     + "user_info JSONB NOT NULL, "
-                    + "created_at TIMESTAMP NOT NULL, "
-                    + "expires_at TIMESTAMP NOT NULL)";
-    private static final String CREATE_EXPIRY_INDEX_SQL =
-            "CREATE INDEX IF NOT EXISTS idx_oauth_sessions_expires_at "
-                    + "ON test.oauth_sessions (expires_at)";
+                    + "created_at TIMESTAMP NOT NULL)";
+    private static final String DROP_LEGACY_EXPIRY_COLUMN_SQL =
+            "ALTER TABLE test.oauth_sessions DROP COLUMN IF EXISTS expires_at";
+    private static final String CREATE_CREATED_AT_INDEX_SQL =
+            "CREATE INDEX IF NOT EXISTS idx_oauth_sessions_created_at "
+                    + "ON test.oauth_sessions (created_at)";
     private static final TypeReference<Map<String, Object>> USER_INFO_TYPE =
             new TypeReference<Map<String, Object>>() { };
 
@@ -50,8 +51,8 @@ public class SessionRepository {
 
     public void save(String sessionId, SessionService.SessionData session) {
         String sql = "INSERT INTO test.oauth_sessions "
-                + "(session_id, user_info, created_at, expires_at) "
-                + "VALUES (?, ?::jsonb, ?, ?)";
+                + "(session_id, user_info, created_at) "
+                + "VALUES (?, ?::jsonb, ?)";
         try {
             String userInfoJson = objectMapper.writeValueAsString(session.getUserInfo());
             try (Connection connection = dataSource.getConnection();
@@ -59,7 +60,6 @@ public class SessionRepository {
                 statement.setString(1, sessionId);
                 statement.setString(2, userInfoJson);
                 statement.setTimestamp(3, Timestamp.valueOf(session.getCreatedAt()));
-                statement.setTimestamp(4, Timestamp.valueOf(session.getExpiresAt()));
                 statement.executeUpdate();
             }
         } catch (JsonProcessingException e) {
@@ -69,8 +69,8 @@ public class SessionRepository {
         }
     }
 
-    public SessionService.SessionData findById(String sessionId) {
-        String sql = "SELECT user_info::text, created_at, expires_at "
+    public SessionService.SessionData findById(String sessionId, long sessionTimeoutMinutes) {
+        String sql = "SELECT user_info::text, created_at "
                 + "FROM test.oauth_sessions WHERE session_id = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -81,8 +81,7 @@ public class SessionRepository {
                 Map<String, Object> userInfo =
                         objectMapper.readValue(resultSet.getString("user_info"), USER_INFO_TYPE);
                 LocalDateTime createdAt = resultSet.getTimestamp("created_at").toLocalDateTime();
-                LocalDateTime expiresAt = resultSet.getTimestamp("expires_at").toLocalDateTime();
-                return new SessionService.SessionData(userInfo, createdAt, expiresAt);
+                return new SessionService.SessionData(userInfo, createdAt, sessionTimeoutMinutes);
             }
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Failed to deserialize session user information", e);
@@ -102,11 +101,11 @@ public class SessionRepository {
         }
     }
 
-    public void deleteExpiredSessions(LocalDateTime now) {
-        String sql = "DELETE FROM test.oauth_sessions WHERE expires_at <= ?";
+    public void deleteExpiredSessions(LocalDateTime expiredBefore) {
+        String sql = "DELETE FROM test.oauth_sessions WHERE created_at <= ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setTimestamp(1, Timestamp.valueOf(now));
+            statement.setTimestamp(1, Timestamp.valueOf(expiredBefore));
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to delete expired sessions from PostgreSQL", e);
@@ -115,10 +114,15 @@ public class SessionRepository {
 
     private void initializeSchema() {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement createTable = connection.prepareStatement(CREATE_TABLE_SQL);
-             PreparedStatement createIndex = connection.prepareStatement(CREATE_EXPIRY_INDEX_SQL)) {
+             PreparedStatement createTable = connection.prepareStatement(CREATE_TABLE_SQL)) {
             createTable.execute();
-            createIndex.execute();
+            try (PreparedStatement dropLegacyExpiryColumn =
+                         connection.prepareStatement(DROP_LEGACY_EXPIRY_COLUMN_SQL);
+                 PreparedStatement createCreatedAtIndex =
+                         connection.prepareStatement(CREATE_CREATED_AT_INDEX_SQL)) {
+                dropLegacyExpiryColumn.execute();
+                createCreatedAtIndex.execute();
+            }
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to initialize PostgreSQL session table", e);
         }
