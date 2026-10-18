@@ -21,6 +21,11 @@ public class AuthController {
         return oauthHandler.handleLoginRequest();
     }
 
+    @GetMapping("/loginMicrosoft")
+    public ResponseEntity<String> loginMicrosoft() {
+        return oauthHandler.handleMicrosoftLoginRequest();
+    }
+
     @GetMapping("/oauth/callback")
     public ResponseEntity<String> callback(
             @RequestParam(required = false) String code,
@@ -29,8 +34,22 @@ public class AuthController {
         return oauthHandler.handleOAuthCallback(code, state, error);
     }
 
+    @GetMapping("/oauth/callbackMicrosoft")
+    public ResponseEntity<String> microsoftCallback(
+            @RequestParam(required = false) String code,
+            @RequestParam(required = false) String state,
+            @RequestParam(required = false) String error) {
+        return oauthHandler.handleMicrosoftOAuthCallback(code, state, error);
+    }
+
     @GetMapping("/profile")
     public ResponseEntity<?> profile(
+            @CookieValue(name = "SESSION", required = false) String sessionId) {
+        return oauthHandler.handleProfileRequest(sessionId);
+    }
+
+    @GetMapping("/profileMicrosoft")
+    public ResponseEntity<?> microsoftProfile(
             @CookieValue(name = "SESSION", required = false) String sessionId) {
         return oauthHandler.handleProfileRequest(sessionId);
     }
@@ -39,5 +58,11 @@ public class AuthController {
     public ResponseEntity<String> logout(
             @CookieValue(name = "SESSION", required = false) String sessionId) {
         return oauthHandler.handleLogoutRequest(sessionId);
+    }
+
+    @GetMapping("/logoutMicrosoft")
+    public ResponseEntity<String> microsoftLogout(
+            @CookieValue(name = "SESSION", required = false) String sessionId) {
+        return oauthHandler.handleMicrosoftLogoutRequest(sessionId);
     }
 }

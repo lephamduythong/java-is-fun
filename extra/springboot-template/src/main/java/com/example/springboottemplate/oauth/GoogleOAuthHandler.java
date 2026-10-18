@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class GoogleOAuthHandler {
+public class GoogleOAuthHandler implements OAuthProviderClient {
 
     private final OAuthConfig config;
     private final HttpClient httpClient = HttpClient.newHttpClient();
