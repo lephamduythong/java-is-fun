@@ -1,5 +1,6 @@
 package com.course.demo;
 
+import org.springframework.ai.chat.client.ChatClient;
 // import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TechAdvisorController {
     // private final ChatClient chatClient;
     private final OpenAiChatModel chatModel;
+    private final ChatClient chatClient;
 
     // @Autowired 
     // public TechAdvisorController(ChatClient chatClient) {
@@ -19,27 +21,26 @@ public class TechAdvisorController {
     // }
 
     @Autowired 
-    public TechAdvisorController(OpenAiChatModel chatModel) {
+    public TechAdvisorController(OpenAiChatModel chatModel, ChatClient chatClient) {
         this.chatModel = chatModel;
+        this.chatClient = chatClient;
+
     }
 
-    // @GetMapping
-    // public String advise() {
-    //     // Implement your logic to get tech advice using chatClient
-
-    //     var message = chatClient
-    //         .prompt()
-    //         .user("Chào bạn Gehihi cute nhé")
-    //         .call().content();
-
-    //     return message;
-    // }
-
-    @GetMapping
-    public String advise2() {
+    @GetMapping("/advise1")
+    public String advise1() {
         // Implement your logic to get tech advice using chatClient
 
         var message = chatModel.call("Chào bạn đáng yêu nhé");
+
+        return message;
+    }
+
+    @GetMapping("/advise2")
+    public String advise2() {
+        // Implement your logic to get tech advice using chatClient
+
+        var message = chatClient.prompt("Whey protein là gì ?").call().content();
 
         return message;
     }
