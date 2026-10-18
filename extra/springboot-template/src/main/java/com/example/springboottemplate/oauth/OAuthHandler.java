@@ -3,6 +3,7 @@ package com.example.springboottemplate.oauth;
 import com.example.springboottemplate.config.OAuthConfig;
 import com.example.springboottemplate.service.SessionService;
 import com.example.springboottemplate.service.SessionService.SessionData;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,16 +22,19 @@ public class OAuthHandler {
     private final MicrosoftOAuthHandler microsoftOAuth;
     private final SessionService sessionService;
     private final OAuthConfig oauthConfig;
+    private final String sessionCookieName;
 
     public OAuthHandler(
             GoogleOAuthHandler googleOAuth,
             MicrosoftOAuthHandler microsoftOAuth,
             SessionService sessionService,
-            OAuthConfig oauthConfig) {
+            OAuthConfig oauthConfig,
+            @Value("${session.cookie-name:SESSION}") String sessionCookieName) {
         this.googleOAuth = googleOAuth;
         this.microsoftOAuth = microsoftOAuth;
         this.sessionService = sessionService;
         this.oauthConfig = oauthConfig;
+        this.sessionCookieName = sessionCookieName;
     }
 
     public ResponseEntity<String> handleLoginRequest() {
@@ -138,7 +142,7 @@ public class OAuthHandler {
 
             return ResponseEntity.ok()
                     .contentType(HTML_UTF8)
-                    .header("Set-Cookie", "SESSION=" + sessionId + "; HttpOnly; Path=/")
+                    .header("Set-Cookie", sessionCookieName + "=" + sessionId + "; HttpOnly; Path=/")
                     .body(wrapHtml("Login Successful", html));
 
         } catch (Exception e) {

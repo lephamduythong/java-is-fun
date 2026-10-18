@@ -44,25 +44,25 @@ public class AuthController {
 
     @GetMapping("/profile")
     public ResponseEntity<?> profile(
-            @CookieValue(name = "SESSION", required = false) String sessionId) {
+            @CookieValue(name = "${session.cookie-name:SESSION}", required = false) String sessionId) {
         return oauthHandler.handleProfileRequest(sessionId);
     }
 
     @GetMapping("/profileMicrosoft")
     public ResponseEntity<?> microsoftProfile(
-            @CookieValue(name = "SESSION", required = false) String sessionId) {
+            @CookieValue(name = "${session.cookie-name:SESSION}", required = false) String sessionId) {
         return oauthHandler.handleProfileRequest(sessionId);
     }
 
     @GetMapping("/logout")
     public ResponseEntity<String> logout(
-            @CookieValue(name = "SESSION", required = false) String sessionId) {
+            @CookieValue(name = "${session.cookie-name:SESSION}", required = false) String sessionId) {
         return oauthHandler.handleLogoutRequest(sessionId);
     }
 
     @GetMapping("/logoutMicrosoft")
     public ResponseEntity<String> microsoftLogout(
-            @CookieValue(name = "SESSION", required = false) String sessionId) {
+            @CookieValue(name = "${session.cookie-name:SESSION}", required = false) String sessionId) {
         return oauthHandler.handleMicrosoftLogoutRequest(sessionId);
     }
 }
