@@ -5,36 +5,43 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * In-memory session store (replaces Netty's SessionManager).
- * Sessions expire after 24 hours.
+ * PostgreSQL-backed session store. Sessions expire after 24 hours.
  */
 @Service
 public class SessionService {
 
-    private final Map<String, SessionData> sessions = new ConcurrentHashMap<>();
+    private final SessionRepository sessionRepository;
+
+    public SessionService(SessionRepository sessionRepository) {
+        this.sessionRepository = sessionRepository;
+    }
 
     public String createSession(Map<String, Object> userInfo) {
         String sessionId = UUID.randomUUID().toString();
-        sessions.put(sessionId, new SessionData(userInfo));
+        SessionData session = new SessionData(userInfo);
+        sessionRepository.deleteExpiredSessions(session.getCreatedAt());
+        sessionRepository.save(sessionId, session);
         return sessionId;
     }
 
     public SessionData getSession(String sessionId) {
         if (sessionId == null) return null;
-        SessionData session = sessions.get(sessionId);
+
+        SessionData session = sessionRepository.findById(sessionId);
         if (session == null) return null;
         if (session.isExpired()) {
-            sessions.remove(sessionId);
+            deleteSession(sessionId);
             return null;
         }
         return session;
     }
 
     public void deleteSession(String sessionId) {
-        if (sessionId != null) sessions.remove(sessionId);
+        if (sessionId != null) {
+            sessionRepository.deleteById(sessionId);
+        }
     }
 
     public static class SessionData {
@@ -43,9 +50,16 @@ public class SessionService {
         private final LocalDateTime expiresAt;
 
         public SessionData(Map<String, Object> userInfo) {
+            this(userInfo, LocalDateTime.now(), null);
+        }
+
+        public SessionData(
+                Map<String, Object> userInfo,
+                LocalDateTime createdAt,
+                LocalDateTime expiresAt) {
             this.userInfo = userInfo;
-            this.createdAt = LocalDateTime.now();
-            this.expiresAt = createdAt.plusHours(24);
+            this.createdAt = createdAt;
+            this.expiresAt = expiresAt != null ? expiresAt : createdAt.plusHours(24);
         }
 
         public boolean isExpired() {
