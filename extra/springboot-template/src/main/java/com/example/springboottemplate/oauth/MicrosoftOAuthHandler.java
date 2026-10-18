@@ -75,10 +75,17 @@ public class MicrosoftOAuthHandler implements OAuthProviderClient {
 
         if (response.statusCode() == 200) {
             JsonNode json = objectMapper.readTree(response.body());
+
+            System.out.println("Microsoft token exchange response: " + json.toString());
+
+
             Map<String, Object> result = new HashMap<>();
             result.put("access_token", json.get("access_token").asText());
             if (json.has("refresh_token")) result.put("refresh_token", json.get("refresh_token").asText());
             if (json.has("expires_in")) result.put("expires_in", json.get("expires_in").asInt());
+            
+            System.out.println("Microsoft token exchange result: " + result);
+            
             return result;
         }
         throw new Exception("Microsoft token exchange failed: " + response.body());

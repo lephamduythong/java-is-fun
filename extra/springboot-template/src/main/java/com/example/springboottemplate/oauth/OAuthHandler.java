@@ -8,11 +8,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class OAuthHandler {
+
+    private static final MediaType HTML_UTF8 = new MediaType("text", "html", StandardCharsets.UTF_8);
 
     private final GoogleOAuthHandler googleOAuth;
     private final MicrosoftOAuthHandler microsoftOAuth;
@@ -52,7 +55,7 @@ public class OAuthHandler {
             String clientSecretEnvironment) {
         if (!configured) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .contentType(MediaType.parseMediaType(MediaType.TEXT_HTML_VALUE))
+                    .contentType(HTML_UTF8)
                     .body(wrapHtml(provider + " OAuth Not Configured",
                             "<h2>" + provider + " OAuth Not Configured</h2>"
                                     + "<p>" + provider + " OAuth credentials are missing. "
@@ -74,12 +77,12 @@ public class OAuthHandler {
                     + "</body></html>";
 
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(MediaType.TEXT_HTML_VALUE))
+                    .contentType(HTML_UTF8)
                     .body(html);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .contentType(MediaType.parseMediaType(MediaType.TEXT_HTML_VALUE))
+                    .contentType(HTML_UTF8)
                     .body("<h2>Error</h2><p>Failed to generate " + provider
                             + " login URL: " + e.getMessage() + "</p>");
         }
@@ -134,7 +137,7 @@ public class OAuthHandler {
                     + "<a href='" + logoutPath + "'>Logout</a></p>";
 
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(MediaType.TEXT_HTML_VALUE))
+                    .contentType(HTML_UTF8)
                     .header("Set-Cookie", "SESSION=" + sessionId + "; HttpOnly; Path=/")
                     .body(wrapHtml("Login Successful", html));
 
@@ -180,7 +183,7 @@ public class OAuthHandler {
 
     private ResponseEntity<String> htmlResponse(String title, String body) {
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(MediaType.TEXT_HTML_VALUE))
+                .contentType(HTML_UTF8)
                 .body(wrapHtml(title, body));
     }
 
