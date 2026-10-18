@@ -11,9 +11,4 @@ public class DemoApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
 	}
-
-	@Bean
-	ChatClient chatClient(ChatClient.Builder builder) {
-		return builder.build();
-	}
 }
