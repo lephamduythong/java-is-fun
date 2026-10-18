@@ -5,12 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GoogleOAuthHandler {
 
     private final OAuthConfig config;
+    private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<String, String> stateStore = new ConcurrentHashMap<>();
 
@@ -65,43 +65,30 @@ public class GoogleOAuthHandler {
      * Exchange authorization code for an access token.
      */
     public Map<String, Object> exchangeCodeForToken(String code) throws Exception {
-        URL url = new URL(config.getTokenUri());
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        conn.setDoOutput(true);
-
         String postData = "code=" + URLEncoder.encode(code, "UTF-8")
                 + "&client_id=" + URLEncoder.encode(config.getClientId(), "UTF-8")
                 + "&client_secret=" + URLEncoder.encode(config.getClientSecret(), "UTF-8")
                 + "&redirect_uri=" + URLEncoder.encode(config.getRedirectUri(), "UTF-8")
                 + "&grant_type=authorization_code";
 
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(postData.getBytes(StandardCharsets.UTF_8));
-        }
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(config.getTokenUri()))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(postData, StandardCharsets.UTF_8))
+                .build();
+        HttpResponse<String> response = httpClient.send(
+                request,
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 
-        int responseCode = conn.getResponseCode();
-        if (responseCode == 200) {
-            StringBuilder response = new StringBuilder();
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-                String line;
-                while ((line = in.readLine()) != null) response.append(line);
-            }
-
-            JsonNode json = objectMapper.readTree(response.toString());
+        if (response.statusCode() == 200) {
+            JsonNode json = objectMapper.readTree(response.body());
             Map<String, Object> result = new HashMap<>();
             result.put("access_token", json.get("access_token").asText());
             if (json.has("refresh_token")) result.put("refresh_token", json.get("refresh_token").asText());
             if (json.has("expires_in"))    result.put("expires_in",    json.get("expires_in").asInt());
             return result;
         } else {
-            StringBuilder err = new StringBuilder();
-            try (BufferedReader r = new BufferedReader(new InputStreamReader(conn.getErrorStream()))) {
-                String line;
-                while ((line = r.readLine()) != null) err.append(line);
-            }
-            throw new Exception("Token exchange failed: " + err);
+            throw new Exception("Token exchange failed: " + response.body());
         }
     }
 
@@ -109,20 +96,17 @@ public class GoogleOAuthHandler {
      * Retrieve user profile from Google using an access token.
      */
     public Map<String, Object> getUserInfo(String accessToken) throws Exception {
-        URL url = new URL(config.getUserInfoUri());
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(config.getUserInfoUri()))
+                .header("Authorization", "Bearer " + accessToken)
+                .GET()
+                .build();
+        HttpResponse<String> response = httpClient.send(
+                request,
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 
-        int responseCode = conn.getResponseCode();
-        if (responseCode == 200) {
-            StringBuilder response = new StringBuilder();
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-                String line;
-                while ((line = in.readLine()) != null) response.append(line);
-            }
-
-            JsonNode json = objectMapper.readTree(response.toString());
+        if (response.statusCode() == 200) {
+            JsonNode json = objectMapper.readTree(response.body());
             Map<String, Object> userInfo = new HashMap<>();
             if (json.has("id"))             userInfo.put("id",             json.get("id").asText());
             if (json.has("email"))          userInfo.put("email",          json.get("email").asText());
@@ -131,7 +115,7 @@ public class GoogleOAuthHandler {
             if (json.has("verified_email")) userInfo.put("verified_email", json.get("verified_email").asBoolean());
             return userInfo;
         } else {
-            throw new Exception("Failed to get user info. HTTP " + responseCode);
+            throw new Exception("Failed to get user info. HTTP " + response.statusCode());
         }
     }
 }
