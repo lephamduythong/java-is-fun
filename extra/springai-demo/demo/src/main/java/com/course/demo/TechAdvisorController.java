@@ -6,42 +6,37 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/advisor")
 public class TechAdvisorController {
     // private final ChatClient chatClient;
-    private final OpenAiChatModel chatModel;
     private final ChatClient chatClient;
-
-    // @Autowired 
-    // public TechAdvisorController(ChatClient chatClient) {
-    //     this.chatClient = chatClient;
-    // }
+    private final ChatClient chatClientWithPersona;
 
     @Autowired 
-    public TechAdvisorController(OpenAiChatModel chatModel, ChatClient chatClient) {
-        this.chatModel = chatModel;
-        this.chatClient = chatClient;
-
+    public TechAdvisorController(ChatClient.Builder builder) {
+        this.chatClient = builder.build();
+        this.chatClientWithPersona = builder.build();
     }
 
-    @GetMapping("/advise1")
-    public String advise1() {
-        // Implement your logic to get tech advice using chatClient
-
-        var message = chatModel.call("Chào bạn đáng yêu nhé");
-
-        return message;
+    @GetMapping("/default-system-prompt")
+    public String defaultSystemPrompt() {
+        return chatClient
+            .prompt()
+            .system("Bạn là một dev Java")
+            .user("Giải thích cơ chế memory của Java")
+            .call().content();
     }
 
-    @GetMapping("/advise2")
-    public String advise2() {
-        // Implement your logic to get tech advice using chatClient
-
-        var message = chatClient.prompt("Whey protein là gì ?").call().content();
-
-        return message;
+    @GetMapping("/system-prompt-with-persona")
+    public String systemPromptWithPersona(@RequestParam String persona, @RequestParam String question) {
+        return chatClientWithPersona
+            .prompt()
+            .system("Bạn là một dev " + persona + " vui lòng format câu trả lời mardown đẹp lại, có xuống dòng")
+            .user(question)
+            .call().content();
     }
 }
