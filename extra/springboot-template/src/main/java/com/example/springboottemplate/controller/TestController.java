@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.example.springboottemplate.pool.RequestThreadPoolManager;
 import com.example.springboottemplate.service.CaffeineCacheService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
@@ -21,6 +22,7 @@ import org.springframework.http.MediaType;
 public class TestController {
     private final CaffeineCacheService cacheService = CaffeineCacheService.getInstance();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final RequestThreadPoolManager reqPool = RequestThreadPoolManager.getInstance();
 
     @GetMapping("/info")
     public ResponseEntity<Map<String, Object>> getInfo() throws InterruptedException {
@@ -38,7 +40,7 @@ public class TestController {
     @GetMapping(value = "/cache/{recid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getRecord(@PathVariable String recid) throws IOException {
         
-        Thread thread = new Thread(() -> {
+        reqPool.runTask(() -> {
             String xmlRecord = cacheService.getXmlRecord(recid);
             if (xmlRecord == null) {
                 System.out.println("Không tìm thấy record");
@@ -46,7 +48,16 @@ public class TestController {
             }
             System.out.println(xmlRecord);
         });
-        thread.start();
+
+        // Thread thread = new Thread(() -> {
+        //     String xmlRecord = cacheService.getXmlRecord(recid);
+        //     if (xmlRecord == null) {
+        //         System.out.println("Không tìm thấy record");
+        //         return; // thoát khỏi Runnable, không trả về giá trị
+        //     }
+        //     System.out.println(xmlRecord);
+        // });
+        // thread.start();
         
         return ResponseEntity.ok("OK");
         // return ResponseEntity.ok(objectMapper.readTree(xmlRecord));

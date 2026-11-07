@@ -1,5 +1,6 @@
 package com.example.springboottemplate.service;
 
+import com.example.springboottemplate.pool.RequestThreadPoolManager;
 import com.example.springboottemplate.repository.PostgresRecordRepository;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
