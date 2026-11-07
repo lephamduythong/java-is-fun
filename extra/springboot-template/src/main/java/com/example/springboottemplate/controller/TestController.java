@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.example.springboottemplate.pool.RequestThreadPoolManager;
 import com.example.springboottemplate.service.CaffeineCacheService;
@@ -23,6 +24,8 @@ public class TestController {
     private final CaffeineCacheService cacheService = CaffeineCacheService.getInstance();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RequestThreadPoolManager reqPool = RequestThreadPoolManager.getInstance();
+    
+    private AtomicLong counter = new AtomicLong(0);
 
     @GetMapping("/info")
     public ResponseEntity<Map<String, Object>> getInfo() throws InterruptedException {
@@ -47,19 +50,17 @@ public class TestController {
                 return; // thoát khỏi Runnable, không trả về giá trị
             }
             System.out.println(xmlRecord);
+            if (xmlRecord != null && !xmlRecord.isEmpty() && xmlRecord.contains("a")) {
+                counter.incrementAndGet(); // tăng counter mỗi khi tìm thấy record
+            }
         });
 
-        // Thread thread = new Thread(() -> {
-        //     String xmlRecord = cacheService.getXmlRecord(recid);
-        //     if (xmlRecord == null) {
-        //         System.out.println("Không tìm thấy record");
-        //         return; // thoát khỏi Runnable, không trả về giá trị
-        //     }
-        //     System.out.println(xmlRecord);
-        // });
-        // thread.start();
-        
         return ResponseEntity.ok("OK");
         // return ResponseEntity.ok(objectMapper.readTree(xmlRecord));
+    }
+
+    @GetMapping(value = "/cache/getCounter")
+    public ResponseEntity<String> getRecord() throws IOException {
+        return ResponseEntity.ok(String.valueOf(counter.get()));
     }
 }
