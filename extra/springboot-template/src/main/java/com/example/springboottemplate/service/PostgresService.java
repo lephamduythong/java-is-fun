@@ -44,7 +44,7 @@ public class PostgresService {
     }
 
     public String getXmlRecord(String recid) throws SQLException {
-        String sql = "SELECT xmlrecord::text FROM test1 WHERE recid = ?";
+        String sql = "SELECT xmlrecord::text FROM test.test1 WHERE recid = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, recid);

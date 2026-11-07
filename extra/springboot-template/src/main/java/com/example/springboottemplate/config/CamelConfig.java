@@ -221,50 +221,50 @@ public class CamelConfig extends RouteBuilder {
                 }
             });
 
-        // Timer route - runs every 5 seconds
-        from("timer://periodicTimer?period=5000")
-            .routeId("periodicTimerRoute")
-            .process(exchange -> {
-                _logger.debug("Consumer check START");
-                try {
-                    var consumer = WonderQueueSrvConsumerSingleton.getInstance();
-                    _logger.debug("Starting ActiveMQ Consumer...");
-                    consumer.startListening();
-                    _logger.debug("ActiveMQ Consumer started successfully and listening for messages");
-                } catch (Exception e) {
-                    WonderQueueSrvConsumerSingleton consumer = null;
-                    try {
-                        consumer = WonderQueueSrvConsumerSingleton.getInstance();
-                    } catch (JMSException e1) {
-                        _logger.error("Consumer error init: " + e1.getMessage(), e1);
-                    }
-                    _logger.error("Failed to start ActiveMQ Consumer: " + e.getMessage(), e);
-                    if (consumer != null) {
-                        consumer.close();
-                        try {
-                            consumer.resetSession();
-                        } catch (JMSException e1) {
-                            _logger.error("Failed to reset ActiveMQ Consumer session: " + e1.getMessage(), e1);
-                        }
-                    }
-                }
-                _logger.debug("Consumer check END");
-            });
+        // // Timer route - runs every 5 seconds
+        // from("timer://periodicTimer?period=5000")
+        //     .routeId("periodicTimerRoute")
+        //     .process(exchange -> {
+        //         _logger.debug("Consumer check START");
+        //         try {
+        //             var consumer = WonderQueueSrvConsumerSingleton.getInstance();
+        //             _logger.debug("Starting ActiveMQ Consumer...");
+        //             consumer.startListening();
+        //             _logger.debug("ActiveMQ Consumer started successfully and listening for messages");
+        //         } catch (Exception e) {
+        //             WonderQueueSrvConsumerSingleton consumer = null;
+        //             try {
+        //                 consumer = WonderQueueSrvConsumerSingleton.getInstance();
+        //             } catch (JMSException e1) {
+        //                 _logger.error("Consumer error init: " + e1.getMessage(), e1);
+        //             }
+        //             _logger.error("Failed to start ActiveMQ Consumer: " + e.getMessage(), e);
+        //             if (consumer != null) {
+        //                 consumer.close();
+        //                 try {
+        //                     consumer.resetSession();
+        //                 } catch (JMSException e1) {
+        //                     _logger.error("Failed to reset ActiveMQ Consumer session: " + e1.getMessage(), e1);
+        //                 }
+        //             }
+        //         }
+        //         _logger.debug("Consumer check END");
+        //     });
 
 
-        // Timer route - runs every 5 seconds
-        from("timer://periodicTimer?period=5000")
-            .routeId("periodicTimerRoute2")
-            .process(exchange -> {
-                _logger.debug("DB check START");
-                try {
-                    WonderDbFileStoreSrv.getInstance();
-                    _logger.debug("WonderDbStoreSrv connection is healthy");
-                } catch (Exception e) {
-                    _logger.error("WonderDbStoreSrv connection error: " + e.getMessage(), e);
-                }
-                _logger.debug("DB check END");
-            });
+        // // Timer route - runs every 5 seconds
+        // from("timer://periodicTimer?period=5000")
+        //     .routeId("periodicTimerRoute2")
+        //     .process(exchange -> {
+        //         _logger.debug("DB check START");
+        //         try {
+        //             WonderDbFileStoreSrv.getInstance();
+        //             _logger.debug("WonderDbStoreSrv connection is healthy");
+        //         } catch (Exception e) {
+        //             _logger.error("WonderDbStoreSrv connection error: " + e.getMessage(), e);
+        //         }
+        //         _logger.debug("DB check END");
+        //     });
     }
 
     // Inner class for User model
