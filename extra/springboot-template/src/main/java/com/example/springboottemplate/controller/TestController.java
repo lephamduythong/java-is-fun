@@ -51,8 +51,23 @@ public class TestController {
         return ResponseEntity.ok(data);
     }
 
-    @GetMapping(value = "/cache/{recid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getRecord(@PathVariable String recid) throws IOException {
+    @GetMapping(value = "/cache/sync/{recid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getCacheRecord1(@PathVariable String recid) throws IOException {
+        String xmlRecord = cacheService.getXmlRecord(recid);
+        if (xmlRecord == null) {
+            System.out.println("Không tìm thấy record");
+            return ResponseEntity.notFound().build();
+        }
+        System.out.println(xmlRecord);
+        if (xmlRecord != null && !xmlRecord.isEmpty() && xmlRecord.contains("a")) {
+            counter.incrementAndGet(); // tăng counter mỗi khi tìm thấy record
+        }
+        return ResponseEntity.ok("OK");
+        // return ResponseEntity.ok(objectMapper.readTree(xmlRecord));
+    }
+
+    @GetMapping(value = "/cache/async/{recid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getCacheRecord2(@PathVariable String recid) throws IOException {
         
         reqPool.runTask(() -> {
             String xmlRecord = cacheService.getXmlRecord(recid);
