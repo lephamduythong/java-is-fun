@@ -2,9 +2,10 @@ package com.example.springboottemplate.service;
 
 import com.example.springboottemplate.pool.RequestThreadPoolManager;
 import com.example.springboottemplate.repository.PostgresRecordRepository;
-import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class CaffeineCacheService {
@@ -18,7 +19,7 @@ public class CaffeineCacheService {
     }
 
     private final PostgresRecordRepository recordRepository;
-    private final Cache<String, String> recordCache;
+    private final LoadingCache<String, Optional<String>> recordCache;
 
     private CaffeineCacheService() {
         this.recordRepository = new PostgresRecordRepository();
@@ -26,22 +27,27 @@ public class CaffeineCacheService {
                 .maximumSize(500)
                 .expireAfterWrite(15, TimeUnit.MINUTES)
                 // .recordStats() // enable metric
-                .build();
+                .build(recid -> {
+                    String value = recordRepository.findXmlRecordById(recid);
+                    if (value != null) {
+                        System.out.println("Cache miss for recid: " + recid);
+                    }
+                    return Optional.ofNullable(value);
+                });
     }
 
     public String getXmlRecord(String recid) {
-        String cachedValue = recordCache.getIfPresent(recid);
-        if (cachedValue != null) {
+        Optional<String> cachedValue = recordCache.getIfPresent(recid);
+        if (cachedValue != null && cachedValue.isPresent()) {
             System.out.println("Cache hit for recid: " + recid);
-            return cachedValue;
+            return cachedValue.get();
         }
 
-        String value = recordRepository.findXmlRecordById(recid);
-        if (value != null) {
-            System.out.println("Cache miss for recid: " + recid);
-            recordCache.put(recid, value);
+        Optional<String> value = recordCache.get(recid);
+        if (!value.isPresent()) {
+            recordCache.invalidate(recid);
         }
-        
-        return value;
+
+        return value.orElse(null);
     }
 }

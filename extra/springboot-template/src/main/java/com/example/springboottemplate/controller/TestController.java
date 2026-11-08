@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.example.springboottemplate.pool.RequestThreadPoolManager;
@@ -105,6 +106,18 @@ public class TestController {
         var result = t24DBService.getRecordByRecid("test1", List.of("1", "3"), "b");
         return ResponseEntity.ok("Record fetched: " + 
             result.getXmlrecord().get("3").toString() // Array
+        );
+    }
+
+    @GetMapping("/getRecord3")
+    public ResponseEntity<String> getRecord3() {
+        // Get selected fields
+        var result = t24DBService.getRecordByRecidV2("V_FBNK_COLLATERAL_RIGHT"
+            , Set.of("LIMIT.REFERENCE", "COLLATERAL.CODE")
+            , "COR23080THP3X"
+        );
+        return ResponseEntity.ok("Record fetched: " + 
+            result.getXmlrecord().get("LIMIT.REFERENCE").toString() // Array
         );
     }
 }
