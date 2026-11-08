@@ -1,13 +1,16 @@
 package com.example.springboottemplate.repository.entity;
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class T24CoreRecordEntity {
     private String recid;
-    private String xmlrecord;
+    private JsonNode xmlrecord;
 
     public T24CoreRecordEntity() {
     }
 
-    public T24CoreRecordEntity(String recid, String xmlrecord) {
+    public T24CoreRecordEntity(String recid, JsonNode xmlrecord) {
         this.recid = recid;
         this.xmlrecord = xmlrecord;
     }
@@ -20,11 +23,11 @@ public class T24CoreRecordEntity {
         this.recid = recid;
     }
 
-    public String getXmlrecord() {
+    public JsonNode getXmlrecord() {
         return xmlrecord;
     }
 
-    public void setXmlrecord(String xmlrecord) {
+    public void setXmlrecord(JsonNode xmlrecord) {
         this.xmlrecord = xmlrecord;
     }
 }
