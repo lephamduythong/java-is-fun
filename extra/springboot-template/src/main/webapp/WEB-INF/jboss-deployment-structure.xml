@@ -15,5 +15,8 @@
             <module name="org.slf4j.impl" />
             <module name="org.slf4j.jcl" />
         </exclusions>
+        <dependencies>
+            <module name="com.custom" slot="main"/>
+        </dependencies>
     </deployment>
 </jboss-deployment-structure>
