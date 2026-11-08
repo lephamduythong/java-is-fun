@@ -24,7 +24,7 @@ public class CaffeineCacheService {
         this.recordRepository = new PostgresRecordRepository();
         this.recordCache = Caffeine.newBuilder()
                 .maximumSize(500)
-                .expireAfterWrite(10, TimeUnit.SECONDS)
+                .expireAfterWrite(15, TimeUnit.MINUTES)
                 // .recordStats() // enable metric
                 .build();
     }

@@ -1,0 +1,4 @@
+http://localhost:8080/test-api/test/cache/sync/a
+http://localhost:8080/test-api/test/cache/async/a
+
+http://localhost:8080/test-api/test/getRecord1
