@@ -14,7 +14,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.example.springboottemplate.pool.RequestThreadPoolManager;
+import com.example.springboottemplate.repository.T24CoreRepositoryImpl;
 import com.example.springboottemplate.service.CaffeineCacheService;
+import com.example.springboottemplate.service.T24DBService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 
@@ -26,6 +28,14 @@ public class TestController {
     private final RequestThreadPoolManager reqPool = RequestThreadPoolManager.getInstance();
     
     private AtomicLong counter = new AtomicLong(0);
+
+    private final T24CoreRepositoryImpl t24CoreRepository;
+    private final T24DBService t24DBService;
+
+    public TestController() {
+        t24CoreRepository = new T24CoreRepositoryImpl();
+        t24DBService = new T24DBService(t24CoreRepository);
+    }
 
     @GetMapping("/info")
     public ResponseEntity<Map<String, Object>> getInfo() throws InterruptedException {
@@ -62,5 +72,11 @@ public class TestController {
     @GetMapping(value = "/cache/getCounter")
     public ResponseEntity<String> getRecord() throws IOException {
         return ResponseEntity.ok(String.valueOf(counter.get()));
+    }
+
+    @GetMapping("/getRecord")
+    public ResponseEntity<String> resetCounter() {
+        var result = t24DBService.getRecordByRecid("test1", "a");
+        return ResponseEntity.ok("Record fetched: " + result.getXmlrecord());
     }
 }
