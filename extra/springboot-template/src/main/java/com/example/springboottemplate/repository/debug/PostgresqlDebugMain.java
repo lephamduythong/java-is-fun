@@ -12,13 +12,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import com.example.springboottemplate.WonderUtils;
 import com.example.springboottemplate.repository.entity.T24CoreRecordEntity;
+import com.example.springboottemplate.service.SysCacheService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -30,28 +33,52 @@ public class PostgresqlDebugMain {
 
     private String T24_DB_JNDI_NAME = "java:jboss/datasources/PostgresDS";
 
-    private static final String JDBC_URL = "jdbc:postgresql://localhost:5432/postgres";
-
+    // For local test
+    // private static final String JDBC_URL = "jdbc:postgresql://localhost:5432/postgres";
+    // private static final String USERNAME = "t24";
+    // private static final String PASSWORD = "123";
+    
+    private static final String JDBC_URL = "jdbc:postgresql://aws-sg-cbs-sit-rds-aurora-postgresql-002.cluster-cn6lmdft73t3.ap-southeast-1.rds.amazonaws.com:5432/transact_sit";
     private static final String USERNAME = "t24";
-    private static final String PASSWORD = "123";
+    private static final String PASSWORD = "zS7ec$tvT^a#xS(4";
 
     public static void main(String[] args) throws Exception {
-        // var result = getRecordByRecidV2(
-        //     "V_FBNK_COLLATERAL_RIGHT" 
-        //     ,Set.of("LIMIT.REFERENCE", "COLLATERAL.CODE") 
-        //     ,"COR23080THP3X");
-        // System.out.println(result);
 
+        Stopwatch stopwatch = new Stopwatch();
 
-        var stopwatch = new Stopwatch();
-        try (var conn = getConnection()) {
-            var sql = "select recid, orclfilename as table_name, 'V_' || orclfilename as view_name from tafj_voc where recid like 'F.%' or recid like 'FBNK.%'";
-            var tafjVoc = queryDB(conn, sql);
-            System.out.println(tafjVoc);
-            System.out.println("Elapsed time: " + stopwatch.elapsed() + " ms");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        var sysCacheService = SysCacheService.getInstance(); // Load cache for the first time
+        System.out.println("Elapsed time sysCacheService: " + stopwatch.elapsed() + " ms");
+
+        var x1 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
+        System.out.println("Elapsed time getTafjVocCache 1: " + stopwatch.elapsed() + " ms");
+        var x2 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
+        System.out.println("Elapsed time getTafjVocCache 2: " + stopwatch.elapsed() + " ms");
+        var x3 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
+        System.out.println("Elapsed time getTafjVocCache 3: " + stopwatch.elapsed() + " ms");
+        var x4 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
+        System.out.println("Elapsed time getTafjVocCache 4: " + stopwatch.elapsed() + " ms");
+        var x5 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
+        System.out.println("Elapsed time getTafjVocCache 5: " + stopwatch.elapsed() + " ms");
+        
+
+        // var stopwatch = new Stopwatch();
+        // try (var conn = getConnection()) {
+        //     var sql = "select recid, orclfilename as table_name, 'V_' || orclfilename as view_name from tafj_voc where recid like 'F.%' or recid like 'FBNK.%'";
+        //     var tafjVoc = queryDB(conn, sql);
+
+        //     // Index value
+        //     var indexValueMap = new HashMap<String, HashMap<String, String>>();
+        //     tafjVoc.forEach(i -> {
+        //         var recid = i.get("RECID");
+        //         indexValueMap.put(recid, i);
+        //     });
+            
+        //     // System.out.println(tafjVoc);
+        //     WonderUtils.writeTextToFile("output/shit.txt", tafjVoc.toString());
+        //     System.out.println("Elapsed time: " + stopwatch.elapsed() + " ms");
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
     }
 
     private static T24CoreRecordEntity getRecordByRecidV2(String viewName, Set<String> fieldNameSet, String recid) {
