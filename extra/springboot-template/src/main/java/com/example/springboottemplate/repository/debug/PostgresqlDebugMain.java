@@ -8,6 +8,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +21,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import com.example.springboottemplate.WonderUtils;
+import com.example.springboottemplate.repository.T24CoreRepositoryImpl;
 import com.example.springboottemplate.repository.entity.T24CoreRecordEntity;
 import com.example.springboottemplate.service.SysCacheService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,24 +44,73 @@ public class PostgresqlDebugMain {
     private static final String USERNAME = "t24";
     private static final String PASSWORD = "zS7ec$tvT^a#xS(4";
 
+    private static SysCacheService sysCacheService = SysCacheService.getInstance();
+
+    static {
+        try {
+            Thread.sleep(25_000);
+        } catch (InterruptedException e) {
+            
+        }
+        sysCacheService.getT24TableRowMapCache();
+    }
+
     public static void main(String[] args) throws Exception {
+
+        // Stopwatch stopwatch = new Stopwatch();
+
+        // var sysCacheService = SysCacheService.getInstance(); // Load cache for the first time
+        // System.out.println("Elapsed time sysCacheService: " + stopwatch.elapsed() + " ms");
+
+        // var x1 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
+        // System.out.println("Elapsed time getTafjVocCache 1: " + stopwatch.elapsed() + " ms");
+        // var x2 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
+        // System.out.println("Elapsed time getTafjVocCache 2: " + stopwatch.elapsed() + " ms");
+        // var x3 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
+        // System.out.println("Elapsed time getTafjVocCache 3: " + stopwatch.elapsed() + " ms");
+        // var x4 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
+        // System.out.println("Elapsed time getTafjVocCache 4: " + stopwatch.elapsed() + " ms");
+        // var x5 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
+        // System.out.println("Elapsed time getTafjVocCache 5: " + stopwatch.elapsed() + " ms");
+        
+        // Stopwatch stopwatch = new Stopwatch();
+        
+        // var repo = new T24CoreRepositoryImpl();
+        // var result = repo.getRecordByRecidV2("V_FBNK_COLLATERAL_RIGHT", Set.of("LIMIT.REFERENCE"), "COR261346Y832" );
+
+        // System.out.println(result.getXmlrecord().get("LIMIT.REFERENCE"));
+        // System.out.println("TOTAL Elapsed time: " + stopwatch.elapsed() + " ms");
+
+        //Thread.sleep(25_000);
 
         Stopwatch stopwatch = new Stopwatch();
 
-        var sysCacheService = SysCacheService.getInstance(); // Load cache for the first time
-        System.out.println("Elapsed time sysCacheService: " + stopwatch.elapsed() + " ms");
+        // var shit = sysCacheService.getT24TableRowMapCache().get("EB.CITAD.TRANSACTION,TRANSACTION.TYPE");
+        var shit = sysCacheService.getT24TableRowMapCache().get("PAYMENT.ORDER,DEBIT.ACCOUNT").getViewName();
 
-        var x1 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
-        System.out.println("Elapsed time getTafjVocCache 1: " + stopwatch.elapsed() + " ms");
-        var x2 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
-        System.out.println("Elapsed time getTafjVocCache 2: " + stopwatch.elapsed() + " ms");
-        var x3 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
-        System.out.println("Elapsed time getTafjVocCache 3: " + stopwatch.elapsed() + " ms");
-        var x4 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
-        System.out.println("Elapsed time getTafjVocCache 4: " + stopwatch.elapsed() + " ms");
-        var x5 = sysCacheService.getTafjVocCache().get("V_FBNK_COLLATERAL_RIGHT");
-        System.out.println("Elapsed time getTafjVocCache 5: " + stopwatch.elapsed() + " ms");
+        System.out.println("Elapsed time 1: " + stopwatch.elapsed() + " ms");
+
+        shit = sysCacheService.getT24TableRowMapCache().get("PAYMENT.ORDER,DEBIT.ACCOUNT").getViewName();
+        System.out.println("Elapsed time 2: " + stopwatch.elapsed() + " ms");
+
+        shit = sysCacheService.getT24TableRowMapCache().get("PAYMENT.ORDER,DEBIT.ACCOUNT").getViewName();
+        System.out.println("Elapsed time 3: " + stopwatch.elapsed() + " ms");
         
+        shit = sysCacheService.getT24TableRowMapCache().get("PAYMENT.ORDER,DEBIT.ACCOUNT").getViewName();
+        System.out.println("Elapsed time 4: " + stopwatch.elapsed() + " ms");
+
+        shit = sysCacheService.getT24TableRowMapCache().get("PAYMENT.ORDER,DEBIT.ACCOUNT").getViewName();
+        System.out.println("Elapsed time 5: " + stopwatch.elapsed() + " ms");
+
+        shit = sysCacheService.getT24TableRowMapCache().get("PAYMENT.ORDER,DEBIT.ACCOUNT").getViewName();
+        System.out.println("Elapsed time 6: " + stopwatch.elapsed() + " ms");
+
+        shit = sysCacheService.getT24TableRowMapCache().get("PAYMENT.ORDER,DEBIT.ACCOUNT").getViewName();
+        System.out.println("Elapsed time 7: " + stopwatch.elapsed() + " ms");
+
+        System.out.println("Shit: " + shit);
+
+        System.out.println("DONE");
 
         // var stopwatch = new Stopwatch();
         // try (var conn = getConnection()) {

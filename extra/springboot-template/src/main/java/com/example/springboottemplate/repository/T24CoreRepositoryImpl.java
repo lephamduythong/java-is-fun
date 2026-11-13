@@ -3,6 +3,7 @@ import com.example.springboottemplate.repository.intf.T24CoreRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -21,6 +22,7 @@ import javax.sql.DataSource;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import com.example.springboottemplate.repository.debug.Stopwatch;
 import com.example.springboottemplate.repository.entity.T24CoreRecordEntity;
 
 public class T24CoreRepositoryImpl implements T24CoreRepository {
@@ -30,8 +32,16 @@ public class T24CoreRepositoryImpl implements T24CoreRepository {
     private String SQL_SELECT_XML_BY_RECID = "SELECT xmlrecord FROM test.%s WHERE recid = ?";
     private String SQL_SELECT_XML_BY_RECID_WITH_FIELDS = "SELECT %s FROM test.%s WHERE recid = ?";
 
-    private Connection getConnection() throws SQLException, NamingException {
-        return ((DataSource) new InitialContext().lookup(T24_DB_JNDI_NAME)).getConnection();
+    // private Connection getConnection() throws SQLException, NamingException {
+    //     return ((DataSource) new InitialContext().lookup(T24_DB_JNDI_NAME)).getConnection();
+    // }
+
+    private static final String JDBC_URL = "jdbc:postgresql://aws-sg-cbs-sit-rds-aurora-postgresql-002.cluster-cn6lmdft73t3.ap-southeast-1.rds.amazonaws.com:5432/transact_sit";
+    private static final String USERNAME = "t24";
+    private static final String PASSWORD = "zS7ec$tvT^a#xS(4";
+
+    private static Connection getConnection() throws SQLException, NamingException {
+        return DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
     }
 
     @Override
@@ -137,9 +147,13 @@ public class T24CoreRepositoryImpl implements T24CoreRepository {
         var columnSet = new HashSet<String>();
         
         try (var conn = getConnection())
-        {
+        {   
+
+            Stopwatch stopwatch = new Stopwatch();
+            
             var stmt = conn.prepareStatement(metaDataFieldSQL);
             var resultSet = stmt.executeQuery();
+            System.out.println("Elapsed time after executing metaDataFieldSQL: " + stopwatch.elapsed() + " ms");
 
             ResultSetMetaData metadata = resultSet.getMetaData();
             int columnCount = metadata.getColumnCount();
@@ -155,21 +169,25 @@ public class T24CoreRepositoryImpl implements T24CoreRepository {
                 columnSet.add(resultSet.getString(1));
             }
 
+
+            
+            System.out.println("Elapsed time after processing resultSet: " + stopwatch.elapsed() + " ms");
+
             // Example Set: [MPM_CUST, VALIDITY_DATE, LIMIT_REF_CUST_4, LIMIT_CAP_PERC_8, CO_CODE, RESERVED_1, RESERVED_6, RESERVED_5, CO_PRIORITY, STATUS, CUSTOMER_17, TM_NOMINAL_VAL, AUTHORISER, OVERRIDE_26, LIMIT_REF_CUST, INTERNAL, CUSTOMER, COLLATERAL_ID_23, CURR_NO, RELATION_ALLOW, AUDIT_DATE_TIME, PERCENT_ALLOC_5, INPUTTER, DEPT_CODE, ALLOCATION_AMT, CUSTOMER_ID, DATE_TIME_30, THE_RECORD, LIMIT_ID, OS_PERCENT_COVER, COMPANY, REVIEW_DATE_FQU, NOTARY, MPM_INSURANCE, MPM_CUS_ROLE, COLLATERAL_RIGHT, COMPANY_2, LIMIT_REFERENCE, MPM_CUST_18, RESERVED_6_10, PERCENTAGE_COVER, DATE_TIME, MPM_CUS_ROLE_18, PERCENT_ALLOC, COLLATERAL_CODE, RECORD_STATUS, EXPIRY_DATE, LIMIT_ID_20, NOTES, SEQ_NO, ALLOCATION_AMT_7, LIMIT_CAP_PERC, CA_PROLENDER_ID, recid, ALLOC_WORK_ID, INSTITUTION, MPM_NO, COLLATERAL_ID, AUDITOR_CODE, MPM_FLAG, LIMIT_REFERENCE_3, NOTES_16, OVERRIDE, REG_LIMIT, ALLOCATION_CCY, RESERVED_5_9, INPUTTER_29, MPM_TRFR_NO, ALLOCATION_CCY_6]
             // Lọc ra các cột có số ở cuối thành 1 set
-            var columnsWithNumbers = columnSet.stream()
+            var columnsWithNumbers = columnSet.parallelStream()
                     .filter(column -> column.matches(".*_\\d+$"))
                     .collect(Collectors.toSet());
             // System.out.println("Columns with numbers at the end: " + columnsWithNumbers);
 
             // Trong tập columnsWithNumbers, ví dụ với item "LIMIT_REF_CUST_4" thì lấy ra string "LIMIT_REF_CUST" lưu thành 1 set "LIMIT_REF_CUST", ...
-            var columnsWithoutNumbers = columnsWithNumbers.stream()
+            var columnsWithoutNumbers = columnsWithNumbers.parallelStream()
                     .map(column -> column.replaceAll("_\\d+$", ""))
                     .collect(Collectors.toSet());
             // System.out.println(columnsWithoutNumbers);
             
             // Lấy tập columnSet trừ đi columnsWithoutNumbers
-            var finalColumnSet = columnSet.stream()
+            var finalColumnSet = columnSet.parallelStream()
                     .filter(column -> !columnsWithoutNumbers.contains(column))
                     .collect(Collectors.toSet());
             
@@ -179,10 +197,10 @@ public class T24CoreRepositoryImpl implements T24CoreRepository {
             // Lưu finalColumnSet vào cache
             // ...
 
-            final Set<String> transformedFieldNameList = fieldNameSet.stream()
+            final Set<String> transformedFieldNameList = fieldNameSet.parallelStream()
                     .map(field -> field.replace(".", "_"))
                     .collect(Collectors.toSet());
-            var selectFields = finalColumnSet.stream()
+            var selectFields = finalColumnSet.parallelStream()
                     .filter(field -> transformedFieldNameList.contains(field) 
                         || transformedFieldNameList.contains(field.replaceAll("_\\d+$", "")))
                     .collect(Collectors.toSet());
@@ -194,6 +212,8 @@ public class T24CoreRepositoryImpl implements T24CoreRepository {
             var selectSql = "select jsonb_build_object(" + "{selectFields}" +") as xmlrecord " +
                     "from " + viewNameWrapped + " where recid = '" + recid + "';";
             System.out.println(selectSql);
+
+            System.out.println("Elapsed time before generating selectFieldsString: " + stopwatch.elapsed() + " ms");
             
             // Example select sql:
             // selectFields set: [COLLATERAL_CODE, LIMIT_REFERENCE_3]
@@ -214,6 +234,8 @@ public class T24CoreRepositoryImpl implements T24CoreRepository {
 
             System.out.println(selectSql);
             var result = queryDB(conn, selectSql);
+
+            System.out.println("Elapsed time after querying DB: " + stopwatch.elapsed() + " ms");
 
             System.out.println("result: " + result);
 
