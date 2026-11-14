@@ -6,7 +6,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.Callable;
 
 public class RequestThreadPoolManager {
-    private static final int THREAD_POOL_SIZE = 25;
+    private static final int THREAD_POOL_SIZE = 100;
 
     // 1. Biến static giữ instance duy nhất (Bill Pugh Singleton approach / Eager initialization)
     private static final RequestThreadPoolManager INSTANCE = new RequestThreadPoolManager();

@@ -4,3 +4,53 @@ http://localhost:8080/test-api/test/cache/async/a
 http://localhost:8080/test-api/test/getRecord1
 http://localhost:8080/test-api/test/getRecord2
 http://localhost:8080/test-api/test/getRecord3
+
+================================================================================================================================================
+
+Arthus java diagnostic tool
+
+add to option boot up file "standalone.conf.bat"
+    set "JAVA_OPTS=%JAVA_OPTS% -Djboss.modules.system.pkgs=org.jboss.byteman,java.arthas"
+
+// sm: see method, tìm và list theo tên
+sm *TestController*
+
+// -n : giới hạn số lần bắt (execution count)
+// -x : Độ sâu khi in object
+// -E: Dùng regex cho class/method
+// -L: listen mode, khi class chưa load
+
+trace com.example.springboottemplate.controller.TestController getInfo
+trace com.example.springboottemplate.controller.TestController *
+trace com.example.springboottemplate.controller.TestController '*' --skipJDKMethod false
+trace -E 'com.example.springboottemplate.controller.TestController|com.example.springboottemplate.pool.RequestThreadPoolManager' '.*' --skipJDKMethod false
+trace -E 'com.example.springboottemplate.controller.TestController|com.example.springboottemplate.pool.RequestThreadPoolManager|com.example.springboottemplate.service.CaffeineCacheService' '.*' --skipJDKMethod false
+-- Xuất ra file với 10000 lần sample bắt dc
+trace -E 'com.example.springboottemplate.controller.TestController|com.example.springboottemplate.pool.RequestThreadPoolManager' '.*' --skipJDKMethod false -n 10000 > /tmp/trace.log &
+
+// Decompile 
+jad com.example.springboottemplate.controller.TestController
+jad --source-only com.example.springboottemplate.controller.TestController
+jad com.example.springboottemplate.controller.TestController getRecord4WithPool
+jad --source-only com.example.springboottemplate.controller.TestController > /tmp/TestController.java
+
+stack com.example.springboottemplate.controller.TestController -n 1
+stack com.example.springboottemplate.pool.RequestThreadPoolManager '*' -n 5
+
+watch com.example.springboottemplate.controller.TestController '*' '{params, returnObj, #cost}' -x 2 -n 1
+
+stack com.example.springboottemplate.controller.TestController '*' '#cost > 100' -n 1
+
+tt -t com.example.springboottemplate.controller.TestController '*' -n 5
+tt -l            # list, có cột COST(ms)
+tt -i 1000       # xem chi tiết 1 lần gọi
+
+sysprop
+vmoption
+    vmoption MaxHeapSize
+options
+memory
+dashboard
+
+
+

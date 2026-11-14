@@ -9,10 +9,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.example.springboottemplate.pool.RequestThreadPoolManager;
@@ -28,6 +33,7 @@ public class TestController {
     private final CaffeineCacheService cacheService = CaffeineCacheService.getInstance();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RequestThreadPoolManager reqPool = RequestThreadPoolManager.getInstance();
+    private final HttpClient httpClient = HttpClient.newHttpClient();
     
     private AtomicLong counter = new AtomicLong(0);
 
@@ -42,7 +48,7 @@ public class TestController {
     @GetMapping("/info")
     public ResponseEntity<Map<String, Object>> getInfo() throws InterruptedException {
         // Simulate slow data retrieval
-        Thread.sleep(2000);
+        // Thread.sleep(2000);
 
         Map<String, Object> data = new HashMap<>();
         data.put("id", 1);
@@ -119,5 +125,32 @@ public class TestController {
         return ResponseEntity.ok("Record fetched: " + 
             result.getXmlrecord().get("LIMIT.REFERENCE").toString() // Array
         );
+    }
+
+
+    // Crash the application if no pool is used
+    // @GetMapping("/getRecord4_noPool")
+    // public ResponseEntity<String> getRecord4() throws IOException, InterruptedException {
+    //     HttpRequest request = HttpRequest.newBuilder()
+    //             .uri(URI.create("http://localhost:8080/test-api/test/info"))
+    //             .GET()
+    //             .build();
+    //     HttpResponse<String> response = HttpClient.newHttpClient()
+    //             .send(request, HttpResponse.BodyHandlers.ofString());
+
+    //     return ResponseEntity.status(response.statusCode()).body(response.body());
+    // }
+
+    @GetMapping("/getRecord4_withPool")
+    public ResponseEntity<String> getRecord4WithPool() throws IOException, InterruptedException, ExecutionException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/test-api/test/info"))
+                .GET()
+                .build();
+        HttpResponse<String> response = reqPool.submitTask(
+                () -> httpClient.send(request, HttpResponse.BodyHandlers.ofString()))
+                .get();
+
+        return ResponseEntity.status(response.statusCode()).body(response.body());
     }
 }
