@@ -15,27 +15,53 @@ add to option boot up file "standalone.conf.bat"
 // sm: see method, tìm và list theo tên
 sm *TestController*
 
+# thread
+-- List ra kèm id
+thread --all | grep "default task"              # thường là default task
+thread --state TIMED_WAITING | grep "pool"   
+-- Xem call stack id, đọc từ dưới lên, trên cùng là lệnh cuối cùng bị kẹt
+thread 281                                      # Xem stack của 1 thread cụ thể
+    [arthas@60200]$ thread 281
+    "default task-50" Id=281 TIMED_WAITING
+        at java.base@21.0.13.0.3/java.lang.Thread.sleep0(Native Method) --> KHẢ NGHI DO ĐANG CỐ TÌNH SLEEP
+        at java.base@21.0.13.0.3/java.lang.Thread.sleep(Thread.java:509) 
+        at deployment.test-api.war//com.example.springboottemplate.controller.TestController.getInfo(TestController.java:62) --> CLASS CẦN THEO DÕI
+        at java.base@21.0.13.0.3/java.lang.invoke.DirectMethodHandle$Holder.invokeVirtual(DirectMethodHandle$Holder)
+        at java.base@21.0.13.0.3/java.lang.invoke.LambdaForm$MH/0x000001d13f24c000.invoke(LambdaForm$MH)
+        ...
+
+thread -n 5                                     # top 5 thread tốn CPU nhất
+thread --state RUNNABLE
+thread --state WAITING
+thread --state BLOCKED
+thread --state TIMED_WAITING
+thread -b                                       # thread đang block thread khác
+
+# trace (time diagnostic)
 // -n : giới hạn số lần bắt (execution count)
 // -x : Độ sâu khi in object
 // -E: Dùng regex cho class/method
 // -L: listen mode, khi class chưa load
-
-trace com.example.springboottemplate.controller.TestController getInfo
-trace com.example.springboottemplate.controller.TestController *
+// --skipJDKMethod false -> Tính luôn các hàm của java core (hưu ích xem xem có Thread.sleep() xảy ra ko)
+-- Xem cơ bản
 trace com.example.springboottemplate.controller.TestController '*' --skipJDKMethod false
 trace -E 'com.example.springboottemplate.controller.TestController|com.example.springboottemplate.pool.RequestThreadPoolManager' '.*' --skipJDKMethod false
-trace -E 'com.example.springboottemplate.controller.TestController|com.example.springboottemplate.pool.RequestThreadPoolManager|com.example.springboottemplate.service.CaffeineCacheService' '.*' --skipJDKMethod false
 -- Xuất ra file với 10000 lần sample bắt dc
 trace -E 'com.example.springboottemplate.controller.TestController|com.example.springboottemplate.pool.RequestThreadPoolManager' '.*' --skipJDKMethod false -n 10000 > /tmp/trace.log &
+trace com.example.springboottemplate.controller.TestController '*' --skipJDKMethod false -n 100000 > /tmp/trace.log &
 
-// Decompile 
-jad com.example.springboottemplate.controller.TestController
+# jad (decompiler) 
+jad com.example.springboottemplate.controller.TestController getInfo
+    jad -c 22cb68ea com.example.springboottemplate.controller.TestController getInfo
 jad --source-only com.example.springboottemplate.controller.TestController
 jad com.example.springboottemplate.controller.TestController getRecord4WithPool
 jad --source-only com.example.springboottemplate.controller.TestController > /tmp/TestController.java
 
+# stack
 stack com.example.springboottemplate.controller.TestController -n 1
 stack com.example.springboottemplate.pool.RequestThreadPoolManager '*' -n 5
+
+monitor -c 5 com.your.package.TestController getHttp1
 
 watch com.example.springboottemplate.controller.TestController '*' '{params, returnObj, #cost}' -x 2 -n 1
 
@@ -45,6 +71,12 @@ tt -t com.example.springboottemplate.controller.TestController '*' -n 5
 tt -l            # list, có cột COST(ms)
 tt -i 1000       # xem chi tiết 1 lần gọi
 
+
+
+profiler start
+# bắn tải vài chục giây
+profiler stop --format html
+
 sysprop
 vmoption
     vmoption MaxHeapSize
@@ -53,4 +85,52 @@ memory
 dashboard
 
 
+=============
 
+Wildfly cli
+
+cd E:\CODING\wildfly-26.1.3.Final\bin
+.\jboss-cli.bat --connect
+
+-- Info
+/subsystem=undertow/server=default-server/http-listener=default:read-attribute(name=worker)
+/subsystem=io/worker=default:read-resource(include-runtime=true)
+
+[standalone@localhost:9990 /] /subsystem=io/worker=default:read-resource(include-runtime=true)
+{
+    "outcome" => "success",
+    "result" => {
+        "busy-task-thread-count" => 192,
+        "core-pool-size" => 2,
+        "io-thread-count" => 16,
+        "io-threads" => "16",
+        "max-pool-size" => 192,
+        "queue-size" => 608,
+        "shutdown-requested" => false,
+        "stack-size" => "0",
+        "task-core-threads" => "2",
+        "task-keepalive" => "60000",
+        "task-max-threads" => "192",
+        "outbound-bind-address" => undefined,
+        "server" => {
+            "/127.0.0.1:8080" => undefined,
+            "/127.0.0.1:8443" => undefined
+        }
+    }
+}
+    busy-task-thread-count = 192 = max-pool-size → 100% thread bận, không còn thread rảnh.
+    queue-size = 608 → 608 task đang xếp hàng chờ thread. (Không phải 416; 608 là toàn bộ số đang chờ, 192 đang chạy là chuyện khác. Con số 416 không xuất hiện ở đâu cả.)
+    task-keepalive là thời gian một task-thread “dư” được phép ngồi rảnh trước khi bị hủy, tính bằng mili giây. Của bạn là 60000 = 60 giây.
+    io-threads là các thread của XNIO (non-blocking I/O), chuyên xử lý I/O ở mức socket, không chạy logic nghiệp vụ. Mặc định io-threads = số CPU core × 2 (máy bạn là 16, tương đương 8 core). Mỗi io-thread gắn với 1 selector, nên connection được chia đều giữa các io-thread.
+    task-max-threads mặc định = 8 × số core
+
+
+-- Gain
+/subsystem=io/worker=default:write-attribute(name=task-max-threads,value=256)
+/subsystem=io/worker=default:write-attribute(name=task-max-threads,value=512)
+/subsystem=io/worker=default:write-attribute(name=task-max-threads,value=1024)
+-- In jboss conf/standalone.xml
+<subsystem xmlns="urn:jboss:domain:io:3.0">
+    <worker name="default" task-max-threads="192"/>
+    <buffer-pool name="default"/>
+</subsystem>

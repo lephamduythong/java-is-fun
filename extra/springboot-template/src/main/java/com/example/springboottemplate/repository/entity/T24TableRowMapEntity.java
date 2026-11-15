@@ -5,15 +5,17 @@ public class T24TableRowMapEntity {
     private String selectColumn;
     private String viewName;
     private String viewColumn;
+    private String dictName;
 
     public T24TableRowMapEntity() {
     }
 
-    public T24TableRowMapEntity(String selectTable, String selectColumn, String viewName, String viewColumn) {
+    public T24TableRowMapEntity(String selectTable, String selectColumn, String viewName, String viewColumn, String dictName) {
         this.selectTable = selectTable;
         this.selectColumn = selectColumn;
         this.viewName = viewName;
         this.viewColumn = viewColumn;
+        this.dictName = dictName;
     }
 
     public String getSelectTable() {
@@ -39,5 +41,11 @@ public class T24TableRowMapEntity {
     }
     public void setViewColumn(String viewColumn) {
         this.viewColumn = viewColumn;
+    }
+    public String getDictName() {
+        return dictName;
+    }
+    public void setDictName(String dictName) {
+        this.dictName = dictName;
     }
 }

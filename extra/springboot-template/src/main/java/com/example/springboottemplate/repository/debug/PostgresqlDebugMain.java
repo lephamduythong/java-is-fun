@@ -36,23 +36,25 @@ public class PostgresqlDebugMain {
     private String T24_DB_JNDI_NAME = "java:jboss/datasources/PostgresDS";
 
     // For local test
-    // private static final String JDBC_URL = "jdbc:postgresql://localhost:5432/postgres";
-    // private static final String USERNAME = "t24";
-    // private static final String PASSWORD = "123";
-    
-    private static final String JDBC_URL = "jdbc:postgresql://aws-sg-cbs-sit-rds-aurora-postgresql-002.cluster-cn6lmdft73t3.ap-southeast-1.rds.amazonaws.com:5432/transact_sit";
+    private static final String JDBC_URL = "jdbc:postgresql://localhost:5432/postgres";
     private static final String USERNAME = "t24";
-    private static final String PASSWORD = "zS7ec$tvT^a#xS(4";
+    private static final String PASSWORD = "123";
+    
+    // private static final String JDBC_URL = "jdbc:postgresql://aws-sg-cbs-sit-rds-aurora-postgresql-002.cluster-cn6lmdft73t3.ap-southeast-1.rds.amazonaws.com:5432/transact_sit";
+    // private static final String USERNAME = "t24";
+    // private static final String PASSWORD = "zS7ec$tvT^a#xS(4";
 
     private static SysCacheService sysCacheService = SysCacheService.getInstance();
 
     static {
-        try {
-            Thread.sleep(25_000);
-        } catch (InterruptedException e) {
-            
-        }
-        sysCacheService.getT24TableRowMapCache();
+        
+        System.out.println("Preparing to load cache...");
+        new Thread(() -> {
+            // Make this asynchronous so it won't impact the warm up process.
+            System.out.println("Loading cache in background...");
+            sysCacheService.getT24TableRowMapCache();
+        }).start();
+    
     }
 
     public static void main(String[] args) throws Exception {

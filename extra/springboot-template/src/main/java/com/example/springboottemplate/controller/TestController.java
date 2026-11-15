@@ -1,6 +1,7 @@
 package com.example.springboottemplate.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,11 +14,20 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.example.springboottemplate.pool.RequestThreadPoolManager;
@@ -33,6 +43,7 @@ public class TestController {
     private final CaffeineCacheService cacheService = CaffeineCacheService.getInstance();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RequestThreadPoolManager reqPool = RequestThreadPoolManager.getInstance();
+    
     private final HttpClient httpClient = HttpClient.newHttpClient();
     
     private AtomicLong counter = new AtomicLong(0);
@@ -48,11 +59,11 @@ public class TestController {
     @GetMapping("/info")
     public ResponseEntity<Map<String, Object>> getInfo() throws InterruptedException {
         // Simulate slow data retrieval
-        // Thread.sleep(2000);
+        Thread.sleep(1500);
 
         Map<String, Object> data = new HashMap<>();
-        data.put("id", 1);
-        data.put("name", "Sample Info");
+        data.put("id", UUID.randomUUID().toString());
+        data.put("name", UUID.randomUUID().toString());
         data.put("status", "ok");
 
         return ResponseEntity.ok(data);
@@ -77,15 +88,24 @@ public class TestController {
     public ResponseEntity<String> getCacheRecord2(@PathVariable String recid) throws IOException {
         
         reqPool.runTask(() -> {
-            String xmlRecord = cacheService.getXmlRecord(recid);
-            if (xmlRecord == null) {
-                System.out.println("Không tìm thấy record");
-                return; // thoát khỏi Runnable, không trả về giá trị
+            // String xmlRecord = cacheService.getXmlRecord(recid);
+            // if (xmlRecord == null) {
+            //     System.out.println("Không tìm thấy record");
+            //     return; // thoát khỏi Runnable, không trả về giá trị
+            // }
+            // System.out.println(xmlRecord);
+            // if (xmlRecord != null && !xmlRecord.isEmpty() && xmlRecord.contains("a")) {
+            //     counter.incrementAndGet(); // tăng counter mỗi khi tìm thấy record
+            // }
+
+            try {
+                Thread.sleep(3600);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
-            System.out.println(xmlRecord);
-            if (xmlRecord != null && !xmlRecord.isEmpty() && xmlRecord.contains("a")) {
-                counter.incrementAndGet(); // tăng counter mỗi khi tìm thấy record
-            }
+
+            System.out.println("Done fetching data");
+
         });
 
         return ResponseEntity.ok("OK");
@@ -141,16 +161,100 @@ public class TestController {
     //     return ResponseEntity.status(response.statusCode()).body(response.body());
     // }
 
-    @GetMapping("/getRecord4_withPool")
-    public ResponseEntity<String> getRecord4WithPool() throws IOException, InterruptedException, ExecutionException {
+    @GetMapping("/getHttp1")
+    public CompletableFuture<ResponseEntity<String>> getHttp1() {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/test-api/test/info"))
+                .timeout(Duration.ofSeconds(10))
+                .GET()
+                .build();
+        
+        var result = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> ResponseEntity.status(response.statusCode()).body(response.body()))
+                .exceptionally(this::handleHttpError);
+
+        System.out.println("PASS");
+
+        return result;
+    }
+
+    // Test with parallel requests to increase speed get data in one single request
+    @GetMapping("/getHttp2")
+    public CompletableFuture<ResponseEntity<String>> getHttp2() {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/test-api/test/info"))
+                .timeout(Duration.ofSeconds(10))
+                .GET()
+                .build();
+
+        List<CompletableFuture<HttpResponse<String>>> requests = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            requests.add(httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()));
+        }
+
+        return CompletableFuture.allOf(requests.toArray(new CompletableFuture<?>[0]))
+                .thenApply(ignored -> {
+                    StringBuilder results = new StringBuilder();
+                    for (CompletableFuture<HttpResponse<String>> requestFuture : requests) {
+                        if (results.length() > 0) {
+                            results.append('\n');
+                        }
+                        results.append(requestFuture.join().body());
+                    }
+                    System.out.println("DONE getHttp2");
+                    return ResponseEntity.ok(results.toString());
+                })
+                .exceptionally(this::handleHttpError);
+    }
+
+    private ResponseEntity<String> handleHttpError(Throwable error) {
+        Throwable cause = error instanceof CompletionException ? error.getCause() : error;
+        if (cause instanceof HttpTimeoutException) {
+            return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body("Request timeout");
+        }
+        throw new CompletionException(cause);
+    }
+
+    @GetMapping("/getHttp3")
+    public ResponseEntity<String> getHttp3() throws InterruptedException, ExecutionException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/test-api/test/info"))
                 .GET()
                 .build();
-        HttpResponse<String> response = reqPool.submitTask(
-                () -> httpClient.send(request, HttpResponse.BodyHandlers.ofString()))
-                .get();
 
-        return ResponseEntity.status(response.statusCode()).body(response.body());
+        String results = reqPool.submitTask(() -> {
+            ExecutorService smallPool = Executors.newFixedThreadPool(5);
+            try {
+                List<Future<HttpResponse<String>>> requests = new ArrayList<>();
+                for (int i = 0; i < 5; i++) {
+                    requests.add(smallPool.submit(
+                            () -> httpClient.send(request, HttpResponse.BodyHandlers.ofString())));
+                }
+
+                StringBuilder responseBodies = new StringBuilder();
+                ExecutionException firstFailure = null;
+                for (Future<HttpResponse<String>> requestFuture : requests) {
+                    try {
+                        if (responseBodies.length() > 0) {
+                            responseBodies.append('\n');
+                        }
+                        responseBodies.append(requestFuture.get().body());
+                    } catch (ExecutionException e) {
+                        if (firstFailure == null) {
+                            firstFailure = e;
+                        }
+                    }
+                }
+                if (firstFailure != null) {
+                    throw firstFailure;
+                }
+
+                return responseBodies.toString();
+            } finally {
+                smallPool.shutdown();
+            }
+        }).get();
+
+        return ResponseEntity.ok(results);
     }
 }

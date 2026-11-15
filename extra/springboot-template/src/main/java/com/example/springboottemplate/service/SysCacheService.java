@@ -76,49 +76,45 @@ public class SysCacheService {
             Stopwatch stopwatch = new Stopwatch();
             
             var sql = "WITH parsed_columns AS (\r\n" + //
-                                "    SELECT \r\n" + //
-                                "        table_name,\r\n" + //
-                                "        column_name,\r\n" + //
-                                "        -- Tách tên gốc (bỏ phần _số ở cuối nếu có)\r\n" + //
-                                "        REGEXP_REPLACE(column_name, '_\\d+$', '') AS base_name,\r\n" + //
-                                "        -- Đánh dấu: Cột có số ở cuối ưu tiên 1, cột không có số ưu tiên 0\r\n" + //
-                                "        CASE WHEN column_name ~ '_\\d+$' THEN 1 ELSE 0 END AS has_number\r\n" + //
-                                "    FROM \r\n" + //
-                                "        information_schema.columns\r\n" + //
-                                "    WHERE \r\n" + //
-                                "        table_schema = 'public'\r\n" + //
-                                "        AND table_name like 'V_%'\r\n" + //
-                                "--        AND table_name = 'V_FBNK_COLLATERAL_RIGHT'\r\n" + //
-                                "),\r\n" + //
-                                "ranked_columns AS (\r\n" + //
-                                "    SELECT \r\n" + //
-                                "        table_name,\r\n" + //
-                                "        column_name,\r\n" + //
-                                "        base_name,\r\n" + //
-                                "        ROW_NUMBER() OVER (\r\n" + //
-                                "            PARTITION BY base_name, table_name \r\n" + //
-                                "            ORDER BY has_number DESC, column_name DESC\r\n" + //
-                                "        ) AS rn\r\n" + //
-                                "    FROM parsed_columns\r\n" + //
-                                "),\r\n" + //
-                                "result as\r\n" + //
-                                "(\r\n" + //
-                                "\tSELECT \r\n" + //
-                                "\t\t-- Cột mới: Lấy từ sau dấu _ thứ 2 và thay _ bằng dấu .\r\n" + //
-                                "\t\tREPLACE(REGEXP_REPLACE(table_name, '^[^_]+_[^_]+_(.*)$', '\\1'), '_', '.') AS t24_select_table\r\n" + //
-                                "\t\t-- Thay thế toàn bộ dấu _ thành .\r\n" + //
-                                "\t\t,REPLACE(\r\n" + //
-                                "\t        base_name, \r\n" + //
-                                "\t        '_', \r\n" + //
-                                "\t        '.'\r\n" + //
-                                "\t    ) AS t24_select_col\r\n" + //
-                                "\t    ,table_name as t24_view_name\r\n" + //
-                                "\t    ,column_name AS t24_view_col\r\n" + //
-                                "\tFROM ranked_columns\r\n" + //
-                                "\tWHERE rn = 1\r\n" + //
-                                "--\tORDER BY table_name\r\n" + //
-                                ")\r\n" + //
-                                "select * from result";
+                "    SELECT\r\n" + //
+                "        table_name,\r\n" + //
+                "        column_name,\r\n" + //
+                "        -- Tách tên gốc (bỏ phần _số ở cuối nếu có)\r\n" + //
+                "        REGEXP_REPLACE(column_name, '_\\d+$', '') AS base_name,\r\n" + //
+                "        -- Đánh dấu: Cột có số ở cuối ưu tiên 1, cột không có số ưu tiên 0\r\n" + //
+                "        CASE WHEN column_name ~ '_\\d+$' THEN 1 ELSE 0 END AS has_number\r\n" + //
+                "    FROM\r\n" + //
+                "        information_schema.columns\r\n" + //
+                "    WHERE\r\n" + //
+                "        table_schema = 'public'\r\n" + //
+                "        AND (table_name LIKE 'V\\_FBNK\\_%' escape '\\' or table_name LIKE 'V\\_F\\_%' escape '\\')\r\n" + //
+                "--        AND table_name = 'V_FBNK_COLLATERAL_RIGHT'\r\n" + //
+                "),\r\n" + //
+                "ranked_columns AS (\r\n" + //
+                "    SELECT\r\n" + //
+                "        table_name,\r\n" + //
+                "        column_name,\r\n" + //
+                "        base_name,\r\n" + //
+                "        ROW_NUMBER() OVER (\r\n" + //
+                "            PARTITION BY base_name, table_name\r\n" + //
+                "            ORDER BY has_number DESC, column_name DESC\r\n" + //
+                "        ) AS rn\r\n" + //
+                "    FROM parsed_columns\r\n" + //
+                "),\r\n" + //
+                "result AS (\r\n" + //
+                "    SELECT\r\n" + //
+                "        -- Cột mới: Lấy từ sau dấu _ thứ 2 và thay _ bằng dấu .\r\n" + //
+                "        REPLACE(REGEXP_REPLACE(table_name, '^[^_]+_[^_]+_(.*)$', '\\1'), '_', '.') AS t24_select_table,\r\n" + //
+                "        -- Thay thế toàn bộ dấu _ thành .\r\n" + //
+                "        REPLACE(base_name, '_', '.') AS t24_select_col,\r\n" + //
+                "        table_name AS t24_view_name,\r\n" + //
+                "        column_name AS t24_view_col,\r\n" + //
+                "        'D_F_' || REGEXP_REPLACE(table_name, '^[^_]+_[^_]+_(.*)$', '\\1') as t24_dict_name\r\n" + //
+                "    FROM ranked_columns\r\n" + //
+                "    WHERE rn = 1\r\n" + //
+                "--  ORDER BY table_name\r\n" + //
+                ")\r\n" + //
+                "SELECT * FROM result";
             
             var queryResult = queryDB(conn, sql);
 
@@ -141,14 +137,12 @@ public class SysCacheService {
                 entity.setSelectColumn(item.get("T24_SELECT_COL"));
                 entity.setViewName(item.get("T24_VIEW_NAME"));
                 entity.setViewColumn(item.get("T24_VIEW_COL"));
+                entity.setDictName(item.get("T24_DICT_NAME"));
                 indexValueMap.put(
                     entity.getSelectTable() + "," + entity.getSelectColumn(),
                     entity
                 );
             }
-
-            
-            
 
             // var indexValueMap = queryResult.stream()
             //     .collect(Collectors.toMap(
@@ -157,7 +151,7 @@ public class SysCacheService {
             //         (oldVal, newVal) -> newVal
             //     ));
 
-            WonderUtils.writeTextToFile("output/indexValueMap.txt", indexValueMap.toString());
+            // WonderUtils.writeTextToFile("output/indexValueMap.txt", indexValueMap.toString());
 
             System.out.println("Elapsed time indexValueMap: " + stopwatch.elapsed() + " ms");
 
@@ -180,9 +174,13 @@ public class SysCacheService {
     // private final DataRepository _dataRepository = DataRepository.getInstance();
     // private final CacheService _cacheService = CacheService.getInstance();
 
-    private static final String JDBC_URL = "jdbc:postgresql://aws-sg-cbs-sit-rds-aurora-postgresql-002.cluster-cn6lmdft73t3.ap-southeast-1.rds.amazonaws.com:5432/transact_sit";
+    private static final String JDBC_URL = "jdbc:postgresql://localhost:5432/postgres";
     private static final String USERNAME = "t24";
-    private static final String PASSWORD = "zS7ec$tvT^a#xS(4";
+    private static final String PASSWORD = "123";
+
+    // private static final String JDBC_URL = "jdbc:postgresql://aws-sg-cbs-sit-rds-aurora-postgresql-002.cluster-cn6lmdft73t3.ap-southeast-1.rds.amazonaws.com:5432/transact_sit";
+    // private static final String USERNAME = "t24";
+    // private static final String PASSWORD = "zS7ec$tvT^a#xS(4";
 
     private static List<HashMap<String, String>> queryDB(Connection connection, String sql)
             throws SQLException {
