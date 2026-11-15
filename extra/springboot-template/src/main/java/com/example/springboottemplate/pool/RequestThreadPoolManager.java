@@ -28,20 +28,24 @@ public class RequestThreadPoolManager {
     private static final RequestThreadPoolManager INSTANCE = new RequestThreadPoolManager();
 
     // Khai báo ExecutorService
-    private final ThreadPoolExecutor executorService;
-    private final ScheduledThreadPoolExecutor timeoutScheduler;
+    private ThreadPoolExecutor executorService;
+    private ScheduledThreadPoolExecutor timeoutScheduler;
+    private final AtomicLong threadNumber = new AtomicLong(1);
 
     // 2. Private constructor để ngăn việc khởi tạo từ bên ngoài bằng từ khóa 'new'
     private RequestThreadPoolManager() {
+        initializePool();
+    }
+
+    private void initializePool() {
         ThreadFactory defaultFactory = Executors.defaultThreadFactory();
-        AtomicLong threadNumber = new AtomicLong(1);
-        this.timeoutScheduler = new ScheduledThreadPoolExecutor(1, task -> {
+        ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(1, task -> {
             Thread thread = defaultFactory.newThread(task);
             thread.setName("event-noti-timeout");
             return thread;
         });
-        this.timeoutScheduler.setRemoveOnCancelPolicy(true);
-        this.executorService = new ThreadPoolExecutor(THREAD_POOL_SIZE, THREAD_POOL_SIZE,
+        scheduler.setRemoveOnCancelPolicy(true);
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(THREAD_POOL_SIZE, THREAD_POOL_SIZE,
                 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), task -> {
             Thread thread = defaultFactory.newThread(task);
             thread.setName("event-noti-pool-" + threadNumber.getAndIncrement());
@@ -49,9 +53,11 @@ public class RequestThreadPoolManager {
         }) {
             @Override
             protected void terminated() {
-                timeoutScheduler.shutdown();
+                scheduler.shutdown();
             }
         };
+        this.timeoutScheduler = scheduler;
+        this.executorService = executor;
     }
 
     // 3. Phương thức public toàn cục để lấy instance duy nhất
@@ -69,7 +75,9 @@ public class RequestThreadPoolManager {
         return submit(task, false);
     }
 
-    private <T> Future<T> submit(Callable<T> task, boolean logFailure) {
+    private synchronized <T> Future<T> submit(Callable<T> task, boolean logFailure) {
+        ThreadPoolExecutor executor = executorService;
+        ScheduledThreadPoolExecutor scheduler = timeoutScheduler;
         AtomicReference<ScheduledFuture<?>> timeout = new AtomicReference<>();
         FutureTask<T> future = new FutureTask<T>(task) {
             @Override
@@ -79,7 +87,7 @@ public class RequestThreadPoolManager {
                 }
                 ScheduledFuture<?> scheduled;
                 try {
-                    scheduled = timeoutScheduler.schedule(() -> {
+                    scheduled = scheduler.schedule(() -> {
                         if (cancel(true)) {
                             // LOGGER.warn("Request pool task timed out after {} seconds", TASK_TIMEOUT_SECONDS);
                             System.err.println("Request pool task timed out after " + TASK_TIMEOUT_SECONDS + " seconds");
@@ -107,7 +115,7 @@ public class RequestThreadPoolManager {
                     scheduled.cancel(false);
                 }
                 if (isCancelled()) {
-                    executorService.remove(this);
+                    executor.remove(this);
                 } else if (logFailure) {
                     try {
                         get();
@@ -125,9 +133,9 @@ public class RequestThreadPoolManager {
             }
         };
         try {
-            executorService.execute(future);
+            executor.execute(future);
             if (future.isCancelled()) {
-                executorService.remove(future);
+                executor.remove(future);
             }
         } catch (RejectedExecutionException e) {
             future.cancel(false);
@@ -139,17 +147,42 @@ public class RequestThreadPoolManager {
         return future;
     }
 
-    // Phương thức đóng Thread Pool khi ứng dụng tắt hẳn (tránh rò rỉ luồng)
-    public void shutdown() {
-        executorService.shutdown();
+    // // Phương thức đóng Thread Pool khi ứng dụng tắt hẳn (tránh rò rỉ luồng)
+    // public void shutdown() {
+    //     executorService.shutdown();
+    // }
+
+    // // Force close all tasks
+    // public void shutdownNow() {
+    //     for (Runnable task : executorService.shutdownNow()) {
+    //         if (task instanceof Future<?>) {
+    //             ((Future<?>) task).cancel(false);
+    //         }
+    //     }
+    // }
+
+    public int getQueueSize() {
+        return executorService.getQueue().size();
     }
 
-    // Force close all tasks
-    public void shutdownNow() {
-        for (Runnable task : executorService.shutdownNow()) {
+    public synchronized void clearQueue() {
+        for (Runnable task : executorService.getQueue()) {
+            if (task instanceof Future<?>) {
+                ((Future<?>) task).cancel(false);
+            }
+        }
+        executorService.getQueue().clear();
+    }
+
+    public synchronized void restart() {
+        ThreadPoolExecutor previous = executorService;
+        initializePool();
+        for (Runnable task : previous.shutdownNow()) {
             if (task instanceof Future<?>) {
                 ((Future<?>) task).cancel(false);
             }
         }
     }
+
+
 }

@@ -59,7 +59,7 @@ public class TestController {
     @GetMapping("/info")
     public ResponseEntity<Map<String, Object>> getInfo() throws InterruptedException {
         // Simulate slow data retrieval
-        Thread.sleep(1500);
+        Thread.sleep(500);
 
         Map<String, Object> data = new HashMap<>();
         data.put("id", UUID.randomUUID().toString());
@@ -85,7 +85,7 @@ public class TestController {
     }
 
     @GetMapping(value = "/cache/async/{recid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getCacheRecord2(@PathVariable String recid) throws IOException {
+    public ResponseEntity<String> getCacheRecord2(@PathVariable String recid) {
         
         reqPool.runTask(() -> {
             // String xmlRecord = cacheService.getXmlRecord(recid);
@@ -99,17 +99,26 @@ public class TestController {
             // }
 
             try {
-                Thread.sleep(3600);
+                Thread.sleep(200);
+                throw new RuntimeException("Test exception");
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-
+            
             System.out.println("Done fetching data");
 
         });
 
         return ResponseEntity.ok("OK");
         // return ResponseEntity.ok(objectMapper.readTree(xmlRecord));
+    }
+
+    @GetMapping(value = "/cache/restartThreadPool", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> restartThreadPool() {
+        
+        reqPool.restart();
+
+        return ResponseEntity.ok("restartThreadPool");
     }
 
     @GetMapping(value = "/cache/getCounter")
@@ -169,9 +178,21 @@ public class TestController {
                 .GET()
                 .build();
         
+        // Vẫn không ổn vì call local tới api vẫn bị Undertow giới hạn trong jboss
         var result = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> ResponseEntity.status(response.statusCode()).body(response.body()))
                 .exceptionally(this::handleHttpError);
+
+        System.out.println("PASS");
+
+        return result;
+    }
+
+    @GetMapping("/getHttp1_better")
+    public ResponseEntity<Map<String, Object>> getHttp1_better() throws InterruptedException {
+        
+        // Use direct method
+        var result = getInfo();
 
         System.out.println("PASS");
 
